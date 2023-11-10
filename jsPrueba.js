@@ -13,8 +13,6 @@ if(document.getElementById("login-us").value==""){
     alert("El password no es correcto")
 }else{
     window.location.replace("./Menu.html");
-
-
 }
 
 
