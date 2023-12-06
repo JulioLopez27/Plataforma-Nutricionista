@@ -5,9 +5,9 @@ export const Input = ({ name, label, ...props }) => (
       <label htmlFor={name} className="font-semibold mb-2">{label}</label>
   
       <input
-        {...props}
         name={name}
         id={name}
+        {...props}
         className=" 
         rounded-xl 
         border-2 

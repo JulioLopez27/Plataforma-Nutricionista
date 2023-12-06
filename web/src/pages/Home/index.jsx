@@ -1,5 +1,5 @@
 
-import {Input} from './../../components'
+import { Input } from '~/components'
 
 
 
@@ -13,26 +13,27 @@ export function Home() {
 
         <p className="font-semibold">Este es un espacio dedicado a profesionales de la nutrición para gestionar y mejorar la salud de sus pacientes.</p>
 
-          <form className="space-y-4 mt-3">
+        <form className="space-y-4 mt-3">
 
-            <Input
-              type="text"
-              name="email"
-              label="Correo electrónico "
-              placeholder="ingrese su correo"
-              
-            />
+          <Input
+            autoComplete="off"
+            type="text"
+            name="email"
+            label="Correo electrónico "
+            placeholder="ingrese su correo"
 
-            <Input 
+          />
+
+          <Input
             type="password"
             name="password"
             label="Constraseña"
             placeholder="Ingrese su contraseña"
-            />
+          />
 
-          </form>
+        </form>
 
-        
+
 
         <div className="flex justify-center space-x-4 mt-4">
 
