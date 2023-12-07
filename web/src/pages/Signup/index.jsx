@@ -45,6 +45,33 @@ export const Signup = () => {
                         placeholder="Ingrese su contraseña"
                     />
 
+
+
+
+                    <Input
+                        type="text"
+                        name="pais"
+                        label="País"
+                        placeholder="Ingrese su país"
+                    />
+
+                    <Input
+                        type="text"
+                        name="zona"
+                        label="Zona"
+                        placeholder="Ingrese su zona de residencia"
+                    />
+
+
+                    <Input
+                        disabled="on"
+                        type="text"
+                        name="foto"
+                        label="Foto"
+                        placeholder="**Corregir futuramente **"
+                    />
+
+
                 </form>
 
                 <div className="flex justify-center space-x-4 mt-4">
