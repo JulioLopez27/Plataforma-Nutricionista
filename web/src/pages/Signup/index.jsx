@@ -71,7 +71,13 @@ export const Signup = () => {
                         placeholder="**Corregir futuramente **"
                     />
 
-
+                    <Input
+                        disabled="on"
+                        type="text"
+                        name="foto"
+                        label="TEST"
+                        placeholder="**Corregir futuramente **"
+                    />
                 </form>
 
                 <div className="flex justify-center space-x-4 mt-4">
