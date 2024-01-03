@@ -6,5 +6,7 @@ import * as nutricionista from '../api/nutricionista/index.js'
 export const router = new Router()
 
 
-router.get('/signup',nutricionista.signup)
+
+
+router.get('/login',nutricionista.login)
 // router.post('/signup',nutricionista.test)
