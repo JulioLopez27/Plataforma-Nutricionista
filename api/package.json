@@ -4,7 +4,7 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node -r dotenv-safe/config api/server.js"
+    "server": "node -r dotenv-safe/config api/server.js"
   },
   "author": "",
   "license": "MIT",
