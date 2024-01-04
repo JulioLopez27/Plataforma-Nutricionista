@@ -19,7 +19,7 @@ model consultante {
   id                        Int                         @id @default(autoincrement())
   nombre                    String                      @db.VarChar(255)
   email                     String                      @unique(map: "email") @db.VarChar(255)
-  user_password             String                      @db.VarChar(255)
+  password                  String                      @db.VarChar(255)
   edad                      Int
   peso                      Decimal                     @db.Decimal(5, 2)
   altura                    Decimal                     @db.Decimal(3, 2)
@@ -74,7 +74,7 @@ model ingrediente {
 model nutricionista {
   id                         Int                          @id @default(autoincrement())
   email                      String                       @unique(map: "email") @db.VarChar(255)
-  nutri_password             String                       @db.VarChar(255)
+  password                   String                       @db.VarChar(255)
   nombre                     String                       @db.VarChar(255)
   apellido                   String                       @db.VarChar(255)
   telefono                   String?                      @db.VarChar(255)
