@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model afeccion {
+  id                   Int                    @id @default(autoincrement())
+  nombre               String                 @unique(map: "nombre") @db.VarChar(255)
+  createdAt            DateTime?              @default(now()) @db.Timestamp(0)
+  updatedAt            DateTime?              @default(now()) @db.Timestamp(0)
+  consultante_afeccion consultante_afeccion[]
+}
+
+model consultante {
+  id                        Int                         @id @default(autoincrement())
+  nombre                    String                      @db.VarChar(255)
+  email                     String                      @unique(map: "email") @db.VarChar(255)
+  user_password             String                      @db.VarChar(255)
+  edad                      Int
+  peso                      Decimal                     @db.Decimal(5, 2)
+  altura                    Decimal                     @db.Decimal(3, 2)
+  createdAt                 DateTime?                   @default(now()) @db.Timestamp(0)
+  updatedAt                 DateTime?                   @default(now()) @db.Timestamp(0)
+  consultante_afeccion      consultante_afeccion[]
+  consultante_receta        consultante_receta[]
+  nutricionista_consultante nutricionista_consultante[]
+  registro                  registro[]
+}
+
+model consultante_afeccion {
+  id_consultante Int
+  id_afeccion    Int
+  createdAt      DateTime?   @default(now()) @db.Timestamp(0)
+  updatedAt      DateTime?   @default(now()) @db.Timestamp(0)
+  consultante    consultante @relation(fields: [id_consultante], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "consultante_afeccion_ibfk_1")
+  afeccion       afeccion    @relation(fields: [id_afeccion], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "consultante_afeccion_ibfk_2")
+
+  @@id([id_consultante, id_afeccion])
+  @@index([id_afeccion], map: "id_afeccion")
+}
+
+model consultante_receta {
+  id_consultante Int
+  id_receta      Int
+  createdAt      DateTime?   @default(now()) @db.Timestamp(0)
+  updatedAt      DateTime?   @default(now()) @db.Timestamp(0)
+  consultante    consultante @relation(fields: [id_consultante], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "consultante_receta_ibfk_1")
+  receta         receta      @relation(fields: [id_receta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "consultante_receta_ibfk_2")
+
+  @@id([id_consultante, id_receta])
+  @@index([id_receta], map: "id_receta")
+}
+
+model especialidad {
+  id                         Int                          @id @default(autoincrement())
+  nombre                     String                       @unique(map: "nombre") @db.VarChar(255)
+  createdAt                  DateTime?                    @default(now()) @db.Timestamp(0)
+  updatedAt                  DateTime?                    @default(now()) @db.Timestamp(0)
+  nutricionista_especialidad nutricionista_especialidad[]
+}
+
+model ingrediente {
+  id                 Int                  @id @default(autoincrement())
+  nombre             String               @unique(map: "nombre") @db.VarChar(255)
+  createdAt          DateTime?            @default(now()) @db.Timestamp(0)
+  updatedAt          DateTime?            @default(now()) @db.Timestamp(0)
+  receta_ingrediente receta_ingrediente[]
+}
+
+model nutricionista {
+  id                         Int                          @id @default(autoincrement())
+  email                      String                       @unique(map: "email") @db.VarChar(255)
+  nutri_password             String                       @db.VarChar(255)
+  nombre                     String                       @db.VarChar(255)
+  apellido                   String                       @db.VarChar(255)
+  telefono                   String?                      @db.VarChar(255)
+  anos_experiencia           Int
+  foto_diploma               Bytes                        @db.Blob
+  id_chefDigitales           Int?
+  createdAt                  DateTime?                    @default(now()) @db.Timestamp(0)
+  updatedAt                  DateTime?                    @default(now()) @db.Timestamp(0)
+  nutricionista_consultante  nutricionista_consultante[]
+  nutricionista_especialidad nutricionista_especialidad[]
+  receta                     receta[]
+  registro                   registro[]
+}
+
+model nutricionista_consultante {
+  id_nutricionista Int
+  id_consultante   Int
+  createdAt        DateTime?     @default(now()) @db.Timestamp(0)
+  updatedAt        DateTime?     @default(now()) @db.Timestamp(0)
+  nutricionista    nutricionista @relation(fields: [id_nutricionista], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "nutricionista_consultante_ibfk_1")
+  consultante      consultante   @relation(fields: [id_consultante], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "nutricionista_consultante_ibfk_2")
+
+  @@id([id_nutricionista, id_consultante])
+  @@index([id_consultante], map: "id_consultante")
+}
+
+model nutricionista_especialidad {
+  id_nutricionista Int
+  id_especialidad  Int
+  createdAt        DateTime?     @default(now()) @db.Timestamp(0)
+  updatedAt        DateTime?     @default(now()) @db.Timestamp(0)
+  nutricionista    nutricionista @relation(fields: [id_nutricionista], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "nutricionista_especialidad_ibfk_1")
+  especialidad     especialidad  @relation(fields: [id_especialidad], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "nutricionista_especialidad_ibfk_2")
+
+  @@id([id_nutricionista, id_especialidad])
+  @@index([id_especialidad], map: "id_especialidad")
+}
+
+model receta {
+  id                 Int                  @id @default(autoincrement())
+  nombre             String               @unique(map: "nombre") @db.VarChar(255)
+  instrucciones      String               @db.Text
+  id_nutricionista   Int
+  createdAt          DateTime?            @default(now()) @db.Timestamp(0)
+  updatedAt          DateTime?            @default(now()) @db.Timestamp(0)
+  consultante_receta consultante_receta[]
+  nutricionista      nutricionista        @relation(fields: [id_nutricionista], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "receta_ibfk_1")
+  receta_ingrediente receta_ingrediente[]
+
+  @@index([id_nutricionista], map: "id_nutricionista")
+}
+
+model receta_ingrediente {
+  id_receta      Int
+  id_ingrediente Int
+  cantidad       Float       @db.Float
+  createdAt      DateTime?   @default(now()) @db.Timestamp(0)
+  updatedAt      DateTime?   @default(now()) @db.Timestamp(0)
+  receta         receta      @relation(fields: [id_receta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "receta_ingrediente_ibfk_1")
+  ingrediente    ingrediente @relation(fields: [id_ingrediente], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "receta_ingrediente_ibfk_2")
+
+  @@id([id_receta, id_ingrediente])
+  @@index([id_ingrediente], map: "id_ingrediente")
+}
+
+model registro {
+  id               Int           @id @default(autoincrement())
+  id_nutricionista Int
+  id_consultante   Int
+  fecha            DateTime      @db.DateTime(0)
+  nota             String        @db.Text
+  updatedAt        DateTime?     @default(now()) @db.Timestamp(0)
+  nutricionista    nutricionista @relation(fields: [id_nutricionista], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "registro_ibfk_1")
+  consultante      consultante   @relation(fields: [id_consultante], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "registro_ibfk_2")
+
+  @@index([id_consultante], map: "id_consultante")
+  @@index([id_nutricionista], map: "id_nutricionista")
+}
