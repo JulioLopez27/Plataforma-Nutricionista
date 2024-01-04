@@ -1,34 +1,89 @@
 
-import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient()
+import bcrypt from 'bcrypt'
+import { prisma } from '../../prisma/index.js'
+
+
 
 //creacion de un nutricionista
 export const login = async (ctx) => {
-  const email=ctx.request.body.email
+
+  const email = ctx.request.body.email
+
   try {
 
-    const user= await prisma.nutricionista.findUnique({where:{email}})
+    const user = await prisma.nutricionista.findUnique({ where: { email } })
 
-    if(!user){
-      ctx.status=404
+    if (!user) {
+      ctx.status = 400
       return
     }
-    
-    ctx.body=user
-    ctx.status=201
+
+    ctx.body = user
+    ctx.status = 201
     console.log(ctx.body);
 
+    // TODO: IMPLEMENTAR jwt  
+
   } catch (error) {
-    ctx.body=error
-    ctx.status=500
+    ctx.body = error
+    ctx.status = 500
   }
 
 }
 
-// export const signup = async (ctx) =>{
 
-// } 
+// *codigo para crear un usuario Nutricionista y guardarlo en la db
+export const signup = async (ctx) => {
+
+  const email = ctx.request.body.email
+  const exist_user = await prisma.nutricionista.findUnique({ where: { email } })
+
+  if (exist_user) {
+    ctx.status = 400
+    return
+  }
+
+  //! hasheo la pass que el usuario ingresa / 10->round for hash encryption
+  const nutri_password = await bcrypt.hash(ctx.request.body.nutri_password, 10)
+
+  //TODO:mover a una funcion externa para validar errores
+  //*Parseo los sig campos para que no den error
+  const anos=parseInt(ctx.request.body.anos_experiencia)
+  const idChef=parseInt(ctx.request.body.id_chefDigitales)
+//TODO:-------------------------------------------------------
+
+  const data = {
+    email,
+    nutri_password,
+    nombre: ctx.request.body.nombre,
+    apellido: ctx.request.body.apellido,
+    telefono: ctx.request.body.telefono,
+    anos_experiencia: anos,
+    foto_diploma: ctx.request.body.foto_diploma,
+    id_chefDigitales: idChef,
+  }
+
+  try {
+    //retiro la pass de los demas attr
+    const {nutri_password,...user} = await prisma.nutricionista.create({ data })
+    ctx.body = user
+    ctx.status = 201
+
+  } catch (error) {
+    ctx.body = error
+    ctx.status = 500
+    console.log("🚀 ~ file: index.js:67 ~ signup ~ error:", error)
+
+  }
+
+}
+
+
+
+
+
+
 
 
 
