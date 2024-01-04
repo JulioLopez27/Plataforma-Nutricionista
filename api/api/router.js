@@ -9,4 +9,4 @@ export const router = new Router()
 
 
 router.get('/login',nutricionista.login)
-// router.post('/signup',nutricionista.test)
+router.post('/signup', nutricionista.signup)
