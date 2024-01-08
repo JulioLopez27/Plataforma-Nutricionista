@@ -8,5 +8,6 @@ export const router = new Router()
 
 
 
-router.get('/login',nutricionista.login)
+router.post('/login',nutricionista.login)
 router.post('/signup', nutricionista.signup)
+router.get('/list',nutricionista.getSpecialty)
