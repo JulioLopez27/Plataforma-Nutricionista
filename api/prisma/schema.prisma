@@ -83,6 +83,8 @@ model nutricionista {
   id_chefDigitales           Int?
   createdAt                  DateTime?                    @default(now()) @db.Timestamp(0)
   updatedAt                  DateTime?                    @default(now()) @db.Timestamp(0)
+  pais                       String                       @db.VarChar(255)
+  zona                       String                       @db.VarChar(255)
   nutricionista_consultante  nutricionista_consultante[]
   nutricionista_especialidad nutricionista_especialidad[]
   receta                     receta[]
