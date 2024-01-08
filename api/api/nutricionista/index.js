@@ -10,13 +10,13 @@ const set_expiration_time = "8h"
 
 //creacion de un nutricionista
 export const login = async (ctx) => {
-   
+
   // const [type, token] = ctx.headers.authorization.split(" ")
 
   // const [email, plainTextPassword] = Buffer.from(token, 'base64').toString().split(":")
 
-  const email=ctx.request.body.email
-  const plainTextPassword=ctx.request.body.password
+  const email = ctx.request.body.email
+  const plainTextPassword = ctx.request.body.password
 
   const user = await prisma.nutricionista.findUnique({ where: { email } })
   if (!user) {
@@ -137,9 +137,14 @@ function stringToInt(pValue) {
 //*ToDo:crear una funcion para borrar algun nutricionista
 
 export const getSpecialty = async (ctx) => {
-  const list = await prisma.especialidad.findMany()
-  ctx.body = list
-  ctx.status = 201
+  try {
+    const list = await prisma.especialidad.findMany()
+    ctx.body = list
+    ctx.status = 201
+  } catch (error) {
+    ctx.body = error
+    ctx.status = 500
+  }
 }
 
 
