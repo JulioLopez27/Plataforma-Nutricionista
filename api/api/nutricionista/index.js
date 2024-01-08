@@ -10,10 +10,13 @@ const set_expiration_time = "8h"
 
 //creacion de un nutricionista
 export const login = async (ctx) => {
+   
+  // const [type, token] = ctx.headers.authorization.split(" ")
 
-  const [type, token] = ctx.headers.authorization.split(" ")
+  // const [email, plainTextPassword] = Buffer.from(token, 'base64').toString().split(":")
 
-  const [email, plainTextPassword] = Buffer.from(token, 'base64').toString().split(":")
+  const email=ctx.request.body.email
+  const plainTextPassword=ctx.request.body.password
 
   const user = await prisma.nutricionista.findUnique({ where: { email } })
   if (!user) {
@@ -77,8 +80,7 @@ export const signup = async (ctx) => {
   }
 
   const idChef = parseInt(ctx.request.body.id_chefDigitales) || 0
-  console.log("🚀 ~ file: index.js:80 ~ signup ~ idChef:", idChef)
-  
+
   const data = {
     email,
     password,
@@ -88,6 +90,8 @@ export const signup = async (ctx) => {
     anos_experiencia: anos,
     foto_diploma: ctx.request.body.foto_diploma,
     id_chefDigitales: idChef,
+    pais: ctx.request.body.pais,
+    zona: ctx.request.body.zona
   }
 
   try {
@@ -98,6 +102,7 @@ export const signup = async (ctx) => {
     const accesToken = jwt.sign({
       sub: user.id,
       name: user.nombre,
+      expiresIn: set_expiration_time,
     }, process.env.JWT_SECRET)
 
     ctx.body = {
@@ -131,6 +136,11 @@ function stringToInt(pValue) {
 //*ToDo:crear una funcion para listar todos los nutricionistas
 //*ToDo:crear una funcion para borrar algun nutricionista
 
+export const getSpecialty = async (ctx) => {
+  const list = await prisma.especialidad.findMany()
+  ctx.body = list
+  ctx.status = 201
+}
 
 
 // CODIGO PRE-REGISTRO PARA UN USUARIO NUTRICIONISTA
