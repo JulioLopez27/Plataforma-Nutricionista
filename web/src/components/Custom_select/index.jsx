@@ -44,6 +44,6 @@ Custom_select.propTypes = {
     name: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
     dataFetcher: PropTypes.func,
-    error: PropTypes.bool,
+    error: PropTypes.string
 
 }
