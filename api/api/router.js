@@ -10,4 +10,5 @@ export const router = new Router()
 
 router.post('/login',nutricionista.login)
 router.post('/signup', nutricionista.signup)
-router.get('/list',nutricionista.getSpecialty)
+router.get('/getSpecialty',nutricionista.getSpecialty)
+router.get('/getCountries',nutricionista.getCountries)
