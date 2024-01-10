@@ -84,9 +84,10 @@ model nutricionista {
   createdAt                  DateTime?                    @default(now()) @db.Timestamp(0)
   updatedAt                  DateTime?                    @default(now()) @db.Timestamp(0)
   pais                       String                       @db.VarChar(255)
-  zona                       String                       @db.VarChar(255)
+  ciudad                     String                       @db.VarChar(255)
   nutricionista_consultante  nutricionista_consultante[]
   nutricionista_especialidad nutricionista_especialidad[]
+  nutricionista_pais         nutricionista_pais[]
   receta                     receta[]
   registro                   registro[]
 }
@@ -154,4 +155,24 @@ model registro {
 
   @@index([id_consultante], map: "id_consultante")
   @@index([id_nutricionista], map: "id_nutricionista")
+}
+
+model nutricionista_pais {
+  id_nutricionista Int
+  id_pais          Int
+  createdAt        DateTime?     @default(now()) @db.Timestamp(0)
+  updatedAt        DateTime?     @default(now()) @db.Timestamp(0)
+  nutricionista    nutricionista @relation(fields: [id_nutricionista], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "nutricionista_pais_ibfk_1")
+  pais             pais          @relation(fields: [id_pais], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "nutricionista_pais_ibfk_2")
+
+  @@id([id_nutricionista, id_pais])
+  @@index([id_pais], map: "id_pais")
+}
+
+model pais {
+  id                 Int                  @id @default(autoincrement())
+  nombre             String               @unique(map: "nombre") @db.VarChar(255)
+  createdAt          DateTime?            @default(now()) @db.Timestamp(0)
+  updatedAt          DateTime?            @default(now()) @db.Timestamp(0)
+  nutricionista_pais nutricionista_pais[]
 }
