@@ -83,8 +83,6 @@ model nutricionista {
   id_chefDigitales           Int?
   createdAt                  DateTime?                    @default(now()) @db.Timestamp(0)
   updatedAt                  DateTime?                    @default(now()) @db.Timestamp(0)
-  pais                       String                       @db.VarChar(255)
-  ciudad                     String                       @db.VarChar(255)
   nutricionista_consultante  nutricionista_consultante[]
   nutricionista_especialidad nutricionista_especialidad[]
   nutricionista_pais         nutricionista_pais[]
@@ -160,12 +158,13 @@ model registro {
 model nutricionista_pais {
   id_nutricionista Int
   id_pais          Int
+  ciudad           String        @unique(map: "ciudad") @db.VarChar(255)
   createdAt        DateTime?     @default(now()) @db.Timestamp(0)
   updatedAt        DateTime?     @default(now()) @db.Timestamp(0)
   nutricionista    nutricionista @relation(fields: [id_nutricionista], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "nutricionista_pais_ibfk_1")
   pais             pais          @relation(fields: [id_pais], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "nutricionista_pais_ibfk_2")
 
-  @@id([id_nutricionista, id_pais])
+  @@id([id_nutricionista, id_pais, ciudad])
   @@index([id_pais], map: "id_pais")
 }
 
