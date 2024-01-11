@@ -5,7 +5,7 @@ import { prisma } from '../../prisma/index.js'
 
 //se setea el tiempo de expiracion del token
 const set_expiration_time = "8h"
-
+const set_default_idChefDigitales = 0
 
 
 //creacion de un nutricionista
@@ -59,7 +59,7 @@ export const login = async (ctx) => {
 
 // *codigo para crear un usuario Nutricionista y guardarlo en la db
 export const signup = async (ctx) => {
-
+  console.log(ctx.request.body);
   //extraigo el email y lo busco para ver si existe en la DB
   const email = ctx.request.body.email
   const exist_user = await prisma.nutricionista.findUnique({ where: { email } })
@@ -79,9 +79,28 @@ export const signup = async (ctx) => {
     return
   }
 
-  const idChef = parseInt(ctx.request.body.id_chefDigitales) || 0
+  const id_especialidad = stringToInt(ctx.request.body.especialidad)
+  if (id_especialidad === -1) {
+    ctx.status = 404
+    return
+  }
 
-  const data = {
+  const id_pais = stringToInt(ctx.request.body.pais)
+  if (id_pais === -1) {
+    ctx.status4 = 404
+    return
+  }
+
+  const ciudad = ctx.request.body.ciudad
+  if (ciudad === "") {
+    ctx.status = 404
+    return
+  }
+
+
+  const idChef = parseInt(ctx.request.body.id_chefDigitales) || set_default_idChefDigitales
+
+  const user_data = {
     email,
     password,
     nombre: ctx.request.body.nombre,
@@ -90,13 +109,18 @@ export const signup = async (ctx) => {
     anos_experiencia: anos,
     foto_diploma: ctx.request.body.foto_diploma,
     id_chefDigitales: idChef,
-    pais: ctx.request.body.pais,
-    zona: ctx.request.body.zona
   }
 
   try {
+
+    const user = await prisma.nutricionista.create({ data: user_data })
+    const id_nutricionista = user.id
+
+    const user_country_data = await prisma.nutricionista_pais.create({ data: { id_nutricionista, id_pais, ciudad } })
+
+    const user_specialty_data = await prisma.nutricionista_especialidad.create({ data: { id_nutricionista, id_especialidad } })
+
     //retiro la pass de los demas attr
-    const user = await prisma.nutricionista.create({ data })
     const { password, ...result } = user
 
     const accesToken = jwt.sign({
@@ -106,7 +130,7 @@ export const signup = async (ctx) => {
     }, process.env.JWT_SECRET)
 
     ctx.body = {
-      user: result,
+      user: result, user_country_data,user_specialty_data,
       accesToken
     }
     ctx.status = 201
@@ -139,6 +163,17 @@ function stringToInt(pValue) {
 export const getSpecialty = async (ctx) => {
   try {
     const list = await prisma.especialidad.findMany()
+    ctx.body = list
+    ctx.status = 201
+  } catch (error) {
+    ctx.body = error
+    ctx.status = 500
+  }
+}
+
+export const getCountries = async (ctx) => {
+  try {
+    const list = await prisma.pais.findMany()
     ctx.body = list
     ctx.status = 201
   } catch (error) {
