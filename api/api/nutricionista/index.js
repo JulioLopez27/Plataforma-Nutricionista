@@ -3,122 +3,123 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import { prisma } from '../../prisma/index.js'
 
+import {
+  HTTP_STATUS_CREATED,
+  HTTP_STATUS_NOT_FOUND,
+  HTTP_STATUS_INTERNAL_SERVER_ERROR
+} from '../HTTP_STATUS/index.js'
+
+import {
+  authenticateUser,
+  validatePhone,
+  validateEmail,
+  validatePassword,
+  createUser,
+  createUserCountryData,
+  createUserSpecialtyData,
+  stringToInt
+} from './helpers.js'
+
 //se setea el tiempo de expiracion del token
 const set_expiration_time = "8h"
 const set_default_idChefDigitales = 0
 
 
+// Función para validar si el email ya existe
+
 //creacion de un nutricionista
+// Función para manejar el inicio de sesión de un usuario
 export const login = async (ctx) => {
-
-  // const [type, token] = ctx.headers.authorization.split(" ")
-
-  // const [email, plainTextPassword] = Buffer.from(token, 'base64').toString().split(":")
-
-  const email = ctx.request.body.email
-  const plainTextPassword = ctx.request.body.password
-
-  const user = await prisma.nutricionista.findUnique({ where: { email } })
-  if (!user) {
-    ctx.status = 404
-    return
-  }
-
-  const passwordMatch = await bcrypt.compare(plainTextPassword, user.password)
-  if (!passwordMatch) {
-    ctx.status = 406
-    return
-  }
-
-  const { password, ...result } = user
-
+  console.log(ctx.request.body)
   try {
+    // Extraemos el email y la contraseña del cuerpo de la petición
+    const email = ctx.request.body.email
+    const plainTextPassword = ctx.request.body.password
 
+    await validatePassword(plainTextPassword)
+    // Intentamos autenticar al usuario
+    const user = await authenticateUser(email, plainTextPassword)
+
+    // Si la autenticación es exitosa, eliminamos la contraseña del objeto del usuario
+    const { password, ...result } = user
+
+    // Creamos un token de acceso para el usuario
     const accesToken = jwt.sign({
       sub: user.id,
       name: user.nombre,
       expiresIn: set_expiration_time,
     }, process.env.JWT_SECRET)
 
-    //JWT_SECRET => corresponde a una clave(string),variable de ambiente en la cual
-    //se usa para que solo el back-end pueda crearla y validar el token 
-
+    // Preparamos la respuesta para el cliente
     ctx.body = {
       user: result,
       accesToken
     }
-    ctx.status = 201
+    // Establecemos el código de estado HTTP a 201 (Creado)
+    ctx.status = HTTP_STATUS_CREATED
 
   } catch (error) {
-    ctx.body = error
-    ctx.status = 500
+    // Si ocurre un error, preparamos un mensaje de error para el cliente
+    ctx.body = { error: error.message }
+    // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
+    ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
   }
-
 }
 
 
 // *codigo para crear un usuario Nutricionista y guardarlo en la db
 export const signup = async (ctx) => {
-  console.log(ctx.request.body);
-  //extraigo el email y lo busco para ver si existe en la DB
-  const email = ctx.request.body.email
-  const exist_user = await prisma.nutricionista.findUnique({ where: { email } })
-  //email existente, corto ejecucion del codigo y mando error
-  if (exist_user) {
-    ctx.status = 400
-    return
-  }
-
-  //email no existente, hasheo la pass ingresada por el usuario
-  //! hasheo la pass que el usuario ingresa / 10->round for hash encryption
-  const password = await bcrypt.hash(ctx.request.body.password, 10)
-
-  const anos = stringToInt(ctx.request.body.anos_experiencia)
-  if (anos === -1) {
-    ctx.status = 426
-    return
-  }
-
-  const id_especialidad = stringToInt(ctx.request.body.especialidad)
-  if (id_especialidad === -1) {
-    ctx.status = 404
-    return
-  }
-
-  const id_pais = stringToInt(ctx.request.body.pais)
-  if (id_pais === -1) {
-    ctx.status4 = 404
-    return
-  }
-
-  const ciudad = ctx.request.body.ciudad
-  if (ciudad === "") {
-    ctx.status = 404
-    return
-  }
-
-
-  const idChef = parseInt(ctx.request.body.id_chefDigitales) || set_default_idChefDigitales
-
-  const user_data = {
-    email,
-    password,
-    nombre: ctx.request.body.nombre,
-    apellido: ctx.request.body.apellido,
-    telefono: ctx.request.body.telefono,
-    anos_experiencia: anos,
-    foto_diploma: ctx.request.body.foto_diploma,
-    id_chefDigitales: idChef,
-  }
-
   try {
+    // extraigo el email y lo busco para ver si existe en la DB
+    const email = ctx.request.body.email
 
-    const user = await prisma.nutricionista.create({ data: user_data })
+    //verifico en la DB que no existe ese email
+    await validateEmail(email)
+
+    //valido la contraseña
+    await validatePassword(ctx.request.body.password)
+
+    //valido el telefono
+    await validatePhone(ctx.request.body.telefono)
+    //email no existente, hasheo la pass ingresada por el usuario
+    //! hasheo la pass que el usuario ingresa / 10->round for hash encryption
+    const hashPassword = await bcrypt.hash(ctx.request.body.password, 10)
+
+    //parseo a int los valores que recibo del front
+    const anos = await stringToInt(ctx.request.body.anos_experiencia)
+    const id_especialidad = await stringToInt(ctx.request.body.especialidad)
+    const id_pais = await stringToInt(ctx.request.body.pais)
+
+
+    const ciudad = ctx.request.body.ciudad
+    if (ciudad === "") {
+      ctx.status = HTTP_STATUS_NOT_FOUND
+      return
+    }
+
+    //si no recibo id de chefDigitales, seteo uno propio=0, para evitar inyeccion de datos
+    const idChef = parseInt(ctx.request.body.id_chefDigitales) || set_default_idChefDigitales
+    //guardo en una variable la informacion del diploma que el nutricionista subio 
+    const { foto_diploma } = ctx.request.files
+
+    //creo el obj user_data para darle a prisma y crear el nutricionista
+    const user_data = {
+      email,
+      password: hashPassword,
+      nombre: ctx.request.body.nombre,
+      apellido: ctx.request.body.apellido,
+      telefono: ctx.request.body.telefono,
+      anos_experiencia: anos,
+      //guardo la ruta del diploma
+      foto_diploma: foto_diploma ? foto_diploma.filepath : null,
+      id_chefDigitales: idChef,
+    }
+
+    //se envian los datos del registro para crear el usuario 
+    const user = await createUser(user_data)
     const id_nutricionista = user.id
-
-    const user_country_data = await prisma.nutricionista_pais.create({ data: { id_nutricionista, id_pais, ciudad } })
-
-    const user_specialty_data = await prisma.nutricionista_especialidad.create({ data: { id_nutricionista, id_especialidad } })
+    const user_country_data = await createUserCountryData(id_nutricionista, id_pais, ciudad)
+    const user_specialty_data = await createUserSpecialtyData(id_nutricionista, id_especialidad)
 
     //retiro la pass de los demas attr
     const { password, ...result } = user
@@ -130,36 +131,25 @@ export const signup = async (ctx) => {
     }, process.env.JWT_SECRET)
 
     ctx.body = {
-      user: result, user_country_data,user_specialty_data,
+      user: result, user_country_data, user_specialty_data,
       accesToken
     }
-    ctx.status = 201
+    ctx.status = HTTP_STATUS_CREATED
 
   } catch (error) {
-    ctx.body = error
-    ctx.status = 500
+    ctx.body = { error: error.message }
+    ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
   }
 }
 
-// recibo valor string
-function stringToInt(pValue) {
 
-  //lo parseo a int
-  const v1 = parseInt(pValue)
-  //validar que sean numeros y >0
-  if (!isNaN(v1) && v1 >= 0) {
-    return v1
-  }
-
-  return -1
-
-}
 
 
 //*ToDo:crear funciones para actualizar los datos del nutricionista
 //*ToDo:crear una funcion para listar todos los nutricionistas
 //*ToDo:crear una funcion para borrar algun nutricionista
 
+//obtengo el listado de las especialidades
 export const getSpecialty = async (ctx) => {
   try {
     const list = await prisma.especialidad.findMany()
@@ -171,6 +161,7 @@ export const getSpecialty = async (ctx) => {
   }
 }
 
+//obtengo el listado de los paises en cual chefDigitales tiene presencia
 export const getCountries = async (ctx) => {
   try {
     const list = await prisma.pais.findMany()
@@ -190,42 +181,46 @@ export const getCountries = async (ctx) => {
 
 // mejoras a futuro y lineas de accion
 // Ruta para el registro de usuarios
-// //------------------------------------------
-// app.post('/registro', async (req, res) => {
+//------------------------------------------
+// export const envio_de_registro = async (ctx) => {
 //   try {
-//     // Envía los datos al servicio externo
-//     const servicioExternoRespuesta = await enviarAServiceExterno(req.body);
+//     // extraigo el email y lo busco para ver si existe en la DB
+//     const email = ctx.request.body.email
+//     await validateEmail(email)
 
-//     // Si la respuesta del servicio externo es exitosa, guarda en la base de datos
-//     if (servicioExternoRespuesta.exitoso) {
-//       const usuarioCreado = await prisma.usuario.create({
-//         data: {
-//           // Aquí puedes mapear los datos recibidos según tu modelo de base de datos
-//           // Ejemplo: email, nombre, etc.
-//           email: req.body.email,
-//           nombre: req.body.nombre,
-//           // ...otros campos
-//         },
-//       });
+//     // ... (código anterior)
 
-//       res.json({ exitoso: true, usuario: usuarioCreado });
-//     } else {
-//       res.json({ exitoso: false, mensaje: 'Registro no aceptado por el servicio externo' });
+//     // Preparamos los datos del usuario
+//     const user_data = {
+//       email,
+//       password: hashPassword,
+//       nombre: ctx.request.body.nombre,
+//       apellido: ctx.request.body.apellido,
+//       telefono: ctx.request.body.telefono,
+//       anos_experiencia: anos,
+//       foto_diploma: foto_diploma ? foto_diploma.filepath : null,
+//       id_chefDigitales: idChef,
 //     }
+
+//     // Enviamos los datos del usuario a la API externa
+//     const response = await fetch('https://api.example.com/register', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(user_data),
+//     });
+
+//     // Comprobamos si la solicitud fue exitosa
+//     if (!response.ok) {
+//       throw new Error('Error al registrar el usuario en la API externa');
+//     }
+
+//     // Si la API acepta los datos, creamos el usuario en nuestra base de datos
+//     const user = await prisma.nutricionista.create({ data: user_data })
+
 //   } catch (error) {
-//     console.error('Error:', error);
-//     res.status(500).json({ exitoso: false, mensaje: 'Error en el servidor' });
+//     ctx.body = { error: error.message }
+//     ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
 //   }
-// });
-
-// app.listen(port, () => {
-//   console.log(`Servidor escuchando en el puerto ${port}`);
-// });
-
-// // Función para enviar datos al servicio externo
-// async function enviarAServiceExterno(datos) {
-//   // Implementa la lógica para enviar datos al servicio externo aquí
-//   // Puedes usar bibliotecas como axios o fetch para hacer la solicitud HTTP
-//   // Retorna una respuesta simulada por ahora
-//   return { exitoso: true };
 // }
