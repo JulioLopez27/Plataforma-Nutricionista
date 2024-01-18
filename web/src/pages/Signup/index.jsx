@@ -7,6 +7,16 @@ import { useFormik } from 'formik'
 import { Input, Custom_select } from '~/components'
 
 
+//Codigo validacion de extencion de archivo
+const validateFileType = (value) => {
+    if (!value) return false;
+
+    const fileName = value.name;
+    const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+
+    return allowedExtensions.test(fileName);
+}
+
 const validationSchema = yup.object().shape({
     nombre: yup.string().required('Campo obligatorio'),
     apellido: yup.string().required('Campo obligatorio'),
@@ -17,7 +27,11 @@ const validationSchema = yup.object().shape({
     anos_experiencia: yup.number().required('Campo obligatorio'),
     pais: yup.number().integer().required('Campo obligatorio'),
     ciudad: yup.string().required('Campo obligatorio'),
-    // foto_diploma: yup.string().required('Campo obligatorio')
+    foto_diploma: yup.mixed().test(
+        'fileType',
+        'Solo se permiten archivos de imagen (jpg, jpeg, png, gif)',
+        validateFileType
+    )
 })
 
 export const Signup = () => {
@@ -31,25 +45,39 @@ export const Signup = () => {
         });
     }
 
-const fetchCountries =async () =>{
-    return axios({
-        method:'GET',
-        baseURL:'http://localhost:3000',
-        url:'/getCountries'
+    const fetchCountries = async () => {
+        return axios({
+            method: 'GET',
+            baseURL: 'http://localhost:3000',
+            url: '/getCountries'
 
-    })
-}
+        })
+    }
 
     const formik = useFormik({
         onSubmit: async (values) => {
+            let formData = new FormData();
+            Object.keys(values).forEach((key) => {
+                formData.append(key, values[key]);
+            });
+            
+            try {
 
-            const res = await axios({
-                method: 'POST',
-                baseURL: "http://localhost:3000",
-                url: '/signup',
-                data: values
-            })
-            console.log(res.data);
+                const res = await axios({
+                    method: 'POST',
+                    baseURL: "http://localhost:3000",
+                    url: '/signup',
+                    data: formData,
+                    headers: {
+                        "Content-Type": 'multipart/form-data'
+                    }
+                })
+
+            } catch (err) {
+                console.log("🚀 ~ onSubmit: ~ err:", err.message)
+
+            }
+
         },
         initialValues: {
             nombre: '',
@@ -59,9 +87,10 @@ const fetchCountries =async () =>{
             password: '',
             especialidad: '',
             anos_experiencia: '',
-            foto_diploma: '89504E470D0A1A0A',
+            foto_diploma: '',
             pais: '',
             ciudad: '',
+
         },
         validationSchema
     })
@@ -71,10 +100,12 @@ const fetchCountries =async () =>{
             <main className="p-4">
 
                 <h2 className="text-3xl text-center font-semibold mb-3">Bienvenido a la página de registro</h2>
-                {/* el boton de crear usuario dispara el evento onSubmit que lo maneja formik en la linea 23 */}
+
                 <form className="space-y-4 mt-3" onSubmit={formik.handleSubmit} >
 
                     <Input
+                        htmlFor='nombre'
+                        id='nombre'
                         autoComplete="off"
                         type="text"
                         name="nombre"
@@ -87,6 +118,8 @@ const fetchCountries =async () =>{
                     />
 
                     <Input
+                        htmlFor='apellido'
+                        id='apellido'
                         autoComplete="off"
                         type="text"
                         name="apellido"
@@ -97,7 +130,10 @@ const fetchCountries =async () =>{
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                     />
+
                     <Input
+                        htmlFor='telefono'
+                        id='telefono'
                         autoComplete="off"
                         type="text"
                         name="telefono"
@@ -110,7 +146,8 @@ const fetchCountries =async () =>{
                     />
 
                     <Input
-
+                        htmlFor='email'
+                        id='email'
                         autoComplete="off"
                         type="text"
                         name="email"
@@ -123,6 +160,8 @@ const fetchCountries =async () =>{
                     />
 
                     <Input
+                        htmlFor='password'
+                        id='password'
                         type="password"
                         name="password"
                         label="Constraseña"
@@ -133,9 +172,9 @@ const fetchCountries =async () =>{
                         onBlur={formik.handleBlur}
                     />
 
-
-
                     <Custom_select
+                        htmlFor='especialidad'
+                        id='especialidad'
                         type="number"
                         name="especialidad"
                         label="Especialidad"
@@ -145,10 +184,11 @@ const fetchCountries =async () =>{
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         dataFetcher={fetchSpecialty}
-
                     />
 
                     <Input
+                        htmlFor='anos_experiencia'
+                        id='anos_experiencia'
                         type="number"
                         name="anos_experiencia"
                         label="Experiencia"
@@ -160,6 +200,8 @@ const fetchCountries =async () =>{
                     />
 
                     <Custom_select
+                        htmlFor='pais'
+                        id='pais'
                         type="number"
                         name="pais"
                         label="País"
@@ -172,6 +214,8 @@ const fetchCountries =async () =>{
                     />
 
                     <Input
+                        htmlFor='ciudad'
+                        id='ciudad'
                         type="text"
                         name="ciudad"
                         label="Ciudad"
@@ -182,17 +226,18 @@ const fetchCountries =async () =>{
                         onBlur={formik.handleBlur}
                     />
 
-
                     <Input
-                        disabled="on"
-                        type="text"
+                        htmlFor='foto_diploma'
+                        id="foto_diploma"
+                        type="file"
                         name="foto_diploma"
-                        label="Foto del diploma"
-                        placeholder="**Corregir futuramente **"
+                        label='Foto de su diploma'
+                        accept='image/*'
                         error={formik.touched.foto_diploma && formik.errors.foto_diploma}
-                        value={formik.values.foto_diploma}
-                        onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
+                        onChange={(event) => {
+                            formik.setFieldValue("foto_diploma", event.currentTarget.files[0]);
+                        }}
                     />
 
                     <div className="flex justify-center space-x-4 mt-4">
