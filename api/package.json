@@ -16,7 +16,7 @@
     "dotenv-safe": "^8.2.0",
     "jsonwebtoken": "^9.0.2",
     "koa": "^2.14.2",
-    "koa-bodyparser": "^4.4.1",
+    "koa-body": "^6.0.1",
     "mysql2": "^3.6.5"
   },
   "devDependencies": {
