@@ -79,7 +79,7 @@ model nutricionista {
   apellido                   String                       @db.VarChar(255)
   telefono                   String?                      @db.VarChar(255)
   anos_experiencia           Int
-  foto_diploma               Bytes                        @db.Blob
+  foto_diploma               String?                      @db.VarChar(255)
   id_chefDigitales           Int?
   createdAt                  DateTime?                    @default(now()) @db.Timestamp(0)
   updatedAt                  DateTime?                    @default(now()) @db.Timestamp(0)
@@ -158,7 +158,7 @@ model registro {
 model nutricionista_pais {
   id_nutricionista Int
   id_pais          Int
-  ciudad           String        @unique(map: "ciudad") @db.VarChar(255)
+  ciudad           String        @db.VarChar(255)
   createdAt        DateTime?     @default(now()) @db.Timestamp(0)
   updatedAt        DateTime?     @default(now()) @db.Timestamp(0)
   nutricionista    nutricionista @relation(fields: [id_nutricionista], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "nutricionista_pais_ibfk_1")
