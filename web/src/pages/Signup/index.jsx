@@ -22,9 +22,19 @@ const validationSchema = yup.object().shape({
     apellido: yup.string().required('Campo obligatorio'),
     telefono: yup.number().integer().typeError("Ingrese datos numéricos"),
     email: yup.string().email().required('Campo obligatorio'),
-    password: yup.string().required('Campo obligatorio'),
+    password: yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres')
+        .max(12, 'La contraseña no puede tener más de 12 caracteres')
+        .matches(/[a-z]/, 'La contraseña debe contener al menos una letra minúscula')
+        .matches(/[A-Z]/, 'La contraseña debe contener al menos una letra mayúscula')
+        .matches(/[0-9]+/, 'La contraseña debe contener al menos un número')
+        .matches(/[!@#$%^&*(),.?":{}|<>]/, 'La contraseña debe contener al menos un símbolo especial')
+        .matches(/^\S*$/, 'La contraseña no puede contener espacios en blanco')
+        .required('La contraseña es requerida'),
     especialidad: yup.number().integer().required('Campo obligatorio'),
-    anos_experiencia: yup.number().required('Campo obligatorio'),
+    anos_experiencia: yup.number()
+        .min(0, 'Solo se aceptan valores positivos')
+        .max(70, 'Maximo valor que puede ingresar')
+        .required('Campo obligatorio'),
     pais: yup.number().integer().required('Campo obligatorio'),
     ciudad: yup.string().required('Campo obligatorio'),
     foto_diploma: yup.mixed().test(
@@ -60,9 +70,8 @@ export const Signup = () => {
             Object.keys(values).forEach((key) => {
                 formData.append(key, values[key]);
             });
-            
-            try {
 
+            try {
                 const res = await axios({
                     method: 'POST',
                     baseURL: "http://localhost:3000",
