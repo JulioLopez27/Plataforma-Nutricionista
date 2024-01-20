@@ -17,7 +17,8 @@ import {
   createUser,
   createUserCountryData,
   createUserSpecialtyData,
-  stringToInt
+  stringToInt,
+  positiveValue
 } from './helpers.js'
 
 //se setea el tiempo de expiracion del token
@@ -86,7 +87,7 @@ export const signup = async (ctx) => {
     const hashPassword = await bcrypt.hash(ctx.request.body.password, 10)
 
     //parseo a int los valores que recibo del front
-    const anos = await stringToInt(ctx.request.body.anos_experiencia)
+    const anos = await positiveValue(ctx.request.body.anos_experiencia)
     const id_especialidad = await stringToInt(ctx.request.body.especialidad)
     const id_pais = await stringToInt(ctx.request.body.pais)
 
@@ -149,27 +150,26 @@ export const signup = async (ctx) => {
 //*ToDo:crear una funcion para listar todos los nutricionistas
 //*ToDo:crear una funcion para borrar algun nutricionista
 
-//obtengo el listado de las especialidades
+
 export const getSpecialty = async (ctx) => {
   try {
     const list = await prisma.especialidad.findMany()
     ctx.body = list
-    ctx.status = 201
+    ctx.status = HTTP_STATUS_CREATED
   } catch (error) {
-    ctx.body = error
-    ctx.status = 500
+    ctx.body = { message: 'Hubo un error al obtener las especialidades', error: error.message }
+    ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
   }
 }
 
-//obtengo el listado de los paises en cual chefDigitales tiene presencia
 export const getCountries = async (ctx) => {
   try {
     const list = await prisma.pais.findMany()
     ctx.body = list
-    ctx.status = 201
+    ctx.status = HTTP_STATUS_CREATED
   } catch (error) {
-    ctx.body = error
-    ctx.status = 500
+    ctx.body = { message: 'Hubo un error al obtener los países', error: error.message }
+    ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
   }
 }
 
