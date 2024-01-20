@@ -20,7 +20,10 @@ const validateFileType = (value) => {
 const validationSchema = yup.object().shape({
     nombre: yup.string().required('Campo obligatorio'),
     apellido: yup.string().required('Campo obligatorio'),
-    telefono: yup.number().integer().typeError("Ingrese datos numéricos"),
+    telefono: yup.string()
+        .min(9, 'El número de teléfono debe tener al menos 9 dígitos')
+        .max(15, 'El número de teléfono tiene un máximo de 15 dígitos')
+        .matches(/^[0-9]*$/, 'El número de teléfono solo puede contener números'),
     email: yup.string().email().required('Campo obligatorio'),
     password: yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres')
         .max(12, 'La contraseña no puede tener más de 12 caracteres')
@@ -146,8 +149,8 @@ export const Signup = () => {
                         autoComplete="off"
                         type="text"
                         name="telefono"
-                        label="Telefono"
-                        placeholder="ingrese su numero telefonico (campo no obligatorio)"
+                        label="Telefono celular"
+                        placeholder="ingrese su numero telefonico con prefijo internacional (campo no obligatorio)"
                         error={formik.touched.telefono && formik.errors.telefono}
                         value={formik.values.telefono}
                         onChange={formik.handleChange}
