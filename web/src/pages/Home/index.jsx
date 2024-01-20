@@ -3,7 +3,9 @@ import axios from 'axios'
 import * as yup from 'yup'
 import { useFormik } from 'formik'
 
-import { Input } from '~/components'
+import { Input, CustomModal } from '~/components'
+import { useState } from 'react';
+
 
 const validationSchema = yup.object().shape({
   email: yup.string().required('Campo obligatorio').email('Ingrese un formato valido').trim(),
@@ -11,6 +13,9 @@ const validationSchema = yup.object().shape({
 })
 
 export function Home() {
+
+  const [isModalOpen, setIsModalOpen] = useState(false); // Agrega este estado
+  const [errorMessage, setErrorMessage] = useState(''); // Agrega este estado para manejar el mensaje de error
 
   const formik = useFormik({
     onSubmit: async (values) => {
@@ -25,7 +30,9 @@ export function Home() {
 
         console.log("🚀 ~ file: index.jsx:20 ~ onSubmit: ~ res:", res.data)
       } catch (error) {
-        console.log('Error del servidor', error);
+         console.log('Error del servidor', error);
+        setIsModalOpen(true); // Abre el modal cuando hay un error
+        setErrorMessage(error.message); // Guarda el mensaje de error
       }
     },
     initialValues: {
@@ -36,9 +43,14 @@ export function Home() {
   })
 
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false); // Función para cerrar el modal
+  };
+
   return (
 
     <div className="container max-w-2xl bg-white rounded-2xl border-2 p-8 my-24 mx-auto space-x-4 ">
+
       <main className="p-4">
 
         <h1 className="text-3xl text-center font-semibold mb-3">Bienvenido nutricionista</h1>
@@ -77,7 +89,10 @@ export function Home() {
           </div>
 
         </form>
-
+        <CustomModal isOpen={isModalOpen} onClose={handleCloseModal}>
+          <h2 className="text-2xl">Algo salió mal</h2>
+          <p>{errorMessage}</p> {/* Muestra el mensaje de error en el modal */}
+        </CustomModal>
       </main>
 
     </div >
