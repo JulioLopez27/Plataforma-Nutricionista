@@ -37,7 +37,7 @@ export async function createUser(user_data) {
     const user = await prisma.nutricionista.create({ data: user_data })
     // Si no se pudo crear el usuario, lanzamos un error
     if (!user) {
-      throw new Error('Error al crear su usuario, contacte con la empresa')
+      throw new Error('No se pudo registrar sus datos')
     }
     return user;
   } catch (error) {
@@ -133,12 +133,12 @@ export async function stringToInt(str) {
 export async function positiveValue(str) {
   try {
     const num = await stringToInt(str)
-    // Si el número es positivo, retornamos verdadero
-    if (num >= 0) {
-      return true
-    } else {
-      throw new Error('El número no es positivo');
-    }
+    // Si el número es negativo, lanzamos un error
+    if (num < 0) {
+      throw new Error('Ingrese un numero positivo');
+    } 
+    return num
+    
   } catch (error) {
     // Si hay un error, lo lanzamos
     throw error
