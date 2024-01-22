@@ -15,7 +15,9 @@ const validationSchema = yup.object().shape({
 export function Home() {
 
   const [isModalOpen, setIsModalOpen] = useState(false); // Agrega este estado
-  const [errorMessage, setErrorMessage] = useState(''); // Agrega este estado para manejar el mensaje de error
+  const [message, setMessage] = useState(''); // Agrega este estado para manejar el mensaje de error
+  const [messageType, setMessageType] = useState('');
+
 
   const formik = useFormik({
     onSubmit: async (values) => {
@@ -28,11 +30,15 @@ export function Home() {
           data: values
         })
 
-        console.log("🚀 ~ file: index.jsx:20 ~ onSubmit: ~ res:", res.data)
+        setIsModalOpen(true);
+        setMessage(`Bienvenido nutricionista: ${res.data.user.nombre}  ${res.data.user.apellido}.`);
+        setMessageType('approval');
+
       } catch (error) {
-         console.log('Error del servidor', error);
-        setIsModalOpen(true); // Abre el modal cuando hay un error
-        setErrorMessage(error.message); // Guarda el mensaje de error
+        console.log('Error del servidor->', error.response.data.error);
+        setIsModalOpen(true);
+        setMessage(error.response.data.error);
+        setMessageType('error');
       }
     },
     initialValues: {
@@ -45,7 +51,7 @@ export function Home() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false); // Función para cerrar el modal
-  };
+  }
 
   return (
 
@@ -89,9 +95,9 @@ export function Home() {
           </div>
 
         </form>
-        <CustomModal isOpen={isModalOpen} onClose={handleCloseModal}>
-          <h2 className="text-2xl">Algo salió mal</h2>
-          <p>{errorMessage}</p> {/* Muestra el mensaje de error en el modal */}
+        <CustomModal isOpen={isModalOpen} onClose={handleCloseModal} message={message} messageType={messageType}>
+          <h2 className="text-2xl">{messageType === 'error' ? 'Algo salió mal' : 'Éxito'}</h2>
+          {messageType === 'error' && <p>{message}</p>}
         </CustomModal>
       </main>
 
