@@ -2,9 +2,9 @@
 import axios from 'axios'
 import * as yup from 'yup'
 import { useFormik } from 'formik'
+import { useState } from 'react'
 
-
-import { Input, Custom_select } from '~/components'
+import { Input, Custom_select, CustomModal } from '~/components'
 
 
 //Codigo validacion de extencion de archivo
@@ -49,6 +49,10 @@ const validationSchema = yup.object().shape({
 
 export const Signup = () => {
 
+    const [isModalOpen, setIsModalOpen] = useState(false); // Agrega este estado
+    const [message, setMessage] = useState(''); // Agrega este estado para manejar el mensaje de error
+    const [messageType, setMessageType] = useState('');
+
 
     const fetchSpecialty = async () => {
         return axios({
@@ -84,10 +88,13 @@ export const Signup = () => {
                         "Content-Type": 'multipart/form-data'
                     }
                 })
-
-            } catch (err) {
-                console.log("🚀 ~ onSubmit: ~ err:", err.message)
-
+                setIsModalOpen(true);
+                setMessage(`Registro realizado con suceso`);
+                setMessageType('approval');
+            } catch (error) {
+                setIsModalOpen(true);
+                setMessage(error.response.data.error);
+                setMessageType('error');
             }
 
         },
@@ -106,6 +113,10 @@ export const Signup = () => {
         },
         validationSchema
     })
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false); // Función para cerrar el modal
+    }
 
     return (
         <div className="container max-w-2xl bg-white rounded-2xl border-2 p-8 my-24 mx-auto space-x-4 ">
@@ -264,7 +275,10 @@ export const Signup = () => {
                     </div>
 
                 </form>
-
+                <CustomModal isOpen={isModalOpen} onClose={handleCloseModal} message={message} messageType={messageType}>
+                    <h2 className="text-2xl">{messageType === 'error' ? 'Algo salió mal' : 'Éxito'}</h2>
+                    {messageType === 'error' && <p>{message}</p>}
+                </CustomModal>
             </main>
 
         </div >
