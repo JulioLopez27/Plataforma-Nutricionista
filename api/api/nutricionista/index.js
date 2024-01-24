@@ -31,7 +31,6 @@ const set_default_idChefDigitales = 0
 //creacion de un nutricionista
 // Función para manejar el inicio de sesión de un usuario
 export const login = async (ctx) => {
-  console.log(ctx.request.body)
   try {
     // Extraemos el email y la contraseña del cuerpo de la petición
     const email = ctx.request.body.email
