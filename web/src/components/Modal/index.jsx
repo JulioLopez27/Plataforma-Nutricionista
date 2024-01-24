@@ -43,8 +43,8 @@ export const CustomModal = ({ isOpen, message, messageType, onClose }) => {
 }
 
 CustomModal.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
+  isOpen: PropTypes.bool,
   message: PropTypes.string.isRequired,
   messageType: PropTypes.string.isRequired,
-  onClose: PropTypes.bool.isRequired
+  onClose: PropTypes.bool
 }
