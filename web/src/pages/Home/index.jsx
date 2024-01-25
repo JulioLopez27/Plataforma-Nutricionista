@@ -35,7 +35,6 @@ export function Home() {
         setMessageType('approval');
 
       } catch (error) {
-        console.log('Error del servidor->', error.response.data.error);
         setIsModalOpen(true);
         setMessage(error.response.data.error);
         setMessageType('error');
@@ -55,9 +54,9 @@ export function Home() {
 
   return (
 
-    <div className="container max-w-2xl bg-white rounded-2xl border-2 p-8 my-24 mx-auto space-x-4 ">
+    <div>
 
-      <main className="p-4">
+      <main className="container max-w-2xl p-8 bg-white rounded-2xl border-2 my-24 mx-auto space-x-4 ">
 
         <h1 className="text-3xl text-center font-semibold mb-3">Bienvenido nutricionista</h1>
 
@@ -69,7 +68,7 @@ export function Home() {
             autoComplete="off"
             type="text"
             name="email"
-            label="Correo electrónico "
+            label="Correo electrónico"
             placeholder="ingrese su correo"
             error={formik.touched.email && formik.errors.email}
             value={formik.values.email}
@@ -88,10 +87,10 @@ export function Home() {
             onBlur={formik.handleBlur}
           />
 
-          <div className="flex justify-center space-x-4 mt-4">
+          <div className="flex flex-col text-center gap-4 text-white">
 
-            <button type='submit' className="text-center p-3 bg-smoke rounded-xl border-2 border-magenta ">Ingresar al Sistema</button>
-            <a href="/signup" className="text-center p-3 bg-magenta rounded-xl border-2 border-solid text-gris">Registrarse</a>
+            <button type='submit' className=" p-2 bg-verde_oscuro rounded-xl border ">Ingresar</button>
+            <a href="/signup" className=" p-2 bg-verde_oscuro rounded-xl border ">Registrar</a>
           </div>
 
         </form>
