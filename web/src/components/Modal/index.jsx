@@ -46,5 +46,5 @@ CustomModal.propTypes = {
   isOpen: PropTypes.bool,
   message: PropTypes.string.isRequired,
   messageType: PropTypes.string.isRequired,
-  onClose: PropTypes.bool
+  onClose: PropTypes.func
 }
