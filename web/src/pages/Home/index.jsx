@@ -56,7 +56,7 @@ export function Home() {
 
     <div>
 
-      <main className="container max-w-2xl p-8 bg-white rounded-2xl border-2 my-24 mx-auto space-x-4 ">
+      <main className="container max-w-2xl p-5 bg-white rounded-2xl border-2 my-24 mx-auto space-x-4 ">
 
         <h1 className="text-3xl text-center font-semibold mb-3">Bienvenido nutricionista</h1>
 
