@@ -119,8 +119,8 @@ export const Signup = () => {
     }
 
     return (
-        <div className="container max-w-2xl bg-white rounded-2xl border-2 p-8 my-24 mx-auto space-x-4 ">
-            <main className="p-4">
+        <div >
+            <main className="container max-w-2xl bg-white rounded-2xl border-2 p-4 my-24 mx-auto space-x-4 " >
 
                 <h2 className="text-3xl text-center font-semibold mb-3">Bienvenido a la página de registro</h2>
 
@@ -161,7 +161,7 @@ export const Signup = () => {
                         type="text"
                         name="telefono"
                         label="Telefono celular"
-                        placeholder="ingrese su numero telefonico con prefijo internacional (campo no obligatorio)"
+                        placeholder="ingrese su número telefónico con prefijo internacional + (campo no obligatorio)"
                         error={formik.touched.telefono && formik.errors.telefono}
                         value={formik.values.telefono}
                         onChange={formik.handleChange}
@@ -263,14 +263,15 @@ export const Signup = () => {
                         }}
                     />
 
-                    <div className="flex justify-center space-x-4 mt-4">
-                        <a href="/" className="text-center p-3 bg-magenta rounded-xl border-2 border-solid text-gris">Página principal</a>
+                    <div className="flex flex-col gap-4 text-center text-white">
 
-                        <button type="submit" className="text-center p-3 bg-magenta rounded-xl border-2 border-solid text-gris disabled:opacity-80"
+                        <button type="submit" className=" p-2 bg-verde_oscuro rounded-xl border  disabled:opacity-80"
                             disabled={!formik.isValid || formik.isSubmitting}>
                             {formik.isSubmitting ? 'Creando su usuario' : 'Crear mi cuenta'}
 
                         </button>
+                       
+                        <a href="/" className=" p-2 bg-verde_oscuro rounded-xl border ">Página principal</a>
 
                     </div>
 
