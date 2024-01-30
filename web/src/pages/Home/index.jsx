@@ -79,7 +79,7 @@ export function Home() {
           <Input
             type="password"
             name="password"
-            label="Constraseña"
+            label="Contraseña"
             placeholder="Ingrese su contraseña"
             error={formik.touched.password && formik.errors.password}
             value={formik.values.password}
