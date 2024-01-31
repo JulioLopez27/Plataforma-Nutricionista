@@ -9,11 +9,11 @@ export const NavBar = () => {
                 </div>
 
                 <div id="consultante" className="border-t-2 border-transparent hover:border-t-2 hover:border-verde_claro">
-                    <a href="/dashboard" className="hover:text-gray-900" > Consultantes</a>
+                    <a href="/consultantes" className="hover:text-gray-900" > Consultantes</a>
                 </div>
 
                 <div id="recetas" className="border-t-2 border-transparent hover:border-t-2 hover:border-verde_claro">
-                    <a href="/dashboard" className="hover:text-gray-900" > Recetas</a>
+                    <a href="/recetas" className="hover:text-gray-900" > Recetas</a>
                 </div>
 
             </div>
