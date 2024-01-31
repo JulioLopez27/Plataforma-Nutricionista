@@ -7,9 +7,9 @@ import {
 import { Home } from './Home'
 import { Signup } from './Signup'
 import { Dashboard } from './Dashboard'
-import { Profile } from "./Profile";
-
-
+import { Profile } from "./Profile"
+import { Consultante } from "./Consultante"
+import { Receta} from './Receta'
 
 const router = createBrowserRouter([
   {
@@ -26,6 +26,12 @@ const router = createBrowserRouter([
   }, {
     path: "/profile",
     element: <Profile />,
+  }, {
+    path: "/consultantes",
+    element: <Consultante />,
+  }, {
+    path: "/recetas",
+    element: <Receta />,
   },
 
 ]);
