@@ -1,11 +1,20 @@
 
+
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    })
+}
+
 export const Header = () => {
     return (
-        <header className="bg-verde_claro text-white">
+        <header className="bg-verde_claro text-white fixed w-full top-0 z-10 ">
 
             <div className="container max-w-full p-2 flex justify-between items-center ">
-
-                <img loading="lazy" src="/logo/Logo.png" alt="logo" className="w-16 sm:w-24 md:w-28 xl:w-30 2xl:w-40 " />
+               
+                    <img loading="lazy" src="/logo/Logo.png" alt="logo" className="w-16 sm:w-24 md:w-28 xl:w-30 2xl:w-40  cursor-pointer" onClick={scrollToTop}  />
+               
 
                 <div className="flex gap-2 sm:gap-3 md:gap-4  items-center ">
 
