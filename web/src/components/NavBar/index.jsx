@@ -1,6 +1,6 @@
 export const NavBar = () => {
     return (
-        <nav className="container max-w-full ">
+        <nav className="container max-w-full mt-24">
 
             <div className="flex justify-around mt-5 mx-20 pb-4 border-b-2 border-verde_oscuro font-medium text-gris_texto text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl ">
 
