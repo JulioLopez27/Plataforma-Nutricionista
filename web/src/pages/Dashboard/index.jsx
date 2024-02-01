@@ -25,7 +25,7 @@ export function Dashboard() {
                 <section id="header" className="max-w-full flex items-center justify-center">
                     <div className="flex flex-col text-center m-4 gap-4">
                         <h1 className="p-2 text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold text-azul_titulo ">
-                            Recetas destacadas de ChefDigitales
+                            Recetas sugeridas de ChefDigitales
                         </h1>
                         <p className="w-full sm:w-5/6 md:w-3/4 lg:w-1/2 m-auto text-gray-900">
                             Bienvenido a nuestra plataforma de nutrición.
