@@ -5,17 +5,15 @@ const TipoRegistro = {
 };
 
 export class Registro {
-    constructor(fecha, contenido, tipo, nutricionista) {
+    constructor(fecha, contenido, tipo) {
         this.fecha = fecha;
         this.contenido = contenido;
-        this.enviado = enviado; //Boolean
         // Verificar que el tipo proporcionado esté en TipoRegistro
         if (Object.values(TipoRegistro).includes(tipo)) {
             this.tipo = tipo;
         } else {
             throw new Error("Tipo de registro no válido");
         }
-        this.nutricionista = nutricionista;
         this.enviado = false; // Valor por defecto
     }
 

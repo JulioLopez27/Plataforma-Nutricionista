@@ -1,5 +1,6 @@
 class Afeccion {
-    constructor(diabetes_tipo_1, diabetes_tipo_2, celiaquismo, hipertension, alergias, enfermedad_renal,hipercolesterolemia, anemia, obesidad) {
+    constructor(diabetes_tipo_1, diabetes_tipo_2, celiaquismo, hipertension, alergias, enfermedad_renal,
+                    hipercolesterolemia, anemia, obesidad) {
         this.diabetes_tipo_1 = diabetes_tipo_1; // Booleano
         this.diabetes_tipo_2 = diabetes_tipo_2; // Booleano
         this.celiaquismo = celiaquismo; // Booleano
@@ -14,10 +15,3 @@ class Afeccion {
 }
 
 
-
-/*
-// Ejemplo de creación de una instancia de la clase Afeccion
-const afeccionEjemplo = new Afeccion(true, false, true, false, "polen, frutos secos", true, false, true);
-
-console.log(afeccionEjemplo);
-*/

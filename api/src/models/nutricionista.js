@@ -1,3 +1,4 @@
+import { Consultante } from "./consultante";
 
 
 export class Nutricionista {
@@ -11,11 +12,20 @@ export class Nutricionista {
         this.contraseña = contraseña; // La contraseña se almacenará como un hash mediante un algoritmo
         this.país = país;
         this.ciudad = ciudad;
-        this.sugerencias = [];
+        this.consultantes = []
     }
 
-    agregarSugerencia(sugerencia) {
-        this.sugerencias.push(sugerencia);
+    agregarConsultante(consultante) {
+        // Verificar si el parámetro es una instancia de la clase Consultante
+        if (consultante instanceof Consultante) {
+            this.consultantes.push(consultante);
+        } else {
+            throw new Error("El parámetro debe ser una instancia de la clase Consultante");
+        }
+    }
+
+    getConsultantes(){
+        return this.consultantes;
     }
 
 }

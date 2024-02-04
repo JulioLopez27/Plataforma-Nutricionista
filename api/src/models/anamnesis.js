@@ -1,5 +1,6 @@
 class Anamnesis {
-    constructor(fecha, edad, peso, altura, constitucion_corporal, historia_alimentaria, horarios_alimenticios, objetivos_clinicos, deficits_nutricionales) {
+    constructor(fecha, edad, peso, altura, constitucion_corporal, historia_alimentaria, 
+                    horarios_alimenticios, objetivos_clinicos, deficits_nutricionales) {
         this.fecha = fecha; // Date
         this.edad = edad; // int
         this.peso = peso; // double

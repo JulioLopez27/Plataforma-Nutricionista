@@ -1,5 +1,8 @@
+import { Receta } from "./receta";
+
+
 export class Sugerencia {
-    constructor(etiqueta, enviada, fecha) {
+    constructor(etiqueta, enviada, fecha, nutricionista) {
         this.etiqueta = etiqueta;
         this.enviada = enviada; //Boolean
         this.fecha = fecha;
@@ -7,7 +10,14 @@ export class Sugerencia {
 
     }
     agregarReceta(receta) {
-        this.recetas.push(receta);
+        // Verificar si el parámetro es una instancia de la clase Receta
+        if (receta instanceof Receta) {
+            this.recetas.push(receta);
+        } else {
+            throw new Error("El parámetro debe ser una instancia de la clase Receta");
+        }
+
+        
     }
 
 }

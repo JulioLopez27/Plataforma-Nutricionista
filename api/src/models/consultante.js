@@ -1,12 +1,22 @@
+import { Registro } from "./registro";
+import { TipoDieta } from "./tipo_dieta";
+import { Sugerencia } from "./sugerencia";
+
+
 export class Consultante {
-    constructor(nombre, apellido, correo, telefono, sexo) {
+    constructor(nombre, apellido, correo, telefono, sexo, nutricionista) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.correo = correo;
         this.telefono = telefono;
         this.sexo = sexo;
+        this.nutricionista = nutricionista;
         this.afeccion = null;
         this.anamnesis = null;
+        this.tipoDieta = null;
+        this.sugerencias = [];
+        this.registros = []
+        
     }
 
     agregarAfeccion(afeccion) {
@@ -24,6 +34,33 @@ export class Consultante {
             this.anamnesis = anamnesis;
         } else {
             throw new Error("El parámetro debe ser una instancia de la clase Anamnesis");
+        }
+    }
+
+    agregarTipoDieta(tipoDieta) {
+        // Verificar si el parámetro es una instancia de la clase TipoDieta
+        if (tipoDieta instanceof TipoDieta) {
+            this.tipoDieta = tipoDieta;
+        } else {
+            throw new Error("El parámetro debe ser una instancia de la clase TipoDieta");
+        }
+    }
+
+    agregarSugerencia(sugerencia) {
+        // Verificar si el parámetro es una instancia de la clase Sugerencia
+        if (sugerencia instanceof Sugerencia) {
+            this.sugerencias.push(sugerencia);
+        } else {
+            throw new Error("El parámetro debe ser una instancia de la clase Sugerencia");
+        }
+    }
+
+    agregarRegistro(registro) {
+        // Verificar si el parámetro es una instancia de la clase Registro
+        if (registro instanceof Registro) {
+            this.registros.push(registro);
+        } else {
+            throw new Error("El parámetro debe ser una instancia de la clase Registro");
         }
     }
 
