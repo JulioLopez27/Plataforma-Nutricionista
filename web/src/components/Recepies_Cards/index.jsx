@@ -18,7 +18,7 @@ export const Recepies_Cards = () => {
             <img
               alt="Spaghetti Bolognese"
               className="w-full h-48 object-cover aspect-w-16 aspect-h-9 rounded-md"
-              src="/public/assets/img/espagueti.jpg"
+              src="/assets/img/espagueti.jpg"
            
             />
             <p className="mt-2 sm:mt-4 text-sm sm:text-base">A classic Italian dish with a rich and meaty sauce served over spaghetti.</p>
@@ -35,7 +35,7 @@ export const Recepies_Cards = () => {
             <img
               alt="Chicken Tikka Masala"
               className="w-full h-48 object-cover aspect-w-16 aspect-h-9 rounded-md"
-              src="/public/assets/img/chicken.jpg"
+              src="/assets/img/chicken.jpg"
             />
             <p className="mt-4">A popular Indian dish made with chicken in a creamy, spicy tomato sauce.</p>
           </CardContent>
@@ -49,7 +49,7 @@ export const Recepies_Cards = () => {
             <img
               alt="Beef Tacos"
               className="w-full h-48 object-cover aspect-w-16 aspect-h-9 rounded-md"
-              src="/public/assets/img/beefTacos.jpg"
+              src="/assets/img/beefTacos.jpg"
             />
             <p className="mt-4">A Mexican dish with beef, lettuce, and cheese served in a crunchy taco shell.</p>
           </CardContent>
@@ -63,7 +63,7 @@ export const Recepies_Cards = () => {
             <img
               alt="Vegetable Stir Fry"
               className="w-full h-48 object-cover aspect-w-16 aspect-h-9 rounded-md"
-              src="/public/assets/img/vegetales.jpg"
+              src="/assets/img/vegetales.jpg"
             />
             <p className="mt-4">A healthy and colorful dish with a variety of stir-fried vegetables in a savory sauce.</p>
           </CardContent>
@@ -77,7 +77,7 @@ export const Recepies_Cards = () => {
             <img
               alt="Seafood Paella"
               className="w-full h-48 object-cover aspect-w-16 aspect-h-9 rounded-md"
-              src="/public/assets/img/paella.jpg"
+              src="/assets/img/paella.jpg"
               
             />
             <p className="mt-4">A traditional Spanish dish with rice, various types of seafood, and a blend of spices.</p>
@@ -92,7 +92,7 @@ export const Recepies_Cards = () => {
             <img
               alt="Chocolate Cake"
               className="w-full h-48 object-cover aspect-w-16 aspect-h-9 rounded-md"
-              src="/public/assets/img/chocolate.jpg"
+              src="/assets/img/chocolate.jpg"
               
             />
             <p className="mt-4">
