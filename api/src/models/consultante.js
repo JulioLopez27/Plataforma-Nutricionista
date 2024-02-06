@@ -1,6 +1,6 @@
-import { Registro } from "./registro";
-import { TipoDieta } from "./tipo_dieta";
-import { Sugerencia } from "./sugerencia";
+import { Registro } from "./registro.js";
+import { TipoDieta } from "./tipo_dieta.js";
+import { Sugerencia } from "./sugerencia.js";
 
 
 export class Consultante {
@@ -16,7 +16,7 @@ export class Consultante {
         this.tipoDieta = null;
         this.sugerencias = [];
         this.registros = []
-        
+
     }
 
     agregarAfeccion(afeccion) {
@@ -64,6 +64,6 @@ export class Consultante {
         }
     }
 
-    
+
 
 }
