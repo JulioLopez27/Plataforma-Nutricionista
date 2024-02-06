@@ -20,7 +20,7 @@ export function Dashboard() {
             <NavBar />
 
 
-            <main className="">
+            <main>
 
                 <section id="header" className="max-w-full flex items-center justify-center">
                     <div className="flex flex-col text-center m-4 gap-4">
