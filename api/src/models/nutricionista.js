@@ -82,10 +82,85 @@ export class Nutricionista {
         }
     }
 
+    static async getProfileData(ctx) {
+        // if (!ctx.headers.authorization) {
+        //     ctx.status = HTTP_STATUS_UNAUTHORIZED
+        //     return
+        // }
+        // const [type, token] = ctx.headers.authorization.split(" ")
+        // const data = jwt.verify(token, process.env.JWT_SECRET)
+        // const userId = data.sub
+
+        try {
+            const getProfileData = await prisma.nutricionista.findUnique({
+                where: { id: 91 },
+                select: {
+                    nombre: true,
+                    apellido: true,
+                    telefono: true,
+                    email: true,
+                    anos_experiencia: true,
+                }
+            })
+
+            if (!getProfileData) {
+                ctx.status = HTTP_STATUS_NOT_FOUND
+                throw new Error('No se encontró el perfil del nutricionista')
+            }
+
+            const getProfileCountry = await prisma.nutricionista_pais.findFirst({
+                where: { id_nutricionista: 91 },
+                select: {
+                    pais: {
+                        select: { nombre: true }
+                    },
+                    ciudad: true
+                }
+            })
+
+            if (!getProfileCountry) {
+                ctx.status = HTTP_STATUS_NOT_FOUND
+                throw new Error('No se encontró el nutricionista o no tiene país asociado.')
+            }
+
+            const getProfileSpecialty = await prisma.nutricionista_especialidad.findFirst({
+                where: { id_nutricionista: 91 },
+                select: {
+                    especialidad: { select: { nombre: true } }
+                }
+            })
+
+            if (!getProfileSpecialty) {
+                ctx.status = HTTP_STATUS_NOT_FOUND
+                throw new Error('No se encontró el nutricionista o no tiene especialidad asociada.')
+            }
+
+            const { nombre, apellido, telefono, email, anos_experiencia } = getProfileData
+            const { pais: { nombre: nombrePais }, ciudad } = getProfileCountry
+            const { especialidad: { nombre: nombreEspecialidad } } = getProfileSpecialty
+            const profileData = {
+                nombre,
+                apellido,
+                telefono,
+                email,
+                especialidad: nombreEspecialidad,
+                anos_experiencia,
+                pais: nombrePais,
+                ciudad
+            }
+
+            ctx.body = profileData
+            ctx.status = HTTP_STATUS_CREATED
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     //creacion de un nutricionista
     // Función para manejar el inicio de sesión de un usuario
     static async login(ctx) {
+        // const [type, token] = ctx.headers.authorization.split(" ")
+        // const [email, plainTextPassword] = Buffer.from(token, 'base64').toString().split(":")
         try {
             // Extraemos el email y la contraseña del cuerpo de la petición
             const email = ctx.request.body.email
@@ -197,12 +272,40 @@ export class Nutricionista {
     }
 
 
-
-
     //*ToDo:crear funciones para actualizar los datos del nutricionista
-    //*ToDo:crear una funcion para listar todos los nutricionistas
-    //*ToDo:crear una funcion para borrar algun nutricionista
+    static async updateProfile(ctx) {
+        // if (!ctx.headers.authorization) {
+        //     ctx.status = HTTP_STATUS_UNAUTHORIZED
+        //     return
+        // }
+        // const [type, token] = ctx.headers.authorization.split(" ")
+        // const data = jwt.verify(token, process.env.JWT_SECRET)
+        // const userId = data.sub
+
+        //  const newData = ctx.request.body;
+       
+          console.log("🚀 ~ Nutricionista ~ updateProfile ~ newData:", ctx.request.body)
+       
+        // try {
+        //     const updatedProfile = await prisma.nutricionista.update({
+        //         where: { id: newData.id },
+        //         data: newData
+        //     });
+        //     ctx.body = updatedProfile;
+        //     ctx.status = HTTP_STATUS_CREATED
+        // } catch (error) {
+        //     console.error('Error al actualizar el perfil:', error);
+        //     ctx.body = { error: 'Error al actualizar el perfil.' };
+        //     ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+        // }
+    }
 
 
 }
+
+//*ToDo:crear una funcion para listar todos los nutricionistas
+//*ToDo:crear una funcion para borrar algun nutricionista
+
+
+
 
