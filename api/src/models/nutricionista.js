@@ -111,9 +111,7 @@ export class Nutricionista {
             const getProfileCountry = await prisma.nutricionista_pais.findFirst({
                 where: { id_nutricionista: 91 },
                 select: {
-                    pais: {
-                        select: { nombre: true }
-                    },
+                    id_pais: true,
                     ciudad: true
                 }
             })
@@ -126,7 +124,7 @@ export class Nutricionista {
             const getProfileSpecialty = await prisma.nutricionista_especialidad.findFirst({
                 where: { id_nutricionista: 91 },
                 select: {
-                    especialidad: { select: { nombre: true } }
+                    id_especialidad: true
                 }
             })
 
@@ -136,18 +134,20 @@ export class Nutricionista {
             }
 
             const { nombre, apellido, telefono, email, anos_experiencia } = getProfileData
-            const { pais: { nombre: nombrePais }, ciudad } = getProfileCountry
-            const { especialidad: { nombre: nombreEspecialidad } } = getProfileSpecialty
+            const { id_pais, ciudad } = getProfileCountry
+            const { id_especialidad } = getProfileSpecialty
+
             const profileData = {
                 nombre,
                 apellido,
                 telefono,
                 email,
-                especialidad: nombreEspecialidad,
+                especialidad: id_especialidad,
                 anos_experiencia,
-                pais: nombrePais,
+                pais: id_pais,
                 ciudad
             }
+
 
             ctx.body = profileData
             ctx.status = HTTP_STATUS_CREATED
@@ -159,8 +159,6 @@ export class Nutricionista {
     //creacion de un nutricionista
     // Función para manejar el inicio de sesión de un usuario
     static async login(ctx) {
-        // const [type, token] = ctx.headers.authorization.split(" ")
-        // const [email, plainTextPassword] = Buffer.from(token, 'base64').toString().split(":")
         try {
             // Extraemos el email y la contraseña del cuerpo de la petición
             const email = ctx.request.body.email
@@ -172,7 +170,6 @@ export class Nutricionista {
 
             // Si la autenticación es exitosa, eliminamos la contraseña del objeto del usuario
             const { password, ...result } = user
-
             // Creamos un token de acceso para el usuario
             const accesToken = jwt.sign({
                 sub: user.id,
@@ -256,7 +253,7 @@ export class Nutricionista {
             const accesToken = jwt.sign({
                 sub: user.id,
                 name: user.nombre,
-                expiresIn: set_expiration_time,
+                expiresIn: Nutricionista.#set_expiration_time,
             }, process.env.JWT_SECRET)
 
             ctx.body = {
@@ -283,9 +280,9 @@ export class Nutricionista {
         // const userId = data.sub
 
         //  const newData = ctx.request.body;
-       
-          console.log("🚀 ~ Nutricionista ~ updateProfile ~ newData:", ctx.request.body)
-       
+
+        console.log("🚀 ~ Nutricionista ~ updateProfile ~ newData:", ctx.request.body)
+
         // try {
         //     const updatedProfile = await prisma.nutricionista.update({
         //         where: { id: newData.id },
