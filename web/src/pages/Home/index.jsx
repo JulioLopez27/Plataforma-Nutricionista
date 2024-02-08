@@ -29,7 +29,7 @@ export function Home() {
           url: '/login',
           data: values
         })
-
+       
         setIsModalOpen(true);
         setMessage(`Bienvenido nutricionista: ${res.data.user.nombre}  ${res.data.user.apellido}.`);
         setMessageType('approval');
