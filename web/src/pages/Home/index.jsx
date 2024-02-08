@@ -15,10 +15,8 @@ const validationSchema = yup.object().shape({
 })
 
 export function Home() {
-
-  const [isModalOpen, setIsModalOpen] = useState(false); // Agrega este estado
-  const [message, setMessage] = useState(''); // Agrega este estado para manejar el mensaje de error
-  const [messageType, setMessageType] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false) // Agrega este estado
+  const [message, setMessage] = useState('') // Agrega este estado para manejar el mensaje de error  const [messageType, setMessageType] = useState('')
 
   const [auth, setAuth] = useLocalStorage('auth', {})
 
