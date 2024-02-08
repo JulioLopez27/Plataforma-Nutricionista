@@ -15,7 +15,6 @@ export async function authenticateUser(email, plainTextPassword) {
       password:true,
     }
   });
-  console.log(user);
   // Si el usuario no existe, lanzamos un error
   if (!user) {
     throw new Error('Email no encontrado');
