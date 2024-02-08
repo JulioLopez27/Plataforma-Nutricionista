@@ -3,6 +3,7 @@ a ser usadas*/
 import Router from '@koa/router'
 import { Nutricionista } from './models/nutricionista.js'
 
+
 export const router = new Router()
 
 
@@ -16,4 +17,3 @@ router.get('/getProfileData', async (ctx) => { await Nutricionista.getProfileDat
 router.put('/updateProfileData', async (ctx) => { await Nutricionista.updateProfile(ctx) })
 router.get('/getConsultants', async (ctx) => { await Nutricionista.getConsultantes(ctx) })
 router.get('/getHistory', async (ctx) => { await Nutricionista.getHistory(ctx) })
-router.get('/getHistoryInformes', async (ctx) => { await Nutricionista.getHistoryInformes(ctx) })
