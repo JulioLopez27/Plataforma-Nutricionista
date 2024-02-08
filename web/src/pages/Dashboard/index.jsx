@@ -1,21 +1,13 @@
-import { useLocalStorage, useAsyncFn } from 'react-use'
-import { Navigate,useNavigate } from 'react-router-dom'
+import { useLocalStorage } from 'react-use'
+import { Navigate } from 'react-router-dom'
 import { Recepies_Cards, Header, NavBar } from "~/components"
 
 
 export function Dashboard() {
-    const navigate = useNavigate()
-
-    const [auth,setAuth] = useLocalStorage('auth', {})
-    console.log(auth);
+    const [auth] = useLocalStorage('auth', {})
     
     if (!auth?.user?.id) {
         return <Navigate to="/" replace={true} />
-    }
-
-    const logout = () => {
-        setAuth({})
-        navigate('/')
     }
 
     return (
@@ -36,9 +28,6 @@ export function Dashboard() {
                         <h1 className="p-2 text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold text-azul_titulo ">
                             Recetas sugeridas de ChefDigitales
                         </h1>
-                        {auth?.user?.id && (<div onClick={logout} className="p-2 cursor-pointer text-xl font-semibold">
-                        Logout
-                    </div>)}
                         <p className="w-full sm:w-5/6 md:w-3/4 lg:w-1/2 m-auto text-gray-900">
                             Bienvenido a nuestra plataforma de nutrición.
                             Aquí, podrás gestionar tus clientes, crear planes de alimentación personalizados,
