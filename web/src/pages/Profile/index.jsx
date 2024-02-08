@@ -2,88 +2,125 @@ import axios from 'axios'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 
-import { Input, Header, NavBar } from '~/components'
-
+import { Input, Custom_select, Header, NavBar } from '~/components'
 
 const validationSchema = yup.object().shape({
-    email: yup.string().required('Campo obligatorio').email('Ingrese un formato valido').trim(),
-    password: yup.string().required('Campo obigatorio').trim()
+    nombre: yup.string().required('Campo obligatorio'),
+    apellido: yup.string().required('Campo obligatorio'),
+    telefono: yup.string()
+        .min(9, 'El número de teléfono debe tener al menos 9 dígitos')
+        .max(15, 'El número de teléfono tiene un máximo de 15 dígitos')
+        .matches(/^[0-9]*$/, 'El número de teléfono solo puede contener números'),
+    email: yup.string().email().required('Campo obligatorio'),
+    especialidad: yup.number().integer().required('Campo obligatorio'),
+    anos_experiencia: yup.number()
+        .min(0, 'Solo se aceptan valores positivos')
+        .max(70, 'Maximo valor que puede ingresar')
+        .required('Campo obligatorio'),
+    pais: yup.number().integer().required('Campo obligatorio'),
+    ciudad: yup.string().required('Campo obligatorio'),
 })
 
-
-
-
+const fetchData = async (url) => {
+    const res = await axios({
+        method: 'GET',
+        baseURL: 'http://localhost:3000',
+        url: url,
+    })
+    return res.data;
+}
 
 export function Profile() {
-    const [userInfo, setUserInfo] = useState({});
-    const [error, setError] = useState(null);
-    const [retryCount, setRetryCount] = useState(0);
-    const maxRetries = 3;
+    const [userInfo, setUserInfo] = useState({})
+    const [isLoaded, setIsLoaded] = useState(false)
+    const [error, setError] = useState(null)
+    const [countries, setCountries] = useState([])
+    const [specialties, setSpecialties] = useState([])
+
+
+    const fetchUserInfo = useCallback(async () => {
+        try {
+            const dataUser = await fetchData('/getProfileData');
+            setUserInfo(dataUser)
+        } catch (error) {
+            console.error('Error al obtener la información del usuario:', error)
+            setError(error);
+        } finally {
+            setIsLoaded(true)
+        }
+    }, [])
+
+    const fetchSpecialty = useCallback(async () => {
+        const data = await fetchData('/getSpecialty');
+        setSpecialties(data);
+    }, [])
+
+    const fetchCountries = useCallback(async () => {
+        const data = await fetchData('/getCountries');
+        setCountries(data);
+    }, [])
 
     useEffect(() => {
-        // Obtener la información del usuario del servidor al cargar el componente
-        async function fetchUserInfo() {
-            try {
-                const res = await axios({
-                    method: "GET",
-                    baseURL: 'http://localhost:3000',
-                    url: '/getProfileData'
-                });
-                console.log(res.data);
-                setUserInfo(res.data);
-            } catch (error) {
-                console.error('Error al obtener la información del usuario:', error);
-                setError(error);
-            }
-        }
+        // Realizar las solicitudes HTTP de manera concurrente
+        Promise.all([fetchUserInfo(), fetchSpecialty(), fetchCountries()]);
+    }, [fetchUserInfo, fetchSpecialty, fetchCountries]);
 
-        // Realizar una nueva solicitud solo si aún no se ha alcanzado el límite máximo de intentos
-        if (retryCount < maxRetries) {
-            fetchUserInfo();
-            setRetryCount(retryCount + 1);
-        }
-    }, [retryCount]); // Reintentar la solicitud cada vez que el contador de intentos cambie
 
     // Función para volver a intentar obtener los datos del usuario
     const retryFetchUserInfo = () => {
-        setRetryCount(0); // Reinicia el contador de intentos
         setError(null); // Reinicia el estado de error
-    };
+        fetchUserInfo(); // Reinicia la solicitud
+    }
 
-    // Función para manejar cambios en los campos de entrada del formulario
-    const handleInputChange = (e) => {
-        // Extraer el nombre y el valor del campo de entrada que ha cambiado del evento
-        const { name, value } = e.target;
-        // Actualizar el estado `userInfo` utilizando una función de actualización que recibe el estado anterior (prevUserInfo)
-        // y devuelve un nuevo estado que incluye las propiedades anteriores junto con la propiedad que está cambiando (name) y su nuevo valor (value)
-        setUserInfo(prevUserInfo => ({
-            ...prevUserInfo, // Copia todas las propiedades existentes del estado previo
-            [name]: value    // Actualiza la propiedad específica que corresponde al nombre del campo de entrada (name) con su nuevo valor (value)
-        }));
-    };
+    const initialValues = useMemo(() => ({
+        nombre: isLoaded ? userInfo.nombre : '',
+        apellido: isLoaded ? userInfo.apellido : '',
+        email: isLoaded ? userInfo.email : '',
+        telefono: isLoaded ? userInfo.telefono : '',
+        anos_experiencia: isLoaded ? userInfo.anos_experiencia : '',
+        especialidad: isLoaded ? userInfo.especialidad : '',
+        pais: isLoaded ? userInfo.pais : '',
+        ciudad: isLoaded ? userInfo.ciudad : ''
+    }), [isLoaded, userInfo]);
 
     // Definir la función de envío del formulario utilizando Formik
     const formik = useFormik({
-        initialValues: userInfo, // Utilizar la información del usuario como valores iniciales del formulario
+        initialValues: initialValues,
+        // Utilizar la información del usuario como valores iniciales del formulario,
         onSubmit: async (values) => {
-
+            console.log("🚀 ~ onSubmit: ~ values:", values)
             try {
                 const res = await axios({
                     method: 'put',
                     baseURL: 'http://localhost:3000',
                     url: '/updateProfileData',
                     data: values  // Enviar los datos modificados al servidor
-                });
-                console.log("🚀 ~ onSubmit: ~ values:", values)
+                })
+
                 // Manejar la respuesta del servidor, por ejemplo, mostrar un mensaje de éxito
             } catch (error) {
                 // Manejar errores, por ejemplo, mostrar un mensaje de error al usuario
                 console.error('Error al actualizar el perfil:', error);
             }
-        }, validationSchema
-    });
+        }
+    })
+
+    useEffect(() => {
+        if (isLoaded) {
+            formik.setValues({
+                nombre: userInfo.nombre,
+                apellido: userInfo.apellido,
+                email: userInfo.email,
+                telefono: userInfo.telefono,
+                anos_experiencia: userInfo.anos_experiencia,
+                especialidad: userInfo.especialidad,
+                pais: userInfo.pais,
+                ciudad: userInfo.ciudad
+            });
+        }
+    }, [isLoaded, userInfo]);
 
     return (
         <div>
@@ -97,11 +134,24 @@ export function Profile() {
                                 <p>Error al obtener la información del usuario. Por favor, inténtalo de nuevo más tarde.</p>
                                 <button onClick={retryFetchUserInfo}>Reintentar</button> {/* Botón para volver a intentar */}
                             </div>
-                        ) : (userInfo !== null &&
+                        ) : isLoaded ? (
                             <form onSubmit={formik.handleSubmit}>
-                                <Input label='Nombre' name='nombre' value={userInfo.nombre} onChange={handleInputChange} />
-                                <button type="submit">Guardar cambios</button>
+                                <Input label='Nombre' name='nombre' value={formik.values.nombre} onChange={formik.handleChange} />
+                                <Input label='Apellido' name='apellido' value={formik.values.apellido} onChange={formik.handleChange} />
+                                <Input label='Email' name='email' value={formik.values.email} onChange={formik.handleChange} />
+                                <Input label='Telefono' name='telefono' value={formik.values.telefono} onChange={formik.handleChange} />
+                                <Input label='Años de experiencia' name='anos_experiencia' value={formik.values.anos_experiencia} onChange={formik.handleChange} />
+                                <Custom_select htmlFor='espescialidad' id='especialidad' type='number' label='Especialidad' name='especialidad' placeholder="Ingrese su especialidad" value={formik.values.especialidad} onChange={formik.handleChange} options={specialties} initialValue={userInfo.especialidad} />
+                                <Custom_select htmlFor='pais' id='pais' type='number' label='Pais' name='pais' placeholder="Ingrese su pais" value={formik.values.pais} onChange={formik.handleChange} options={countries} initialValue={userInfo.pais} />
+
+                                <Input label='Ciudad' name='ciudad' value={formik.values.ciudad} onChange={formik.handleChange} />
+
+                                <div className="flex flex-col text-center gap-4 text-white my-4">
+                                    <button type="submit" className=' p-2 bg-verde_oscuro rounded-xl border'>Guardar cambios</button>
+                                </div>
                             </form>
+                        ) : (
+                            <p>Cargando...</p>
                         )}
                     </div>
                 </section>
