@@ -10,11 +10,7 @@ import { Dashboard } from './Dashboard'
 import { Profile } from "./Profile"
 import { Consultante } from "./Consultante"
 import { Receta} from './Receta'
-import {Lista} from './Consultante/lista'
-import {Historico} from './Receta/historico'
-
-
-
+import { Lista} from "./Consultante/lista"
 
 const router = createBrowserRouter([
   {
@@ -37,12 +33,9 @@ const router = createBrowserRouter([
   }, {
     path: "/recetas",
     element: <Receta />,
-  }, {
+  },{
     path: "/lista",
     element: <Lista />,
-  }, {
-    path: "/historico",
-    element: <Historico />,
   },
 
 ]);
