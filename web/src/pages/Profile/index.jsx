@@ -3,6 +3,8 @@ import { useFormik } from 'formik'
 import * as yup from 'yup'
 
 import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useLocalStorage } from 'react-use'
+import { useNavigate } from 'react-router-dom'
 
 import { Input, Custom_select, Header, NavBar } from '~/components'
 
@@ -33,12 +35,20 @@ const fetchData = async (url) => {
 }
 
 export function Profile() {
+    const navigate = useNavigate()
     const [userInfo, setUserInfo] = useState({})
     const [isLoaded, setIsLoaded] = useState(false)
     const [error, setError] = useState(null)
     const [countries, setCountries] = useState([])
     const [specialties, setSpecialties] = useState([])
 
+    const [auth] = useLocalStorage('auth', {})
+
+    useEffect(() => {
+        if (!auth?.user?.id) {
+            navigate('/')
+        }
+    })
 
     const fetchUserInfo = useCallback(async () => {
         try {
@@ -61,6 +71,8 @@ export function Profile() {
         const data = await fetchData('/getCountries');
         setCountries(data);
     }, [])
+
+
 
     useEffect(() => {
         // Realizar las solicitudes HTTP de manera concurrente
@@ -90,7 +102,6 @@ export function Profile() {
         initialValues: initialValues,
         // Utilizar la información del usuario como valores iniciales del formulario,
         onSubmit: async (values) => {
-            console.log("🚀 ~ onSubmit: ~ values:", values)
             try {
                 const res = await axios({
                     method: 'put',
@@ -105,7 +116,8 @@ export function Profile() {
                 console.error('Error al actualizar el perfil:', error);
             }
         }
-    })
+    }
+    )
 
     useEffect(() => {
         if (isLoaded) {
@@ -122,10 +134,13 @@ export function Profile() {
         }
     }, [isLoaded, userInfo]);
 
+
+
     return (
         <div>
             <Header />
             <NavBar />
+
             <main className='mt-4'>
                 <section id="editPerfil" className='container' >
                     <div className='flex justify-center items-center'>
