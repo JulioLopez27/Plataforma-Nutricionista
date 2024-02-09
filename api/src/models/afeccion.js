@@ -1,4 +1,4 @@
-class Afeccion {
+export class Afeccion {
     constructor(diabetes_tipo_1, diabetes_tipo_2, celiaquismo, hipertension, alergias, enfermedad_renal,
                     hipercolesterolemia, anemia, obesidad) {
         this.diabetes_tipo_1 = diabetes_tipo_1; // Booleano

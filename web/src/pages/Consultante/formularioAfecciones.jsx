@@ -2,7 +2,7 @@ import React from 'react';
 import { Input } from '~/components'
 import { useFormik } from 'formik'
 
-export function FormularioAfecciones({ handleInputChange }) {
+export function FormularioAfecciones() {
 
     const formik = useFormik({
         onSubmit: async (values) => {
@@ -24,7 +24,7 @@ export function FormularioAfecciones({ handleInputChange }) {
     const userInfo = {
         diabetes_tipo_1: false,
         diabetes_tipo_2: false,
-        celiaquismo: false,
+        celiaquismo: true,
         hipertension: false,
         alergias: 'mani, huevos, leche, soja',
         enfermedad_renal: false,
@@ -58,7 +58,7 @@ export function FormularioAfecciones({ handleInputChange }) {
                     id="diabetes_tipo_2"
                     name="diabetes_tipo_2"
                     checked={userInfo.diabetes_tipo_2}
-                    onChange={handleInputChange}
+                    onChange={formik.handleChange}
                     className="rounded-md bg-gray-100 px-4 py-2"
                 />
             </div>
@@ -71,12 +71,12 @@ export function FormularioAfecciones({ handleInputChange }) {
                     id="celiaquismo"
                     name="celiaquismo"
                     checked={userInfo.celiaquismo}
-                    onChange={handleInputChange}
+                    onChange={formik.handleChange}
                     className="rounded-md bg-gray-100 px-4 py-2"
                 />
             </div>
             {/* Repite el patrón para los demás campos booleanos */}
-            <Input label="Alergias" name="alergias" value={userInfo.alergias} onChange={handleInputChange} className="rounded-md bg-gray-100 px-4 py-2" />
+            <Input label="Alergias" name="alergias" value={userInfo.alergias} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" />
             <div>
                 <label htmlFor="enfermedad_renal" className="block text-sm font-medium text-gray-700">
                     Enfermedad Renal
@@ -86,7 +86,7 @@ export function FormularioAfecciones({ handleInputChange }) {
                     id="enfermedad_renal"
                     name="enfermedad_renal"
                     checked={userInfo.enfermedad_renal}
-                    onChange={handleInputChange}
+                    onChange={formik.handleChange}
                     className="rounded-md bg-gray-100 px-4 py-2"
                 />
             </div>

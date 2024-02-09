@@ -2,7 +2,7 @@
 import axios from 'axios'
 import * as yup from 'yup'
 import { useFormik } from 'formik'
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 
 import { Input, Custom_select, CustomModal } from '~/components'
 
@@ -47,29 +47,37 @@ const validationSchema = yup.object().shape({
     )
 })
 
+const fetchData = async (url) => {
+    const res = await axios({
+        method: 'GET',
+        baseURL: 'http://localhost:3000',
+        url: url,
+    })
+    return res.data;
+}
+
 export const Signup = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false); // Agrega este estado
     const [message, setMessage] = useState(''); // Agrega este estado para manejar el mensaje de error
     const [messageType, setMessageType] = useState('');
+    const [countries, setCountries] = useState([])
+    const [specialties, setSpecialties] = useState([])
 
+    const fetchSpecialty = useCallback(async () => {
+        const data = await fetchData('/getSpecialty');
+        setSpecialties(data);
+    }, [])
 
-    const fetchSpecialty = async () => {
-        return axios({
-            method: 'GET',
-            baseURL: 'http://localhost:3000',
-            url: '/getSpecialty',
-        });
-    }
+    const fetchCountries = useCallback(async () => {
+        const data = await fetchData('/getCountries');
+        setCountries(data);
+    }, [])
 
-    const fetchCountries = async () => {
-        return axios({
-            method: 'GET',
-            baseURL: 'http://localhost:3000',
-            url: '/getCountries'
-
-        })
-    }
+    useEffect(() => {
+        // Realizar las solicitudes HTTP de manera concurrente
+        Promise.all([fetchSpecialty(), fetchCountries()]);
+    }, [fetchSpecialty, fetchCountries]);
 
     const formik = useFormik({
         onSubmit: async (values) => {
@@ -206,7 +214,7 @@ export const Signup = () => {
                         value={formik.values.especialidad}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        dataFetcher={fetchSpecialty}
+                        options={specialties}
                     />
 
                     <Input
@@ -233,7 +241,7 @@ export const Signup = () => {
                         value={formik.values.pais}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        dataFetcher={fetchCountries}
+                        options={countries}
                     />
 
                     <Input
@@ -270,7 +278,7 @@ export const Signup = () => {
                             {formik.isSubmitting ? 'Creando su usuario' : 'Crear mi cuenta'}
 
                         </button>
-                       
+
                         <a href="/" className=" p-2 bg-verde_oscuro rounded-xl border ">Página principal</a>
 
                     </div>

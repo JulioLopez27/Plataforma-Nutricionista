@@ -4,8 +4,10 @@ import * as yup from 'yup'
 import { useFormik } from 'formik'
 
 import { Input, CustomModal } from '~/components'
-import { useState } from 'react';
 
+import { useState } from 'react';
+import { useLocalStorage } from 'react-use'
+import { Navigate } from 'react-router-dom'
 
 const validationSchema = yup.object().shape({
   email: yup.string().required('Campo obligatorio').email('Ingrese un formato valido').trim(),
@@ -13,11 +15,10 @@ const validationSchema = yup.object().shape({
 })
 
 export function Home() {
+  const [isModalOpen, setIsModalOpen] = useState(false) // Agrega este estado
+  const [message, setMessage] = useState('') // Agrega este estado para manejar el mensaje de error  const [messageType, setMessageType] = useState('')
 
-  const [isModalOpen, setIsModalOpen] = useState(false); // Agrega este estado
-  const [message, setMessage] = useState(''); // Agrega este estado para manejar el mensaje de error
-  const [messageType, setMessageType] = useState('');
-
+  const [auth, setAuth] = useLocalStorage('auth', {})
 
   const formik = useFormik({
     onSubmit: async (values) => {
@@ -29,7 +30,7 @@ export function Home() {
           url: '/login',
           data: values
         })
-
+        setAuth(res.data)
         setIsModalOpen(true);
         setMessage(`Bienvenido nutricionista: ${res.data.user.nombre}  ${res.data.user.apellido}.`);
         setMessageType('approval');
@@ -51,6 +52,10 @@ export function Home() {
   const handleCloseModal = () => {
     setIsModalOpen(false); // Función para cerrar el modal
   }
+
+  if (auth?.user?.id) {
+    return <Navigate to="/dashboard" replace={true} />
+}
 
   return (
 

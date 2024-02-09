@@ -6,8 +6,15 @@ import bcrypt from 'bcrypt'
 // Función para autenticar al usuario
 export async function authenticateUser(email, plainTextPassword) {
   // Buscamos al usuario en la base de datos
-  const user = await prisma.nutricionista.findUnique({ where: { email } });
-
+  const user = await prisma.nutricionista.findFirst({
+    where: { email },
+    select: {
+      id: true,
+      nombre: true,
+      apellido: true,
+      password:true,
+    }
+  });
   // Si el usuario no existe, lanzamos un error
   if (!user) {
     throw new Error('Email no encontrado');
@@ -90,7 +97,7 @@ export async function validateEmail(email) {
 // CODIGO PRE-REGISTRO PARA UN USUARIO NUTRICIONISTA
 // existira una aprobacion para que un admin de chefDigitales
 // acepte o rechaze la solicitud de creacion del usuario nutricionista
-//#region 
+//#region
 
 // mejoras a futuro y lineas de accion
 // Ruta para el registro de usuarios
@@ -137,4 +144,7 @@ export async function validateEmail(email) {
 //     ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
 //   }
 // }
+
 //#endregion
+//Idea: Se crea el registro del nutricionista siempre en la etapa de pre-registro y cambiar un param
+//booleano(aprobado) en la BD cuando chefDigitales apruebe su registro.

@@ -1,4 +1,4 @@
-class Categoria_Receta {
+export class Categoria_Receta {
     constructor(nombre, descripcion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
