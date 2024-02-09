@@ -16,8 +16,9 @@ const validationSchema = yup.object().shape({
 
 export function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false) // Agrega este estado
-  const [message, setMessage] = useState('') // Agrega este estado para manejar el mensaje de error  const [messageType, setMessageType] = useState('')
-
+  const [message, setMessage] = useState('') // Agrega este estado para manejar el mensaje de error  
+  const [messageType, setMessageType] = useState('')
+  
   const [auth, setAuth] = useLocalStorage('auth', {})
 
   const formik = useFormik({
@@ -31,14 +32,14 @@ export function Home() {
           data: values
         })
         setAuth(res.data)
-        setIsModalOpen(true);
-        setMessage(`Bienvenido nutricionista: ${res.data.user.nombre}  ${res.data.user.apellido}.`);
-        setMessageType('approval');
+        setIsModalOpen(true)
+        setMessage(`Bienvenido nutricionista: ${res.data.user.nombre}  ${res.data.user.apellido}.`)
+        setMessageType('approval')
 
       } catch (error) {
         setIsModalOpen(true);
-        setMessage(error.response.data.error);
-        setMessageType('error');
+        setMessage(error.response.data.error)
+        setMessageType('error')
       }
     },
     initialValues: {
