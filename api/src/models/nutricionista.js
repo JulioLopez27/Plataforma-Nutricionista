@@ -35,8 +35,8 @@ import {
 export class Nutricionista {
 
   //se setea el tiempo de expiracion del token
-  static# set_expiration_time = "8h"
-  static# set_default_idChefDigitales = 0
+  static #set_expiration_time = "8h"
+  static #set_default_idChefDigitales = 0
 
   constructor(nombre, apellido, correo, tituloEscaneado, experiencia, telefono, contraseña, país, ciudad) {
     this.nombre = nombre;
