@@ -44,7 +44,7 @@ const validationSchema = yup.object().shape({
         'fileType',
         'Solo se permiten archivos de imagen (jpg, jpeg, png, gif)',
         validateFileType
-    )
+    ).required("Campo obligatorio")
 })
 
 const fetchData = async (url) => {
@@ -64,6 +64,7 @@ export const Signup = () => {
     const [countries, setCountries] = useState([])
     const [specialties, setSpecialties] = useState([])
 
+    const [didMount, setDidMount] = useState(false)
     const fetchSpecialty = useCallback(async () => {
         const data = await fetchData('/getSpecialty');
         setSpecialties(data);
@@ -75,9 +76,12 @@ export const Signup = () => {
     }, [])
 
     useEffect(() => {
-        // Realizar las solicitudes HTTP de manera concurrente
-        Promise.all([fetchSpecialty(), fetchCountries()]);
-    }, [fetchSpecialty, fetchCountries]);
+        setDidMount(true)
+        if (didMount) {
+            // Realizar las solicitudes HTTP de manera concurrente
+            Promise.all([fetchSpecialty(), fetchCountries()]);
+        }
+    }, [fetchSpecialty, fetchCountries,didMount]);
 
     const formik = useFormik({
         onSubmit: async (values) => {
@@ -132,7 +136,7 @@ export const Signup = () => {
 
                 <h2 className="text-3xl text-center font-semibold mb-3">Bienvenido a la página de registro</h2>
 
-                <form className="space-y-4 mt-3" onSubmit={formik.handleSubmit} >
+                <form className="space-y-4 mt-3" onSubmit={formik.handleSubmit} encType="multipart/form-data" >
 
                     <Input
                         htmlFor='nombre'
