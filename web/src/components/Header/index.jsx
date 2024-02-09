@@ -49,7 +49,7 @@ export const Header = () => {
                                     <button onClick={goToProfile} className="text-sm text-gris_texto hover:text-gray-400">Mi perfil</button>
                                 </div>
                                 <div className="px-4 py-3 flex items-center gap-2">
-                                    <img src="/assets/logout/logout.svg" alt="logout" className='w-2 sm:3 md:w-4 2xl:w-5    ' />
+                                    <img loading='lazy' src="/assets/logout/logout.svg" alt="logout" className='w-2 sm:3 md:w-4 2xl:w-5    ' />
                                     <button onClick={logout} className="text-sm text-red-500 hover:text-red-700">Cerrar sesión</button>
                                 </div>
                             </div>
