@@ -25,8 +25,12 @@ model consultante {
   altura                    Decimal                     @db.Decimal(3, 2)
   createdAt                 DateTime?                   @default(now()) @db.Timestamp(0)
   updatedAt                 DateTime?                   @default(now()) @db.Timestamp(0)
+  apellido                  String                      @db.VarChar(255)
+  sexo                      String                      @db.VarChar(10)
+  telefono                  String                      @db.VarChar(255)
   consultante_afeccion      consultante_afeccion[]
   consultante_receta        consultante_receta[]
+  consultante_tipodieta     consultante_tipodieta[]
   nutricionista_consultante nutricionista_consultante[]
   registro                  registro[]
 }
@@ -44,15 +48,19 @@ model consultante_afeccion {
 }
 
 model consultante_receta {
-  id_consultante Int
-  id_receta      Int
-  createdAt      DateTime?   @default(now()) @db.Timestamp(0)
-  updatedAt      DateTime?   @default(now()) @db.Timestamp(0)
-  consultante    consultante @relation(fields: [id_consultante], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "consultante_receta_ibfk_1")
-  receta         receta      @relation(fields: [id_receta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "consultante_receta_ibfk_2")
+  id_consultante   Int
+  id_receta        Int
+  id_nutricionista Int
+  fecha_envio      DateTime      @db.Date
+  createdAt        DateTime?     @default(now()) @db.Timestamp(0)
+  updatedAt        DateTime?     @default(now()) @db.Timestamp(0)
+  consultante      consultante   @relation(fields: [id_consultante], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "consultante_receta_ibfk_1")
+  receta           receta        @relation(fields: [id_receta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "consultante_receta_ibfk_2")
+  nutricionista    nutricionista @relation(fields: [id_nutricionista], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "consultante_receta_ibfk_3")
 
-  @@id([id_consultante, id_receta])
+  @@id([id_consultante, id_receta, id_nutricionista, fecha_envio])
   @@index([id_receta], map: "id_receta")
+  @@index([id_nutricionista], map: "id_nutricionista")
 }
 
 model especialidad {
@@ -83,6 +91,7 @@ model nutricionista {
   id_chefDigitales           Int?
   createdAt                  DateTime?                    @default(now()) @db.Timestamp(0)
   updatedAt                  DateTime?                    @default(now()) @db.Timestamp(0)
+  consultante_receta         consultante_receta[]
   nutricionista_consultante  nutricionista_consultante[]
   nutricionista_especialidad nutricionista_especialidad[]
   nutricionista_pais         nutricionista_pais[]
@@ -147,6 +156,9 @@ model registro {
   id_consultante   Int
   fecha            DateTime      @db.DateTime(0)
   nota             String        @db.Text
+  tipo             String        @db.VarChar(255)
+  enviado          Boolean
+  createdAt        DateTime?     @default(now()) @db.Timestamp(0)
   updatedAt        DateTime?     @default(now()) @db.Timestamp(0)
   nutricionista    nutricionista @relation(fields: [id_nutricionista], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "registro_ibfk_1")
   consultante      consultante   @relation(fields: [id_consultante], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "registro_ibfk_2")
@@ -174,4 +186,24 @@ model pais {
   createdAt          DateTime?            @default(now()) @db.Timestamp(0)
   updatedAt          DateTime?            @default(now()) @db.Timestamp(0)
   nutricionista_pais nutricionista_pais[]
+}
+
+model consultante_tipodieta {
+  id_consultante Int
+  id_tipoDieta   Int
+  createdAt      DateTime?   @default(now()) @db.Timestamp(0)
+  updatedAt      DateTime?   @default(now()) @db.Timestamp(0)
+  consultante    consultante @relation(fields: [id_consultante], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "consultante_tipodieta_ibfk_1")
+  tipodieta      tipodieta   @relation(fields: [id_tipoDieta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "consultante_tipodieta_ibfk_2")
+
+  @@id([id_consultante, id_tipoDieta])
+  @@index([id_tipoDieta], map: "id_tipoDieta")
+}
+
+model tipodieta {
+  id                    Int                     @id @default(autoincrement())
+  nombre                String                  @unique(map: "nombre") @db.VarChar(255)
+  createdAt             DateTime?               @default(now()) @db.Timestamp(0)
+  updatedAt             DateTime?               @default(now()) @db.Timestamp(0)
+  consultante_tipodieta consultante_tipodieta[]
 }

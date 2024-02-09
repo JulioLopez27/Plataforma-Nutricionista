@@ -14,3 +14,6 @@ router.get('/getSpecialty', async (ctx) => { await Nutricionista.getSpecialty(ct
 router.get('/getCountries', async (ctx) => { await Nutricionista.getCountries(ctx) })
 router.get('/getProfileData', async (ctx) => { await Nutricionista.getProfileData(ctx) })
 router.put('/updateProfileData', async (ctx) => { await Nutricionista.updateProfile(ctx) })
+router.get('/getConsultants', async (ctx) => { await Nutricionista.getConsultantes(ctx) })
+router.get('/getHistory', async (ctx) => { await Nutricionista.getHistory(ctx) })
+router.get('/getHistoryInformes', async (ctx) => { await Nutricionista.getHistoryInformes(ctx) })
