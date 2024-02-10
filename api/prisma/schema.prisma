@@ -112,6 +112,7 @@ model nutricionista_consultante {
 }
 
 model nutricionista_especialidad {
+  id               Int           @id @default(autoincrement())
   id_nutricionista Int
   id_especialidad  Int
   createdAt        DateTime?     @default(now()) @db.Timestamp(0)
@@ -119,8 +120,8 @@ model nutricionista_especialidad {
   nutricionista    nutricionista @relation(fields: [id_nutricionista], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "nutricionista_especialidad_ibfk_1")
   especialidad     especialidad  @relation(fields: [id_especialidad], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "nutricionista_especialidad_ibfk_2")
 
-  @@id([id_nutricionista, id_especialidad])
   @@index([id_especialidad], map: "id_especialidad")
+  @@index([id_nutricionista], map: "id_nutricionista")
 }
 
 model receta {
@@ -168,6 +169,7 @@ model registro {
 }
 
 model nutricionista_pais {
+  id               Int           @id @default(autoincrement())
   id_nutricionista Int
   id_pais          Int
   ciudad           String        @db.VarChar(255)
@@ -176,8 +178,8 @@ model nutricionista_pais {
   nutricionista    nutricionista @relation(fields: [id_nutricionista], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "nutricionista_pais_ibfk_1")
   pais             pais          @relation(fields: [id_pais], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "nutricionista_pais_ibfk_2")
 
-  @@id([id_nutricionista, id_pais, ciudad])
   @@index([id_pais], map: "id_pais")
+  @@index([id_nutricionista], map: "id_nutricionista")
 }
 
 model pais {
