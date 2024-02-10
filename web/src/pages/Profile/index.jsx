@@ -6,7 +6,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useLocalStorage } from 'react-use'
 import { useNavigate } from 'react-router-dom'
 
-import { Input, Custom_select, Header, NavBar } from '~/components'
+import { Input, Custom_select, Header, NavBar, CustomModal } from '~/components'
 
 const validationSchema = yup.object().shape({
   nombre: yup.string().required('Campo obligatorio'),
@@ -23,24 +23,26 @@ const validationSchema = yup.object().shape({
     .required('Campo obligatorio'),
   pais: yup.number().integer().required('Campo obligatorio'),
   ciudad: yup.string().required('Campo obligatorio'),
+  password: yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres')
+  .max(12, 'La contraseña no puede tener más de 12 caracteres')
+  .matches(/[a-z]/, 'La contraseña debe contener al menos una letra minúscula')
+  .matches(/[A-Z]/, 'La contraseña debe contener al menos una letra mayúscula')
+  .matches(/[0-9]+/, 'La contraseña debe contener al menos un número')
+  .matches(/[!@#$%^&*(),.?":{}|<>]/, 'La contraseña debe contener al menos un símbolo especial')
+  .matches(/^\S*$/, 'La contraseña no puede contener espacios en blanco')
+  
 })
 
 
-const fetchData = async (setUserInfo, setCountries, setSpecialties, setIsLoaded) => {
-  const [userRes, countriesRes, specialtiesRes] = await Promise.all([
-    axios.get('http://localhost:3000/getProfileData'),
-    axios.get('http://localhost:3000/getCountries'),
-    axios.get('http://localhost:3000/getSpecialty'),
-  ])
 
-  setUserInfo(userRes.data)
-  setCountries(countriesRes.data)
-  setSpecialties(specialtiesRes.data)
-  setIsLoaded(true);
-}
 
 
 export function Profile() {
+
+  const [isModalOpen, setIsModalOpen] = useState(false) // Agrega este estado
+  const [message, setMessage] = useState('') // Agrega este estado para manejar el mensaje de error  
+  const [messageType, setMessageType] = useState('')
+
   const navigate = useNavigate()
   const [userInfo, setUserInfo] = useState({})
   const [isLoaded, setIsLoaded] = useState(false)
@@ -48,31 +50,9 @@ export function Profile() {
   const [countries, setCountries] = useState([])
   const [specialties, setSpecialties] = useState([])
 
-  const [auth] = useLocalStorage('auth', {})
+  const [auth, setAuth] = useLocalStorage('auth', {})
   const [didMount, setDidMount] = useState(false)
 
-  useEffect(() => {
-    setDidMount(true)
-    if (auth?.user?.id) {
-      if (didMount) {
-        fetchData(setUserInfo, setCountries, setSpecialties, setIsLoaded).catch((error) => {
-          console.error('Error al obtener la información del usuario:', error)
-          setError(error);
-        })
-      }
-    } else {
-      navigate('/');
-    }
-  }, [auth, navigate, didMount])
-
-  // Función para volver a intentar obtener los datos del usuario
-  const retryFetchUserInfo = () => {
-    setError(null); // Reinicia el estado de error
-    fetchData(setUserInfo, setCountries, setSpecialties, setIsLoaded).catch((error) => {
-      console.error('Error al obtener la información del usuario:', error);
-      setError(error);
-    });
-  }
 
   const initialValues = useMemo(() => ({
     nombre: isLoaded ? userInfo.nombre : '',
@@ -82,8 +62,10 @@ export function Profile() {
     anos_experiencia: isLoaded ? userInfo.anos_experiencia : '',
     especialidad: isLoaded ? userInfo.especialidad : '',
     pais: isLoaded ? userInfo.pais : '',
-    ciudad: isLoaded ? userInfo.ciudad : ''
+    ciudad: isLoaded ? userInfo.ciudad : '',
+    password:''
   }), [isLoaded, userInfo])
+
 
   // Definir la función de envío del formulario utilizando Formik
   const formik = useFormik({
@@ -97,29 +79,77 @@ export function Profile() {
           url: '/updateProfileData',
           data: values  // Enviar los datos modificados al servidor
         })
-        //*ToDo: implementar modal o algo así que diga si todo salió bien
-        // Manejar la respuesta del servidor, por ejemplo, mostrar un mensaje de éxito
+        setAuth(res.data)
+        setIsModalOpen(true)
+        setMessage("Sus datos se actualizaron con suceso.")
+        setMessageType('approval')
+
       } catch (error) {
-        // Manejar errores, por ejemplo, mostrar un mensaje de error al usuario
+
         console.error('Error al actualizar el perfil:', error);
+        setIsModalOpen(true);
+        setMessage("No se pudo actualizar sus datos.")
+        setMessageType('error')
+
       }
     }, validationSchema
   })
 
+
+
+  const fetchData = async () => {
+    const [userRes, countriesRes, specialtiesRes] = await Promise.all([
+      axios.get('http://localhost:3000/getProfileData'),
+      axios.get('http://localhost:3000/getCountries'),
+      axios.get('http://localhost:3000/getSpecialty'),
+    ])
+
+    setUserInfo(userRes.data)
+    setCountries(countriesRes.data)
+    setSpecialties(specialtiesRes.data)
+    setIsLoaded(true)
+
+
+    formik.setValues({
+      nombre: userRes.data.nombre,
+      apellido: userRes.data.apellido,
+      email: userRes.data.email,
+      telefono: userRes.data.telefono,
+      anos_experiencia: userRes.data.anos_experiencia,
+      especialidad: userRes.data.especialidad,
+      pais: userRes.data.pais,
+      ciudad: userRes.data.ciudad
+    })
+  }
+
   useEffect(() => {
-    if (isLoaded) {
-      formik.setValues({
-        nombre: userInfo.nombre,
-        apellido: userInfo.apellido,
-        email: userInfo.email,
-        telefono: userInfo.telefono,
-        anos_experiencia: userInfo.anos_experiencia,
-        especialidad: userInfo.especialidad,
-        pais: userInfo.pais,
-        ciudad: userInfo.ciudad
-      });
+    setDidMount(true)
+    if (auth?.user?.id) {
+      if (didMount) {
+        fetchData().catch((error) => {
+          console.error('Error al obtener la información del usuario:', error)
+          setError(error);
+        })
+      }
+    } else {
+      navigate('/');
     }
-  }, [isLoaded, userInfo, formik]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth, navigate, didMount])
+
+  // Función para volver a intentar obtener los datos del usuario
+  const retryFetchUserInfo = () => {
+    setError(null); // Reinicia el estado de error
+    fetchData(setUserInfo, setCountries, setSpecialties, setIsLoaded).catch((error) => {
+      console.error('Error al obtener la información del usuario:', error);
+      setError(error);
+    });
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false); // Función para cerrar el modal
+  }
+
 
   return (
     <div>
@@ -134,19 +164,132 @@ export function Profile() {
                 <button onClick={retryFetchUserInfo}>Reintentar</button> {/* Botón para volver a intentar */}
               </div>
             ) : isLoaded ? (
-              <form onSubmit={formik.handleSubmit}>
-                <Input label='Nombre' name='nombre' value={formik.values.nombre} onChange={formik.handleChange} />
-                <Input label='Apellido' name='apellido' value={formik.values.apellido} onChange={formik.handleChange} />
-                <Input label='Email' name='email' value={formik.values.email} onChange={formik.handleChange} />
-                <Input label='Telefono' name='telefono' value={formik.values.telefono} onChange={formik.handleChange} />
-                <Input label='Años de experiencia' name='anos_experiencia' value={formik.values.anos_experiencia} onChange={formik.handleChange} />
-                <Custom_select htmlFor='espescialidad' id='especialidad' type='number' label='Especialidad' name='especialidad' placeholder="Ingrese su especialidad" value={formik.values.especialidad} onChange={formik.handleChange} options={specialties} initialValue={userInfo.especialidad} />
-                <Custom_select htmlFor='pais' id='pais' type='number' label='Pais' name='pais' placeholder="Ingrese su pais" value={formik.values.pais} onChange={formik.handleChange} options={countries} initialValue={userInfo.pais} />
 
-                <Input label='Ciudad' name='ciudad' value={formik.values.ciudad} onChange={formik.handleChange} />
+              <form onSubmit={formik.handleSubmit}>
+
+                <Input
+                  label='Nombre'
+                  name='nombre'
+                  placeholder="ingrese su nombre"
+                  error={formik.touched.nombre && formik.errors.nombre}
+                  value={formik.values.nombre}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur} />
+
+                <Input
+                  htmlFor='apellido'
+                  id='apellido'
+                  autoComplete="off"
+                  type="text"
+                  name="apellido"
+                  label="Apellido "
+                  placeholder="ingrese su apellido"
+                  error={formik.touched.apellido && formik.errors.apellido}
+                  value={formik.values.apellido}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+
+                <Input
+                  htmlFor='telefono'
+                  id='telefono'
+                  autoComplete="off"
+                  type="text"
+                  name="telefono"
+                  label="Telefono celular"
+                  placeholder="ingrese su número telefónico con prefijo internacional + (campo no obligatorio)"
+                  error={formik.touched.telefono && formik.errors.telefono}
+                  value={formik.values.telefono}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+
+                <Input
+                  htmlFor='email'
+                  id='email'
+                  autoComplete="off"
+                  type="text"
+                  name="email"
+                  label="Correo electrónico "
+                  placeholder="ingrese su correo"
+                  error={formik.touched.email && formik.errors.email}
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  readOnly
+                />
+
+                <Input
+                  htmlFor='password'
+                  id='password'
+                  type="password"
+                  name="password"
+                  label="Constraseña"
+                  placeholder="Ingrese su nueva contraseña"
+                  error={formik.touched.password && formik.errors.password}
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+
+                <Input
+                  htmlFor='anos_experiencia'
+                  id='anos_experiencia'
+                  type="number"
+                  name='anos_experiencia'
+                  label='Años de experiencia'
+                  placeholder="Ingrese su tiempo de experiencia en años"
+                  error={formik.touched.anos_experiencia && formik.errors.anos_experiencia}
+                  value={formik.values.anos_experiencia}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur} />
+
+                <Custom_select
+                  htmlFor='espescialidad'
+                  id='especialidad'
+                  type='number'
+                  label='Especialidad'
+                  name='especialidad'
+                  placeholder="Ingrese su especialidad"
+                  value={formik.values.especialidad}
+                  onChange={formik.handleChange}
+                  options={specialties}
+                  initialValue={userInfo.especialidad}
+                  error={formik.touched.especialidad && formik.errors.especialidad}
+                  onBlur={formik.handleBlur} />
+
+                <Custom_select
+                  htmlFor='pais'
+                  id='pais'
+                  type='number'
+                  label='Pais'
+                  name='pais'
+                  placeholder="Ingrese su pais"
+                  value={formik.values.pais}
+                  options={countries}
+                  onChange={formik.handleChange}
+                  initialValue={userInfo.pais}
+                  error={formik.touched.pais && formik.errors.pais}
+                  onBlur={formik.handleBlur} />
+
+                <Input
+                  htmlFor='ciudad'
+                  id='ciudad'
+                  type="text"
+                  name='ciudad'
+                  label='Ciudad'
+                  placeholder="Ingrese su ciudad de residencia"
+                  error={formik.touched.ciudad && formik.errors.ciudad}
+                  value={formik.values.ciudad}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur} />
 
                 <div className="flex flex-col text-center gap-4 text-white my-4">
-                  <button type="submit" className=' p-2 bg-verde_oscuro rounded-xl border'>Guardar cambios</button>
+                  <button type="submit" className=" p-2 bg-verde_oscuro rounded-xl border  disabled:opacity-80"
+                    disabled={!formik.isValid || formik.isSubmitting}>
+                    {formik.isSubmitting ? 'Guardando sus modificaciones' : 'Guardar cambios'}
+
+                  </button>
                 </div>
               </form>
             ) : (
@@ -154,6 +297,10 @@ export function Profile() {
             )}
           </div>
         </section>
+        <CustomModal isOpen={isModalOpen} onClose={handleCloseModal} message={message} messageType={messageType}>
+          <h2 className="text-2xl">{messageType === 'error' ? 'Algo salió mal' : 'Éxito'}</h2>
+          {messageType === 'error' && <p>{message}</p>}
+        </CustomModal>
       </main>
     </div>
   );
