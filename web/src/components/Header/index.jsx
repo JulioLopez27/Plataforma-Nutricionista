@@ -15,7 +15,7 @@ export const Header = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false)
 
 
-    const nombreCompleto = auth?.user?.nombre + " " + auth?.user?.apellido
+    const nombreCompleto = auth?.user?.nombre
 
     const logout = () => {
         setAuth({})
