@@ -24,6 +24,7 @@ import {
   createUser,
   createUserCountryData,
   createUserSpecialtyData,
+  updateRecord
 } from '../utility/nutricionista/helpers.js'
 
 
@@ -93,6 +94,7 @@ export class Nutricionista {
   }
 
   static async getProfileData(ctx) {
+
     // if (!ctx.headers.authorization) {
     //     ctx.status = HTTP_STATUS_UNAUTHORIZED
     //     return
@@ -151,19 +153,19 @@ export class Nutricionista {
       }
 
       const { nombre, apellido, telefono, email, anos_experiencia } = getProfileData
-            const { id_pais, ciudad } = getProfileCountry
-            const { id_especialidad } = getProfileSpecialty
- 
-            const profileData = {
-                nombre,
-                apellido,
-                telefono,
-                email,
-                especialidad: id_especialidad,
-                anos_experiencia,
-                pais: id_pais,
-                ciudad
-            }
+      const { id_pais, ciudad } = getProfileCountry
+      const { id_especialidad } = getProfileSpecialty
+
+      const profileData = {
+        nombre,
+        apellido,
+        telefono,
+        email,
+        especialidad: id_especialidad,
+        anos_experiencia,
+        pais: id_pais,
+        ciudad
+      }
 
       ctx.body = profileData
       ctx.status = HTTP_STATUS_CREATED
@@ -172,50 +174,6 @@ export class Nutricionista {
     }
   }
 
-  //creacion de un nutricionista
-  // Función para manejar el inicio de sesión de un usuario
-  static async login(ctx) {
-    // const [type, token] = ctx.headers.authorization.split(" ")
-    // const [email, plainTextPassword] = Buffer.from(token, 'base64').toString().split(":")
-    try {
-      // Extraemos el email y la contraseña del cuerpo de la petición
-      const email = ctx.request.body.email
-      const plainTextPassword = ctx.request.body.password
-
-      await validatePassword(plainTextPassword)
-      // Intentamos autenticar al usuario
-      const user = await authenticateUser(email, plainTextPassword)
-
-      // Si la autenticación es exitosa, eliminamos la contraseña del objeto del usuario
-      const {
-        password,
-        ...result
-      } = user
-
-      // Creamos un token de acceso para el usuario
-      const accesToken = jwt.sign({
-        sub: user.id,
-        name: user.nombre,
-        expiresIn: Nutricionista.#set_expiration_time,
-      }, process.env.JWT_SECRET)
-
-      // Preparamos la respuesta para el cliente
-      ctx.body = {
-        user: result,
-        accesToken
-      }
-      // Establecemos el código de estado HTTP a 201 (Creado)
-      ctx.status = HTTP_STATUS_CREATED
-
-    } catch (error) {
-      // Si ocurre un error, preparamos un mensaje de error para el cliente
-      ctx.body = {
-        error: error.message
-      }
-      // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
-      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
-    }
-  }
 
 
   static async getConsultantes(ctx) {
@@ -416,9 +374,50 @@ export class Nutricionista {
 
 
 
+  //creacion de un nutricionista
+  // Función para manejar el inicio de sesión de un usuario
+  static async login(ctx) {
+    // const [type, token] = ctx.headers.authorization.split(" ")
+    // const [email, plainTextPassword] = Buffer.from(token, 'base64').toString().split(":")
+    try {
+      // Extraemos el email y la contraseña del cuerpo de la petición
+      const email = ctx.request.body.email
+      const plainTextPassword = ctx.request.body.password
 
+      await validatePassword(plainTextPassword)
+      // Intentamos autenticar al usuario
+      const user = await authenticateUser(email, plainTextPassword)
 
+      // Si la autenticación es exitosa, eliminamos la contraseña del objeto del usuario
+      const {
+        password,
+        ...result
+      } = user
 
+      // Creamos un token de acceso para el usuario
+      const accesToken = jwt.sign({
+        sub: user.id,
+        name: user.nombre,
+        expiresIn: Nutricionista.#set_expiration_time,
+      }, process.env.JWT_SECRET)
+
+      // Preparamos la respuesta para el cliente
+      ctx.body = {
+        user: result,
+        accesToken
+      }
+      // Establecemos el código de estado HTTP a 201 (Creado)
+      ctx.status = HTTP_STATUS_CREATED
+
+    } catch (error) {
+      // Si ocurre un error, preparamos un mensaje de error para el cliente
+      ctx.body = {
+        error: error.message
+      }
+      // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
+      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+    }
+  }
 
   // *codigo para crear un usuario Nutricionista y guardarlo en la db
   static async signup(ctx) {
@@ -507,6 +506,8 @@ export class Nutricionista {
 
   //*ToDo:crear funciones para actualizar los datos del nutricionista
   static async updateProfile(ctx) {
+
+
     // if (!ctx.headers.authorization) {
     //     ctx.status = HTTP_STATUS_UNAUTHORIZED
     //     return
@@ -515,22 +516,66 @@ export class Nutricionista {
     // const data = jwt.verify(token, process.env.JWT_SECRET)
     // const userId = data.sub
 
-    //  const newData = ctx.request.body;
+    const nombre = ctx.request.body.nombre
+    const apellido = ctx.request.body.apellido
+    const email = ctx.request.body.email
+    const telefono = ctx.request.body.telefono
 
-    console.log("🚀 ~ Nutricionista ~ updateProfile ~ newData:", ctx.request.body)
+    try {
 
-    // try {
-    //     const updatedProfile = await prisma.nutricionista.update({
-    //         where: { id: newData.id },
-    //         data: newData
-    //     });
-    //     ctx.body = updatedProfile;
-    //     ctx.status = HTTP_STATUS_CREATED
-    // } catch (error) {
-    //     console.error('Error al actualizar el perfil:', error);
-    //     ctx.body = { error: 'Error al actualizar el perfil.' };
-    //     ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
-    // }
+      const id_pais = await stringToInt(ctx.request.body.pais)
+      const id_especialidad = await stringToInt(ctx.request.body.especialidad)
+      const anos_experiencia = await positiveValue(ctx.request.body.anos_experiencia)
+      await validatePhone(telefono)
+
+      let profileData = { nombre, apellido, email, telefono, anos_experiencia }
+      const profile_countrie_data = { id_pais, ciudad: ctx.request.body.ciudad }
+      //valido el telefono
+     
+
+      //si recibo contraseña: valido,hasheo y la seteo dentro de profileData
+      if (ctx.request.body.password) {
+        await validatePassword(ctx.request.body.password)
+        //! hasheo la pass que el usuario ingresa / 10->round for hash encryption
+        const hashPassword = await bcrypt.hash(ctx.request.body.password, 10)
+        //parseo a int los valores que recibo del front
+        profileData = { nombre, apellido, email, telefono, anos_experiencia, password:hashPassword }
+      }
+
+     
+      const user = await prisma.nutricionista.update({
+        where: { id: 91 }, data: profileData,
+        select: { id: true, nombre: true, }
+      })
+
+      //invoco la funct aux updateRecord para que me haga las actualizaciones
+      await updateRecord(prisma.nutricionista_pais, 91, profile_countrie_data)
+      await updateRecord(prisma.nutricionista_especialidad, 91, { id_especialidad })
+
+      const accesToken = jwt.sign({
+        sub: user.id,
+        name: user.nombre,
+        expiresIn: Nutricionista.#set_expiration_time,
+      }, process.env.JWT_SECRET)
+
+
+      ctx.body = { user, accesToken }
+      ctx.status = HTTP_STATUS_CREATED
+    } catch (error) {
+
+      if (error instanceof prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        ctx.body = { error: "No se encontro registro para actualizar" }
+        ctx.status = HTTP_STATUS_NOT_FOUND
+        return
+      }
+
+      console.error('Error al actualizar el perfil:', error);
+      ctx.body = { error: 'Error al actualizar el perfil.' };
+      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+
+
+
+    }
   }
 
 
