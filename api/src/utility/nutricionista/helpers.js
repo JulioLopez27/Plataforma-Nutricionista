@@ -90,6 +90,16 @@ export async function validateEmail(email) {
 }
 
 
+//Funcion para actualizar la informacion del nutricionista en las tablas
+//Pais y especialidad
+
+export async function updateRecord(model, id_nutricionista, data) {
+  const record = await model.findFirst({ where: { id_nutricionista } });
+  if (record) {
+    await model.update({ where: { id: record.id }, data });
+  }
+}
+
 
 
 
