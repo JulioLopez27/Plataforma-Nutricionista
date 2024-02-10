@@ -11,7 +11,6 @@ export async function authenticateUser(email, plainTextPassword) {
     select: {
       id: true,
       nombre: true,
-      apellido: true,
       password:true,
     }
   });
