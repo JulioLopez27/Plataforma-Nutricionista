@@ -21,7 +21,7 @@ export function FormularioAfecciones() {
         }
 
     })
-    const userInfo = {
+    const consultanteInfo = {
         diabetes_tipo_1: false,
         diabetes_tipo_2: false,
         celiaquismo: true,
@@ -37,60 +37,65 @@ export function FormularioAfecciones() {
     return (
         <form onSubmit={formik.handleSubmit} className="w-full max-w-lg space-y-4">
             <div>
-                <label htmlFor="diabetes_tipo_1" className="block text-sm font-medium text-gray-700">
-                    Diabetes Tipo 1
-                </label>
-                <input
+                <Input
+                    htmlFor="diabetes_tipo_1"
+                    label="Diabetes Tipo 1"
                     type="checkbox"
                     id="diabetes_tipo_1"
                     name="diabetes_tipo_1"
-                    checked={userInfo.diabetes_tipo_1}
-                    onChange={handleInputChange}
+                    checked={consultanteInfo.diabetes_tipo_1}
+                    onChange={formik.handleChange}
                     className="rounded-md bg-gray-100 px-4 py-2"
                 />
             </div>
             <div>
-                <label htmlFor="diabetes_tipo_2" className="block text-sm font-medium text-gray-700">
-                    Diabetes Tipo 2
-                </label>
-                <input
+                <Input
+                    htmlFor="diabetes_tipo_2"
+                    label="Diabetes Tipo 2"
                     type="checkbox"
                     id="diabetes_tipo_2"
                     name="diabetes_tipo_2"
-                    checked={userInfo.diabetes_tipo_2}
+                    checked={consultanteInfo.diabetes_tipo_2}
                     onChange={formik.handleChange}
                     className="rounded-md bg-gray-100 px-4 py-2"
                 />
             </div>
+
             <div>
-                <label htmlFor="celiaquismo" className="block text-sm font-medium text-gray-700">
-                    Celiaquismo
-                </label>
-                <input
+                <Input
+                    htmlFor="celiaquismo"
+                    label="Celiaquismo"
                     type="checkbox"
                     id="celiaquismo"
                     name="celiaquismo"
-                    checked={userInfo.celiaquismo}
+                    checked={consultanteInfo.celiaquismo}
                     onChange={formik.handleChange}
                     className="rounded-md bg-gray-100 px-4 py-2"
                 />
             </div>
-            {/* Repite el patrón para los demás campos booleanos */}
-            <Input label="Alergias" name="alergias" value={userInfo.alergias} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" />
+
             <div>
-                <label htmlFor="enfermedad_renal" className="block text-sm font-medium text-gray-700">
-                    Enfermedad Renal
-                </label>
-                <input
+            <Input 
+                label="Alergias" 
+                name="alergias" 
+                value={consultanteInfo.alergias} 
+                onChange={formik.handleChange} 
+                className="rounded-md bg-gray-100 px-4 py-2" 
+            />
+            </div>
+            <div>
+                <Input
+                    htmlFor="enfermedad_renal"
+                    label="Enfermedad renal"
                     type="checkbox"
                     id="enfermedad_renal"
                     name="enfermedad_renal"
-                    checked={userInfo.enfermedad_renal}
+                    checked={consultanteInfo.enfermedad_renal}
                     onChange={formik.handleChange}
                     className="rounded-md bg-gray-100 px-4 py-2"
                 />
             </div>
-            {/* Repite el patrón para los demás campos booleanos */}
+
             <button type="submit" className="bg-verde_oscuro hover:bg-verde_claro text-white font-bold py-2 px-4 rounded mt-2">Guardar cambios</button>
         </form>
     );
