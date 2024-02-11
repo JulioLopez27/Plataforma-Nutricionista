@@ -80,13 +80,10 @@ export function Profile() {
           data: values, // Enviar los datos modificados al servidor
           headers: { Authorization: `Bearer ${auth.accesToken}` }
         })
-
-
         setAuth(res.data)
         setIsModalOpen(true)
         setMessage("Sus datos se actualizaron con suceso.")
         setMessageType('approval')
-      
       } catch (error) {
 
         console.error('Error al actualizar el perfil:', error);
