@@ -7,7 +7,8 @@ import {
 import {
   HTTP_STATUS_CREATED,
   HTTP_STATUS_NOT_FOUND,
-  HTTP_STATUS_INTERNAL_SERVER_ERROR
+  HTTP_STATUS_INTERNAL_SERVER_ERROR,
+  HTTP_STATUS_UNAUTHORIZED
 } from '../HTTP_STATUS/index.js'
 
 import {
@@ -95,19 +96,19 @@ export class Nutricionista {
 
   static async getProfileData(ctx) {
 
-    // if (!ctx.headers.authorization) {
-    //     ctx.status = HTTP_STATUS_UNAUTHORIZED
-    //     return
-    // }
-    // const [type, token] = ctx.headers.authorization.split(" ")
-    // const data = jwt.verify(token, process.env.JWT_SECRET)
-    // const userId = data.sub
+    if (!ctx.headers.authorization) {
+      ctx.status = HTTP_STATUS_UNAUTHORIZED
+      return
+    }
+    const [type, token] = ctx.headers.authorization.split(" ")
+    const data = jwt.verify(token, process.env.JWT_SECRET)
+    const userId = data.sub
 
     try {
       const getProfileData = await prisma.nutricionista.findUnique({
         where: {
-          id: 91
-        }, //TODO hacer dinámico mediante token
+          id: userId
+        },
         select: {
           nombre: true,
           apellido: true,
@@ -124,7 +125,7 @@ export class Nutricionista {
 
       const getProfileCountry = await prisma.nutricionista_pais.findFirst({
         where: {
-          id_nutricionista: 91
+          id_nutricionista: userId
         },
         select: {
           id_pais: true,
@@ -140,7 +141,7 @@ export class Nutricionista {
 
       const getProfileSpecialty = await prisma.nutricionista_especialidad.findFirst({
         where: {
-          id_nutricionista: 91
+          id_nutricionista: userId
         },
         select: {
           id_especialidad: true
@@ -377,22 +378,19 @@ export class Nutricionista {
   //creacion de un nutricionista
   // Función para manejar el inicio de sesión de un usuario
   static async login(ctx) {
-    // const [type, token] = ctx.headers.authorization.split(" ")
-    // const [email, plainTextPassword] = Buffer.from(token, 'base64').toString().split(":")
+    const [type, token] = ctx.headers.authorization.split(" ")
+    const [email, plainTextPassword] = Buffer.from(token, 'base64').toString().split(":")
     try {
       // Extraemos el email y la contraseña del cuerpo de la petición
-      const email = ctx.request.body.email
-      const plainTextPassword = ctx.request.body.password
+      // const email = ctx.request.body.email
+      // const plainTextPassword = ctx.request.body.password
 
       await validatePassword(plainTextPassword)
       // Intentamos autenticar al usuario
       const user = await authenticateUser(email, plainTextPassword)
 
       // Si la autenticación es exitosa, eliminamos la contraseña del objeto del usuario
-      const {
-        password,
-        ...result
-      } = user
+      const { password, ...result } = user
 
       // Creamos un token de acceso para el usuario
       const accesToken = jwt.sign({
@@ -403,17 +401,14 @@ export class Nutricionista {
 
       // Preparamos la respuesta para el cliente
       ctx.body = {
-        user: result,
-        accesToken
+        user: result, accesToken
       }
       // Establecemos el código de estado HTTP a 201 (Creado)
       ctx.status = HTTP_STATUS_CREATED
 
     } catch (error) {
       // Si ocurre un error, preparamos un mensaje de error para el cliente
-      ctx.body = {
-        error: error.message
-      }
+      ctx.body = { error: error.message }
       // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
     }
@@ -484,7 +479,7 @@ export class Nutricionista {
       const accesToken = jwt.sign({
         sub: user.id,
         name: user.nombre,
-        expiresIn: set_expiration_time,
+        expiresIn: Nutricionista.#set_expiration_time,
       }, process.env.JWT_SECRET)
 
       ctx.body = {
@@ -504,17 +499,16 @@ export class Nutricionista {
   }
 
 
-  //*ToDo:crear funciones para actualizar los datos del nutricionista
+ 
   static async updateProfile(ctx) {
 
-
-    // if (!ctx.headers.authorization) {
-    //     ctx.status = HTTP_STATUS_UNAUTHORIZED
-    //     return
-    // }
-    // const [type, token] = ctx.headers.authorization.split(" ")
-    // const data = jwt.verify(token, process.env.JWT_SECRET)
-    // const userId = data.sub
+    if (!ctx.headers.authorization) {
+      ctx.status = HTTP_STATUS_UNAUTHORIZED
+      return
+    }
+    const [type, token] = ctx.headers.authorization.split(" ")
+    const data = jwt.verify(token, process.env.JWT_SECRET)
+    const userId = data.sub
 
     const nombre = ctx.request.body.nombre
     const apellido = ctx.request.body.apellido
@@ -531,7 +525,7 @@ export class Nutricionista {
       let profileData = { nombre, apellido, email, telefono, anos_experiencia }
       const profile_countrie_data = { id_pais, ciudad: ctx.request.body.ciudad }
       //valido el telefono
-     
+
 
       //si recibo contraseña: valido,hasheo y la seteo dentro de profileData
       if (ctx.request.body.password) {
@@ -539,18 +533,18 @@ export class Nutricionista {
         //! hasheo la pass que el usuario ingresa / 10->round for hash encryption
         const hashPassword = await bcrypt.hash(ctx.request.body.password, 10)
         //parseo a int los valores que recibo del front
-        profileData = { nombre, apellido, email, telefono, anos_experiencia, password:hashPassword }
+        profileData = { nombre, apellido, email, telefono, anos_experiencia, password: hashPassword }
       }
 
-     
+
       const user = await prisma.nutricionista.update({
-        where: { id: 91 }, data: profileData,
+        where: { id: userId }, data: profileData,
         select: { id: true, nombre: true, }
       })
 
-      //invoco la funct aux updateRecord para que me haga las actualizaciones
-      await updateRecord(prisma.nutricionista_pais, 91, profile_countrie_data)
-      await updateRecord(prisma.nutricionista_especialidad, 91, { id_especialidad })
+      //invoco la funct aux updateRecord de params(NombreDeLaTabla,id,data) para que me haga las actualizaciones
+      await updateRecord(prisma.nutricionista_pais, userId, profile_countrie_data)
+      await updateRecord(prisma.nutricionista_especialidad, userId, { id_especialidad })
 
       const accesToken = jwt.sign({
         sub: user.id,
