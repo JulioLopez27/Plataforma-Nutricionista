@@ -24,13 +24,13 @@ const validationSchema = yup.object().shape({
   pais: yup.number().integer().required('Campo obligatorio'),
   ciudad: yup.string().required('Campo obligatorio'),
   password: yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres')
-  .max(12, 'La contraseña no puede tener más de 12 caracteres')
-  .matches(/[a-z]/, 'La contraseña debe contener al menos una letra minúscula')
-  .matches(/[A-Z]/, 'La contraseña debe contener al menos una letra mayúscula')
-  .matches(/[0-9]+/, 'La contraseña debe contener al menos un número')
-  .matches(/[!@#$%^&*(),.?":{}|<>]/, 'La contraseña debe contener al menos un símbolo especial')
-  .matches(/^\S*$/, 'La contraseña no puede contener espacios en blanco')
-  
+    .max(12, 'La contraseña no puede tener más de 12 caracteres')
+    .matches(/[a-z]/, 'La contraseña debe contener al menos una letra minúscula')
+    .matches(/[A-Z]/, 'La contraseña debe contener al menos una letra mayúscula')
+    .matches(/[0-9]+/, 'La contraseña debe contener al menos un número')
+    .matches(/[!@#$%^&*(),.?":{}|<>]/, 'La contraseña debe contener al menos un símbolo especial')
+    .matches(/^\S*$/, 'La contraseña no puede contener espacios en blanco')
+
 })
 
 
@@ -63,7 +63,7 @@ export function Profile() {
     especialidad: isLoaded ? userInfo.especialidad : '',
     pais: isLoaded ? userInfo.pais : '',
     ciudad: isLoaded ? userInfo.ciudad : '',
-    password:''
+    password: ''
   }), [isLoaded, userInfo])
 
 
@@ -77,13 +77,16 @@ export function Profile() {
           method: 'put',
           baseURL: 'http://localhost:3000',
           url: '/updateProfileData',
-          data: values  // Enviar los datos modificados al servidor
+          data: values, // Enviar los datos modificados al servidor
+          headers: { Authorization: `Bearer ${auth.accesToken}` }
         })
+
+
         setAuth(res.data)
         setIsModalOpen(true)
         setMessage("Sus datos se actualizaron con suceso.")
         setMessageType('approval')
-
+      
       } catch (error) {
 
         console.error('Error al actualizar el perfil:', error);
@@ -99,7 +102,7 @@ export function Profile() {
 
   const fetchData = async () => {
     const [userRes, countriesRes, specialtiesRes] = await Promise.all([
-      axios.get('http://localhost:3000/getProfileData'),
+      axios.get('http://localhost:3000/getProfileData', { headers: { Authorization: `Bearer ${auth.accesToken}` } }),
       axios.get('http://localhost:3000/getCountries'),
       axios.get('http://localhost:3000/getSpecialty'),
     ])
@@ -153,7 +156,7 @@ export function Profile() {
 
   return (
     <div>
-      <Header />
+      <Header nombreDelUsuario  ={auth.user.nombre} />
       <NavBar />
       <main className='mt-4'>
         <section id="editPerfil" className='container' >
@@ -224,8 +227,8 @@ export function Profile() {
                   id='password'
                   type="password"
                   name="password"
-                  label="Constraseña"
-                  placeholder="Ingrese su nueva contraseña"
+                  label="Actualizar contraseña"
+                  placeholder="Deje en blanco si no la quiere cambiar."
                   error={formik.touched.password && formik.errors.password}
                   value={formik.values.password}
                   onChange={formik.handleChange}
