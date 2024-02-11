@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt'
 // Función para autenticar al usuario
 export async function authenticateUser(email, plainTextPassword) {
   // Buscamos al usuario en la base de datos
-  const user = await prisma.nutricionista.findFirst({
+  const user = await prisma.nutricionista.findUnique({
     where: { email },
     select: {
       id: true,
