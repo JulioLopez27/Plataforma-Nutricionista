@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { useLocalStorage } from 'react-use'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
@@ -9,13 +10,11 @@ function scrollToTop() {
     })
 }
 
-export const Header = () => {
+export const Header = ({nombreDelUsuario}) => {
     const navigate = useNavigate()
     const [auth, setAuth] = useLocalStorage('auth', {})
     const [dropdownOpen, setDropdownOpen] = useState(false)
 
-
-    const nombreCompleto = auth?.user?.nombre
 
     const logout = () => {
         setAuth({})
@@ -57,9 +56,14 @@ export const Header = () => {
 
                     </div>
 
-                    <span className=" font-semibold text-gray-950 text-sm sm:text-lg md:text-xl   " >Hola, {nombreCompleto}</span>
+                    <span className=" font-semibold text-gray-950 text-sm sm:text-lg md:text-xl   " >Hola, {nombreDelUsuario}</span>
                 </div>
             </div>
         </header>
     );
 } 
+
+
+Header.propTypes = {
+    nombreDelUsuario: PropTypes.string,
+  }
