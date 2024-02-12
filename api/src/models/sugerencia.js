@@ -1,4 +1,4 @@
-import { Receta } from "./receta";
+import { Receta } from "./receta.js";
 
 
 export class Sugerencia {
