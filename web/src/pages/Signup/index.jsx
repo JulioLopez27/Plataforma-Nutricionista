@@ -226,7 +226,7 @@ export const Signup = () => {
                         id='anos_experiencia'
                         type="number"
                         name="anos_experiencia"
-                        label="Experiencia"
+                        label="Experiencia (años): "
                         placeholder="Ingrese su tiempo de experiencia en años"
                         error={formik.touched.anos_experiencia && formik.errors.anos_experiencia}
                         value={formik.values.anos_experiencia}
