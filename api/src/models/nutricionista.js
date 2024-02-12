@@ -43,6 +43,7 @@ export class Nutricionista {
   constructor(nombre, apellido, correo, tituloEscaneado, experiencia, telefono, contraseña, país, ciudad) {
     this.nombre = nombre;
     this.apellido = apellido;
+    this.activo = false;
     this.correo = correo;
     this.tituloEscaneado = tituloEscaneado;
     this.experiencia = experiencia;
