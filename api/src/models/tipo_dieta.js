@@ -1,5 +1,5 @@
 export class TipoDieta {
-    constructor(vegetariano, vegano, pescetariano, crudivegano, sinGluten, sinLactosa,keto, onmivoro) {
+    constructor(vegetariano, vegano, pescetariano, crudivegano, sinGluten, sinLactosa,keto) {
         this.vegetariano = vegetariano; // Booleano
         this.vegano = vegano; // Booleano
         this.pescetariano = pescetariano; // Booleano
@@ -7,6 +7,6 @@ export class TipoDieta {
         this.sinGluten = sinGluten; // Booleano
         this.sinLactosa = sinLactosa; // Booleano
         this.keto = keto; // Booleano
-        this.onmivoro = onmivoro; // Booleano
+        
     }
 }
