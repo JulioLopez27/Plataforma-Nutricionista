@@ -4,14 +4,15 @@ import { Sugerencia } from "./sugerencia.js";
 
 
 export class Consultante {
-    constructor(nombre, apellido, correo, telefono, sexo, nutricionista) {
+    constructor(nombre, apellido, fecha_nac, correo, telefono, sexo, nutricionista) {
         this.nombre = nombre;
         this.apellido = apellido;
+        this.fecha_nac = fecha_nac;
         this.correo = correo;
         this.telefono = telefono;
         this.sexo = sexo;
         this.nutricionista = nutricionista;
-        this.afeccion = null;
+        this.afecciones = null;
         this.anamnesis = null;
         this.tipoDieta = null;
         this.sugerencias = [];
