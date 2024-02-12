@@ -6,12 +6,11 @@ import bcrypt from 'bcrypt'
 // Función para autenticar al usuario
 export async function authenticateUser(email, plainTextPassword) {
   // Buscamos al usuario en la base de datos
-  const user = await prisma.nutricionista.findFirst({
+  const user = await prisma.nutricionista.findUnique({
     where: { email },
     select: {
       id: true,
       nombre: true,
-      apellido: true,
       password:true,
     }
   });
@@ -89,6 +88,16 @@ export async function validateEmail(email) {
   }
 }
 
+
+//Funcion para actualizar la informacion del nutricionista en las tablas
+//Pais y especialidad
+
+export async function updateRecord(model, id_nutricionista, data) {
+  const record = await model.findFirst({ where: { id_nutricionista } });
+  if (record) {
+    await model.update({ where: { id: record.id }, data });
+  }
+}
 
 
 

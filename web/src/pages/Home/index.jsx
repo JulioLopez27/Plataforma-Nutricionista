@@ -26,10 +26,13 @@ export function Home() {
 
       try {
         const res = await axios({
-          method: 'post',
+          method: 'get',
           baseURL: 'http://localhost:3000',
           url: '/login',
-          data: values
+          auth:{
+            username: values.email,
+            password: values.password
+          }
         })
         setAuth(res.data)
         setIsModalOpen(true)
