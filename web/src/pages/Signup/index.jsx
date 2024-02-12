@@ -93,7 +93,7 @@ export const Signup = () => {
             try {
                 const res = await axios({
                     method: 'POST',
-                    baseURL: "http://localhost:3000",
+                    baseURL: import.meta.env.VITE_API_URL,
                     url: '/signup',
                     data: formData,
                     headers: {
@@ -101,7 +101,7 @@ export const Signup = () => {
                     }
                 })
                 setIsModalOpen(true);
-                setMessage(`Registro realizado con suceso`);
+                setMessage('Su solicitud de registro se ha enviado y está pendiente de aprobación,  le enviaremos un correo electrónico para confirmar su registro. Gracias!')
                 setMessageType('approval');
             } catch (error) {
                 setIsModalOpen(true);
