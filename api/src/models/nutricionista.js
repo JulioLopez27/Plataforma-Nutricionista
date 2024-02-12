@@ -396,6 +396,8 @@ export class Nutricionista {
       const accesToken = jwt.sign({
         sub: user.id,
         name: user.nombre,
+        lName:user.apellido,
+        email:user.email,
         expiresIn: Nutricionista.#set_expiration_time,
       }, process.env.JWT_SECRET)
 
@@ -479,6 +481,8 @@ export class Nutricionista {
       const accesToken = jwt.sign({
         sub: user.id,
         name: user.nombre,
+        lName:user.apellido,
+        email:user.email,
         expiresIn: Nutricionista.#set_expiration_time,
       }, process.env.JWT_SECRET)
 
@@ -566,9 +570,6 @@ export class Nutricionista {
       console.error('Error al actualizar el perfil:', error);
       ctx.body = { error: 'Error al actualizar el perfil.' };
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
-
-
-
     }
   }
 
