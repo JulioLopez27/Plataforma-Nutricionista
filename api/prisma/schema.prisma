@@ -29,14 +29,13 @@ model afeccion {
 model consultante {
   id                        Int                         @id @default(autoincrement())
   nombre                    String                      @db.VarChar(255)
-  email                     String                      @unique(map: "email") @db.VarChar(255)
-  password                  String                      @db.VarChar(255)
-  edad                      Int
-  createdAt                 DateTime?                   @default(now()) @db.Timestamp(0)
-  updatedAt                 DateTime?                   @default(now()) @db.Timestamp(0)
   apellido                  String                      @db.VarChar(255)
+  email                     String                      @unique(map: "email") @db.VarChar(255)
+  fechaNacimiento           DateTime                    @db.Date
   sexo                      String                      @db.VarChar(10)
   telefono                  String                      @db.VarChar(255)
+  createdAt                 DateTime?                   @default(now()) @db.Timestamp(0)
+  updatedAt                 DateTime?                   @default(now()) @db.Timestamp(0)
   afeccion                  afeccion[]
   anamnesis                 anamnesis[]
   consultante_receta        consultante_receta[]
