@@ -2,7 +2,7 @@
 a ser usadas*/
 import Router from '@koa/router'
 import { Nutricionista } from './models/nutricionista.js'
-
+import { Consultante } from './models/consultante.js'
 export const router = new Router()
 
 
@@ -23,3 +23,6 @@ router.put('/updateProfileData', async (ctx) => { await Nutricionista.updateProf
 router.get('/getConsultants', async (ctx) => { await Nutricionista.getConsultantes(ctx) })
 router.get('/getHistory', async (ctx) => { await Nutricionista.getHistory(ctx) })
 router.get('/getHistoryInformes', async (ctx) => { await Nutricionista.getHistoryInformes(ctx) })
+
+
+router.post('/createNewConsultant', async (ctx) => {await Consultante.createNewConsultant(ctx)})
