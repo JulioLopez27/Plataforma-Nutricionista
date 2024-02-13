@@ -538,8 +538,8 @@ export class Nutricionista {
 
   //     const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi()
   //     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail()
-  //     sendSmtpEmail.sender = { name: data.nombre, email: data.email }
-  //     sendSmtpEmail.to = [{ email: p_email }];
+  //     sendSmtpEmail.sender = { name: 'Prueba', email: 'usuario_de_test@proton.me' }
+  //     sendSmtpEmail.to = [{ email: 'julioneo95@hotmail.com' }];
   //     sendSmtpEmail.subject = 'Status de registro.'
   //     sendSmtpEmail.htmlContent = '<p>HTML content of the email</p>'
   //     sendSmtpEmail.textContent = 'Su registro se ha aprobado, por favor inicie sesión en nuestra plataforma para continuar.'
