@@ -1,14 +1,15 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import {
-  prisma
-} from '../../prisma/index.js'
+import SibApiV3Sdk from 'sib-api-v3-sdk';
+
+import { prisma } from '../../prisma/index.js'
 
 import {
   HTTP_STATUS_CREATED,
   HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
-  HTTP_STATUS_UNAUTHORIZED
+  HTTP_STATUS_UNAUTHORIZED,
+  HTTP_STATUS_BAD_REQUEST
 } from '../HTTP_STATUS/index.js'
 
 import {
@@ -396,9 +397,9 @@ export class Nutricionista {
       // Creamos un token de acceso para el usuario
       const accesToken = jwt.sign({
         sub: user.id,
-        name: user.nombre,
-        lName:user.apellido,
-        email:user.email,
+        nombre: user.nombre,
+        apellido: user.apellido,
+        email: user.email,
         expiresIn: Nutricionista.#set_expiration_time,
       }, process.env.JWT_SECRET)
 
@@ -473,19 +474,21 @@ export class Nutricionista {
       const user_country_data = await createUserCountryData(id_nutricionista, id_pais, ciudad)
       const user_specialty_data = await createUserSpecialtyData(id_nutricionista, id_especialidad)
 
-      //retiro la pass de los demas attr
-      const {
-        password,
-        ...result
-      } = user
+      //llamo metodo para enviar datos servicio de chefDigitales
+      //para pre-registro
+      const data = { user_data, id_pais, ciudad, id_especialidad }
+      preRegistro(data)
 
-      const accesToken = jwt.sign({
-        sub: user.id,
-        name: user.nombre,
-        lName:user.apellido,
-        email:user.email,
-        expiresIn: Nutricionista.#set_expiration_time,
-      }, process.env.JWT_SECRET)
+      //retiro la pass de los demas attr
+      const { password, ...result } = user
+
+      // const accesToken = jwt.sign({
+      //   sub: user.id,
+      //   nombre: user.nombre,
+      //   apellido: user.apellido,
+      //   email: user.email,
+      //   expiresIn: Nutricionista.#set_expiration_time,
+      // }, process.env.JWT_SECRET)
 
       ctx.body = {
         user: result,
@@ -503,76 +506,139 @@ export class Nutricionista {
     }
   }
 
-
- 
-  static async updateProfile(ctx) {
-
-    if (!ctx.headers.authorization) {
-      ctx.status = HTTP_STATUS_UNAUTHORIZED
-      return
-    }
-    const [type, token] = ctx.headers.authorization.split(" ")
-    const data = jwt.verify(token, process.env.JWT_SECRET)
-    const userId = data.sub
-
-    const nombre = ctx.request.body.nombre
-    const apellido = ctx.request.body.apellido
-    const email = ctx.request.body.email
-    const telefono = ctx.request.body.telefono
-
+  //funct usada en el metodo de signup
+  //para el pre-registro
+  async preRegistro(data) {
     try {
-
-      const id_pais = await stringToInt(ctx.request.body.pais)
-      const id_especialidad = await stringToInt(ctx.request.body.especialidad)
-      const anos_experiencia = await positiveValue(ctx.request.body.anos_experiencia)
-      await validatePhone(telefono)
-
-      let profileData = { nombre, apellido, email, telefono, anos_experiencia }
-      const profile_countrie_data = { id_pais, ciudad: ctx.request.body.ciudad }
-      //valido el telefono
-
-
-      //si recibo contraseña: valido,hasheo y la seteo dentro de profileData
-      if (ctx.request.body.password) {
-        await validatePassword(ctx.request.body.password)
-        //! hasheo la pass que el usuario ingresa / 10->round for hash encryption
-        const hashPassword = await bcrypt.hash(ctx.request.body.password, 10)
-        //parseo a int los valores que recibo del front
-        profileData = { nombre, apellido, email, telefono, anos_experiencia, password: hashPassword }
-      }
-
-
-      const user = await prisma.nutricionista.update({
-        where: { id: userId }, data: profileData,
-        select: { id: true, nombre: true, }
+      //se envia la data a algun servicio de chefDigitales para 
+      //verificar datos (diploma)
+      await fetch('https://cheffdigital.com/cheffadmin/api/api3.php/registroUsuarioNutricionista', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json', },
+        body: JSON.stringify(data)
       })
-
-      //invoco la funct aux updateRecord de params(NombreDeLaTabla,id,data) para que me haga las actualizaciones
-      await updateRecord(prisma.nutricionista_pais, userId, profile_countrie_data)
-      await updateRecord(prisma.nutricionista_especialidad, userId, { id_especialidad })
-
-      const accesToken = jwt.sign({
-        sub: user.id,
-        name: user.nombre,
-        expiresIn: Nutricionista.#set_expiration_time,
-      }, process.env.JWT_SECRET)
-
-
-      ctx.body = { user, accesToken }
-      ctx.status = HTTP_STATUS_CREATED
+        .then(response => response.json())
     } catch (error) {
-
-      if (error instanceof prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        ctx.body = { error: "No se encontro registro para actualizar" }
-        ctx.status = HTTP_STATUS_NOT_FOUND
-        return
-      }
-
-      console.error('Error al actualizar el perfil:', error);
-      ctx.body = { error: 'Error al actualizar el perfil.' };
-      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+      throw new Error('Error al enviar los datos a ChefDigitales.')
     }
   }
+
+  static async acceptRegistration(ctx) {
+    try {
+      const requestBody = ctx.request.body
+
+      if (requestBody.action === "aprobado") {
+        await prisma.nutricionista.update({
+          where: { email: requestBody.email },
+          data: { activo: true }
+        })
+      }
+      ctx.status = HTTP_STATUS_CREATED
+    } catch (error) {
+      ctx.body = { error: 'No se pudo actualizar el estado del registro' }
+      ctx.status = HTTP_STATUS_BAD_REQUEST
+    }
+  }
+
+//   static async envioDeEmail( p_email) {
+ 
+//     const defaultClient = SibApiV3Sdk.ApiClient.instance
+
+
+//     // Configure API key authorization: api-key
+//     const apiKey = defaultClient.authentications['api-key']
+//     apiKey.apiKey = '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'
+
+//     const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi()
+//     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail()
+//     sendSmtpEmail.sender = { name: data.nombre, email: data.email }
+//     sendSmtpEmail.to = [{ email: p_email }];
+//     sendSmtpEmail.subject = 'Status de registro.'
+//     sendSmtpEmail.htmlContent = '<p>HTML content of the email</p>'
+//     sendSmtpEmail.textContent = 'Su registro se ha aprobado, por favor inicie sesión en nuestra plataforma para continuar.'
+//     sendSmtpEmail.headers = {
+//       'api-key': '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',
+//       'content-type': 'application/json',
+//       'accept': 'application/json',
+//     }
+  
+//     apiInstance.sendTransacEmail(sendSmtpEmail).then(function(data) {
+//     console.log('API called successfully. Returned data: ' + data)
+//   }, function(error) {
+//     console.error(error)
+//   })
+// }
+
+  static async updateProfile(ctx) {
+
+  if (!ctx.headers.authorization) {
+    ctx.status = HTTP_STATUS_UNAUTHORIZED
+    return
+  }
+  const [type, token] = ctx.headers.authorization.split(" ")
+  const data = jwt.verify(token, process.env.JWT_SECRET)
+  const userId = data.sub
+
+  const nombre = ctx.request.body.nombre
+  const apellido = ctx.request.body.apellido
+  const email = ctx.request.body.email
+  const telefono = ctx.request.body.telefono
+
+  try {
+
+    const id_pais = await stringToInt(ctx.request.body.pais)
+    const id_especialidad = await stringToInt(ctx.request.body.especialidad)
+    const anos_experiencia = await positiveValue(ctx.request.body.anos_experiencia)
+    await validatePhone(telefono)
+
+    let profileData = { nombre, apellido, email, telefono, anos_experiencia }
+    const profile_countrie_data = { id_pais, ciudad: ctx.request.body.ciudad }
+    //valido el telefono
+
+
+    //si recibo contraseña: valido,hasheo y la seteo dentro de profileData
+    if (ctx.request.body.password) {
+      await validatePassword(ctx.request.body.password)
+      //! hasheo la pass que el usuario ingresa / 10->round for hash encryption
+      const hashPassword = await bcrypt.hash(ctx.request.body.password, 10)
+      //parseo a int los valores que recibo del front
+      profileData = { nombre, apellido, email, telefono, anos_experiencia, password: hashPassword }
+    }
+
+
+    const user = await prisma.nutricionista.update({
+      where: { id: userId }, data: profileData,
+      select: { id: true, nombre: true, apellido: true, email: true }
+    })
+
+    //invoco la funct aux updateRecord de params(NombreDeLaTabla,id,data) para que me haga las actualizaciones
+    await updateRecord(prisma.nutricionista_pais, userId, profile_countrie_data)
+    await updateRecord(prisma.nutricionista_especialidad, userId, { id_especialidad })
+
+    const accesToken = jwt.sign({
+      sub: user.id,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      email: user.email,
+      expiresIn: Nutricionista.#set_expiration_time,
+    }, process.env.JWT_SECRET)
+
+
+    ctx.body = { user, accesToken }
+    ctx.status = HTTP_STATUS_CREATED
+  } catch (error) {
+
+    if (error instanceof prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      ctx.body = { error: "No se encontro registro para actualizar" }
+      ctx.status = HTTP_STATUS_NOT_FOUND
+      return
+    }
+
+    console.error('Error al actualizar el perfil:', error);
+    ctx.body = { error: 'Error al actualizar el perfil.' };
+    ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+  }
+}
 
 
 }
