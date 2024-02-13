@@ -11,16 +11,19 @@ export async function authenticateUser(email, plainTextPassword) {
     select: {
       id: true,
       nombre: true,
-      apellido:true,
-      email:true,
-      password:true,
+      apellido: true,
+      email: true,
+      password: true,
+      activo: true
     }
   });
   // Si el usuario no existe, lanzamos un error
   if (!user) {
     throw new Error('Email no encontrado');
   }
-
+  if (!user.activo) {
+    throw new Error('Usuario no activo');
+  }
   // Comprobamos si la contraseña proporcionada coincide con la del usuario
   const passwordMatch = await bcrypt.compare(plainTextPassword, user.password);
 
@@ -113,48 +116,48 @@ export async function updateRecord(model, id_nutricionista, data) {
 // mejoras a futuro y lineas de accion
 // Ruta para el registro de usuarios
 //------------------------------------------
-// export const envio_de_registro = async (ctx) => {
-//   try {
-//     // extraigo el email y lo busco para ver si existe en la DB
-//     const email = ctx.request.body.email
-//     await validateEmail(email)
+export const envio_de_registro = async (ctx) => {
+  try {
+    // extraigo el email y lo busco para ver si existe en la DB
+    const email = ctx.request.body.email
+    await validateEmail(email)
 
-//     // ... (código anterior)
+    // ... (código anterior)
 
-//     // Preparamos los datos del usuario
-//     const user_data = {
-//       email,
-//       password: hashPassword,
-//       nombre: ctx.request.body.nombre,
-//       apellido: ctx.request.body.apellido,
-//       telefono: ctx.request.body.telefono,
-//       anos_experiencia: anos,
-//       foto_diploma: foto_diploma ? foto_diploma.filepath : null,
-//       id_chefDigitales: idChef,
-//     }
+    // Preparamos los datos del usuario
+    const user_data = {
+      email,
+      password: hashPassword,
+      nombre: ctx.request.body.nombre,
+      apellido: ctx.request.body.apellido,
+      telefono: ctx.request.body.telefono,
+      anos_experiencia: anos,
+      foto_diploma: foto_diploma ? foto_diploma.filepath : null,
+      id_chefDigitales: idChef,
+    }
 
-//     // Enviamos los datos del usuario a la API externa
-//     const response = await fetch('https://api.example.com/register', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify(user_data),
-//     });
+    // Enviamos los datos del usuario a la API externa
+    const response = await fetch('https://api.example.com/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user_data),
+    });
 
-//     // Comprobamos si la solicitud fue exitosa
-//     if (!response.ok) {
-//       throw new Error('Error al registrar el usuario en la API externa');
-//     }
+    // Comprobamos si la solicitud fue exitosa
+    if (!response.ok) {
+      throw new Error('Error al registrar el usuario en la API externa');
+    }
 
-//     // Si la API acepta los datos, creamos el usuario en nuestra base de datos
-//     const user = await prisma.nutricionista.create({ data: user_data })
+    // Si la API acepta los datos, creamos el usuario en nuestra base de datos
+    const user = await prisma.nutricionista.create({ data: user_data })
 
-//   } catch (error) {
-//     ctx.body = { error: error.message }
-//     ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
-//   }
-// }
+  } catch (error) {
+    ctx.body = { error: error.message }
+    ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+  }
+}
 
 //#endregion
 //Idea: Se crea el registro del nutricionista siempre en la etapa de pre-registro y cambiar un param
