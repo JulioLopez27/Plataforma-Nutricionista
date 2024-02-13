@@ -101,7 +101,7 @@ export const Signup = () => {
                     }
                 })
                 setIsModalOpen(true);
-                setMessage('Su solicitud de registro se ha enviado y está pendiente de aprobación,  le enviaremos un correo electrónico para confirmar su registro. Gracias!')
+                setMessage('Su solicitud de registro se ha enviado y está pendiente de aprobación, le enviaremos un correo electrónico cuando se confirme su registro. Gracias!')
                 setMessageType('approval');
             } catch (error) {
                 setIsModalOpen(true);
