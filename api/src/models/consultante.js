@@ -82,6 +82,7 @@ export class Consultante {
         });
     }
 
+    //!Envio de datos a chefDigitales
     static async createNewConsultant(ctx) {
 
         if (!ctx.headers.authorization) {
