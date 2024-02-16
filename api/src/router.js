@@ -23,6 +23,7 @@ router.put('/updateProfileData', async (ctx) => { await Nutricionista.updateProf
 router.get('/getConsultants', async (ctx) => { await Nutricionista.getConsultantes(ctx) })
 router.get('/getHistory', async (ctx) => { await Nutricionista.getHistory(ctx) })
 router.get('/getHistoryInformes', async (ctx) => { await Nutricionista.getHistoryInformes(ctx) })
-
+router.post('/saveReport', async (ctx) => { await Nutricionista.saveReport(ctx) })
+router.get('/getReport', async (ctx) => { await Nutricionista.getReport(ctx) })
 
 router.post('/createNewConsultant', async (ctx) => {await Consultante.createNewConsultant(ctx)})
