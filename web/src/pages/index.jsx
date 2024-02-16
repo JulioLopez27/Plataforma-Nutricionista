@@ -8,14 +8,12 @@ import { Home } from './Home'
 import { Signup } from './Signup'
 import { Dashboard } from './Dashboard'
 import { Profile } from "./Profile"
-//import { Consultante } from "./Consultante"
-import { DetalleConsultante } from "./Consultante/detalle"
+import { DetalleConsultante } from "./Consultante/detalleConsultante"
 import { Receta} from './Receta'
-import {Lista} from './Consultante/lista'
+import {ListadoConsultantes} from './Consultante/listadoConsultantes'
 import {Historico} from './Receta/historico'
 import {HistoricoRegistro} from './Registro/historico'
 
-import { BotoneraConsultante } from "./Consultante/botonera" //TODO PRUEBAAA
 import { EnviarRegistro } from "./Registro/enviarRegistro";
 import { RegistroEnviado } from "./Registro/RegistroEnviado";
   
@@ -37,21 +35,15 @@ const router = createBrowserRouter([
     path: "/profile",
     element: <Profile />,
   }, 
-  /*{
-    path: "/consultantes",
-    element: <Consultante />,
-  }, */
-  {
-    path: "/detalleConsultante",
-    element: <DetalleConsultante/>,
-  },
   {
     path: "/recetas",
     element: <Receta />,
   }, 
+
+//--->ELIMINAR LUEGO DE IMPLEMETAR LA LISTA DE CONSULTANTES CON LOS ENALCES
   {
-    path: "/lista",
-    element: <Lista />,
+    path: "/consultantes",
+    element: <ListadoConsultantes />,
   }, 
   {
     path: "/historico",
@@ -62,8 +54,8 @@ const router = createBrowserRouter([
     element: <HistoricoRegistro />,
   },
   {
-    path: "/botonera",
-    element: <BotoneraConsultante />,
+    path: "/detalleConsultante",
+    element: <DetalleConsultante/>,
   },
   {
     path: "/enviarRegistro",
@@ -74,6 +66,8 @@ const router = createBrowserRouter([
     path: "/registroEnviado",
     element: <RegistroEnviado />,
   },
+
+//--->ELIMINAR LUEGO DE IMPLEMETAR LA LISTA DE CONSULTANTES CON LOS ENALCES
 
 
 ]);

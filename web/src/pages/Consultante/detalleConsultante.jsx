@@ -4,17 +4,20 @@ import { FormularioGeneral } from './formularioGeneral';
 import { FormularioAnamnesis } from './formularioAnamnesis';
 import { FormularioAfecciones } from './formularioAfecciones';
 import { FormularioTipoDieta } from './formularioTipoDieta';
-import { FormularioInformes } from './formularioInformes';
+import { FormularioRegistros } from './formularioRegistros';
 import { FormularioRecetas } from './formularioRecetas';
+import { useLocalStorage } from 'react-use'
+import { Navigate } from 'react-router-dom'
 // Importa los demás formularios...
 
-export function BotoneraConsultante() {
+export function DetalleConsultante() {
     const [isBotoneraConsultanteVisible, setIsBotoneraConsultanteVisible] = useState(false);
     const [formularioVisible, setFormularioVisible] = useState('general');
+    const [auth] = useLocalStorage('auth', {})
+    if (!auth?.user?.id) {
+        return <Navigate to="/" replace={true} />
+    }
 
-    const retryFetchUserInfo = () => {
-        // Implementa la lógica para volver a intentar obtener la información del consultante
-    };
 
     const mostrarFormulario = (formulario) => {
         setFormularioVisible(formulario);
@@ -23,7 +26,7 @@ export function BotoneraConsultante() {
 
     return (
         <div>
-            <Header />
+            <Header nombreDelUsuario={auth.user.nombre} />
             <NavBar />
 
             <main className="mt-4 flex flex-wrap items-center justify-center h-full">
@@ -39,7 +42,7 @@ export function BotoneraConsultante() {
                                         <button onClick={() => mostrarFormulario('anamnesis')} type="button" className="block w-full text-left px-4 py-2 hover:bg-gray-200">Anamnesis</button>
                                         <button onClick={() => mostrarFormulario('afecciones')} type="button" className="block w-full text-left px-4 py-2 hover:bg-gray-200">Afecciones</button>
                                         <button onClick={() => mostrarFormulario('tipoDieta')} type="button" className="block w-full text-left px-4 py-2 hover:bg-gray-200">Tipo de dieta</button>
-                                        <button onClick={() => mostrarFormulario('informes')} type="button" className="block w-full text-left px-4 py-2 hover:bg-gray-200">Informes</button>
+                                        <button onClick={() => mostrarFormulario('registros')} type="button" className="block w-full text-left px-4 py-2 hover:bg-gray-200">Registros</button>
                                         <button onClick={() => mostrarFormulario('recetas')} type="button" className="block w-full text-left px-4 py-2 hover:bg-gray-200">Recetas</button>
 
                                         {/* Agrega más botones para los otros formularios... */}
@@ -53,7 +56,7 @@ export function BotoneraConsultante() {
                                     <button onClick={() => mostrarFormulario('anamnesis')} type="button" className="bg-white text-gray-700 hover:bg-gray-300 font-bold py-2 px-4 rounded w-full">Anamnesis</button>
                                     <button onClick={() => mostrarFormulario('afecciones')} type="button" className="bg-white text-gray-700 hover:bg-gray-300 font-bold py-2 px-4 rounded w-full">Afecciones</button>
                                     <button onClick={() => mostrarFormulario('tipoDieta')} type="button" className="bg-white text-gray-700 hover:bg-gray-300 font-bold py-2 px-4 rounded w-full">Tipo de dieta</button>
-                                    <button onClick={() => mostrarFormulario('informes')} type="button" className="bg-white text-gray-700 hover:bg-gray-300 font-bold py-2 px-4 rounded w-full">Informes</button>
+                                    <button onClick={() => mostrarFormulario('registros')} type="button" className="bg-white text-gray-700 hover:bg-gray-300 font-bold py-2 px-4 rounded w-full">Registros</button>
                                     <button onClick={() => mostrarFormulario('recetas')} type="button" className="bg-white text-gray-700 hover:bg-gray-300 font-bold py-2 px-4 rounded w-full">Recetas</button>
                                     {/* Agrega más botones para los otros formularios... */}
                                 </form>
@@ -66,7 +69,7 @@ export function BotoneraConsultante() {
                         {formularioVisible === 'anamnesis' && <FormularioAnamnesis />}
                         {formularioVisible === 'afecciones' && <FormularioAfecciones />}
                         {formularioVisible === 'tipoDieta' && <FormularioTipoDieta/>}
-                        {formularioVisible === 'informes' && <FormularioInformes/>}
+                        {formularioVisible === 'registros' && <FormularioRegistros/>}
                         {formularioVisible === 'recetas' && <FormularioRecetas/>}
                         {/* Agrega más condiciones para mostrar los otros formularios... */}
                     </section>

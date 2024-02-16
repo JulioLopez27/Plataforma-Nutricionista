@@ -93,7 +93,7 @@ export const Signup = () => {
             try {
                 const res = await axios({
                     method: 'POST',
-                    baseURL: "http://localhost:3000",
+                    baseURL: import.meta.env.VITE_API_URL,
                     url: '/signup',
                     data: formData,
                     headers: {
@@ -101,7 +101,7 @@ export const Signup = () => {
                     }
                 })
                 setIsModalOpen(true);
-                setMessage(`Registro realizado con suceso`);
+                setMessage('Su solicitud de registro se ha enviado y está pendiente de aprobación, le enviaremos un correo electrónico cuando se confirme su registro. Gracias!')
                 setMessageType('approval');
             } catch (error) {
                 setIsModalOpen(true);
@@ -226,7 +226,7 @@ export const Signup = () => {
                         id='anos_experiencia'
                         type="number"
                         name="anos_experiencia"
-                        label="Experiencia"
+                        label="Experiencia (años): "
                         placeholder="Ingrese su tiempo de experiencia en años"
                         error={formik.touched.anos_experiencia && formik.errors.anos_experiencia}
                         value={formik.values.anos_experiencia}

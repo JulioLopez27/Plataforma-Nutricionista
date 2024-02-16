@@ -1,8 +1,14 @@
 import React, { useState }from 'react';
 import { Input } from '~/components'
 import { useFormik } from 'formik'
+import { useLocalStorage } from 'react-use'
+import { Navigate, useNavigate } from 'react-router-dom'
 
-export function FormularioInformes( ) {
+
+
+export function FormularioRegistros( ) {
+    const [auth, setAuth] = useLocalStorage('auth', {})
+    setAuth(res.data)
 
     const [consultanteInfo, setFormData] = useState({
         enviado: false,
@@ -45,10 +51,9 @@ export function FormularioInformes( ) {
                     className="rounded-md bg-gray-100 px-4 py-2"
                 />
             </div>
-            <button type="submit" className="bg-verde_oscuro hover:bg-verde_claro text-white font-bold py-2 px-4 rounded mt-2">Generar nuevo informe</button>
+            <button type="submit" className="bg-verde_oscuro hover:bg-verde_claro text-white font-bold py-2 px-4 rounded mt-2">Generar nuevo registro</button>
 
 
-            <h1>FALTA LISTA DE INFORMES ANTERIORES CON OPCIÓN DE ENVIAR EN CADA UNO DE ELLOS</h1>
 
 
         </form>

@@ -2,7 +2,7 @@
 a ser usadas*/
 import Router from '@koa/router'
 import { Nutricionista } from './models/nutricionista.js'
-
+import { Consultante } from './models/consultante.js'
 export const router = new Router()
 
 
@@ -11,6 +11,9 @@ export const router = new Router()
 router.get('/login', async (ctx) => { await Nutricionista.login(ctx) })
 router.post('/signup', async (ctx) => { await Nutricionista.signup(ctx) })
 
+//ruta para dejar expuesto la api para cuando se acepte el registro del nutricionista
+router.put('/acceptRegistration', async (ctx) => { await Nutricionista.acceptRegistration(ctx) })
+// router.post('/test', async (ctx) => { await Nutricionista.envioDeEmail(ctx) })
 router.get('/getSpecialty', async (ctx) => { await Nutricionista.getSpecialty(ctx) })
 router.get('/getCountries', async (ctx) => { await Nutricionista.getCountries(ctx) })
 
@@ -23,3 +26,4 @@ router.get('/getHistoryInformes', async (ctx) => { await Nutricionista.getHistor
 router.post('/saveReport', async (ctx) => { await Nutricionista.saveReport(ctx) })
 router.get('/getReport', async (ctx) => { await Nutricionista.getReport(ctx) })
 
+router.post('/createNewConsultant', async (ctx) => {await Consultante.createNewConsultant(ctx)})

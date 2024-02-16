@@ -5,7 +5,7 @@ import { Recepies_Cards, Header, NavBar } from "~/components"
 
 export function Dashboard() {
     const [auth] = useLocalStorage('auth', {})
-    
+
     if (!auth?.user?.id) {
         return <Navigate to="/" replace={true} />
     }
@@ -14,7 +14,7 @@ export function Dashboard() {
 
         <div>
 
-            <Header/>
+            <Header nombreDelUsuario={auth.user.nombre} />
 
             <NavBar />
 
@@ -22,9 +22,9 @@ export function Dashboard() {
             <main>
 
                 <section id="header" className="max-w-full flex items-center justify-center">
-                   
+
                     <div className="flex flex-col text-center m-4 gap-4">
-                      
+
                         <h1 className="p-2 text-lg sm:text-xl md:text-3xl lg:text-4xl font-bold text-azul_titulo ">
                             Recetas sugeridas de ChefDigitales
                         </h1>

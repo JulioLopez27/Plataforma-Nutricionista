@@ -75,7 +75,7 @@ export function Profile() {
       try {
         const res = await axios({
           method: 'put',
-          baseURL: 'http://localhost:3000',
+          baseURL: import.meta.env.VITE_API_URL,
           url: '/updateProfileData',
           data: values, // Enviar los datos modificados al servidor
           headers: { Authorization: `Bearer ${auth.accesToken}` }
@@ -99,9 +99,25 @@ export function Profile() {
 
   const fetchData = async () => {
     const [userRes, countriesRes, specialtiesRes] = await Promise.all([
-      axios.get('http://localhost:3000/getProfileData', { headers: { Authorization: `Bearer ${auth.accesToken}` } }),
-      axios.get('http://localhost:3000/getCountries'),
-      axios.get('http://localhost:3000/getSpecialty'),
+
+      axios({
+        method: 'get',
+        baseURL: import.meta.env.VITE_API_URL,
+        url: '/getProfileData',
+        headers: { Authorization: `Bearer ${auth.accesToken}` }
+      }),
+
+      axios({
+        method: 'get',
+        baseURL: import.meta.env.VITE_API_URL,
+        url: '/getCountries',
+      }),
+
+      axios({
+        method: 'get',
+        baseURL: import.meta.env.VITE_API_URL,
+        url: '/getSpecialty',
+      }),
     ])
 
     setUserInfo(userRes.data)
@@ -153,7 +169,7 @@ export function Profile() {
 
   return (
     <div>
-      <Header nombreDelUsuario  ={auth.user.nombre} />
+      <Header nombreDelUsuario={auth.user.nombre} />
       <NavBar />
       <main className='mt-4'>
         <section id="editPerfil" className='container' >

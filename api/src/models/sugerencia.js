@@ -2,12 +2,13 @@ import { Receta } from "./receta.js";
 
 
 export class Sugerencia {
-    constructor(etiqueta, enviada, fecha, nutricionista) {
+    constructor(etiqueta, enviada, fecha, comentario, nutricionista) {
         this.etiqueta = etiqueta;
         this.enviada = enviada; //Boolean
         this.fecha = fecha;
+        this.comentario = comentario;
+        this.nutricionista = nutricionista;
         this.recetas = [];
-
     }
     agregarReceta(receta) {
         // Verificar si el parámetro es una instancia de la clase Receta
@@ -20,4 +21,5 @@ export class Sugerencia {
         
     }
 
+    //Dos botones: "Guardar borrador" y "Enviar y Guardar"
 }
