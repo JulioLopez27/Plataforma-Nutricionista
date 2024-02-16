@@ -25,7 +25,8 @@ import {
   createUser,
   createUserCountryData,
   createUserSpecialtyData,
-  updateRecord
+  updateRecord,
+  createReport
 } from '../utility/nutricionista/helpers.js'
 
 
@@ -178,6 +179,11 @@ export class Nutricionista {
 
 
   static async getConsultantes(ctx) {
+
+//    const [type, token] = ctx.headers.authorization.split(" ")
+  //  const data = jwt.verify(token, process.env.JWT_SECRET)
+    //const userId = data.sub
+
     try {
       const consultantesID = await prisma.nutricionista_consultante.findMany({
         where: {
@@ -221,11 +227,59 @@ export class Nutricionista {
 
   }
 
+  static async getReport(ctx) {
+    try {
+      console.log(ctx.query.id)
+      const reportData = await prisma.registro.findUnique({
+        where: {
+          id: parseInt(ctx.query.id)
+      //  id: stringToInt("2")
+        },
+        select: {
+          id: true,
+          id_nutricionista: true,
+          id_consultante: true,
+          nota: true,
+          tipo: true,
+        }
+      })
+      
+      const datosRegistro = {
+        id: reportData.id,
+        id_nutricionista: reportData.id_nutricionista,
+        id_consultante: reportData.id_consultante,
+        nota: reportData.nota,
+        tipo: reportData.tipo,
+      };
+      console.log(datosRegistro)
+      ctx.body = datosRegistro;
+      ctx.status = HTTP_STATUS_CREATED
+
+    } catch(error) {
+      console.log(error)
+      ctx.body = {
+        error: error.message,
+  
+      }
+      // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
+      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+
+    }
+
+  }
+
+
   static async getHistory(ctx) {
+//    const [type, token] = ctx.headers.authorization.split(" ")
+  //  const data = jwt.verify(token, process.env.JWT_SECRET)
+    //const userId = data.sub
+
+
+
     try {
       const historyID = await prisma.consultante_receta.findMany({
         where: {
-          // Replace 'id_nutricionista' with the actual field name from your schema
+
           // Recordar hacer esto dinamico!!!
           id_nutricionista: 27,
         },
@@ -264,18 +318,23 @@ export class Nutricionista {
 
   static async getHistoryInformes(ctx) {
     try {
+
+      const idConsultante = ctx.query.idConsultante;
       const historyID = await prisma.registro.findMany({
         where: {
-          // Replace 'id_nutricionista' with the actual field name from your schema
+          
           // Recordar hacer esto dinamico!!!
-          id_nutricionista: 7,
+          id_nutricionista: parseInt(27),
+          id_consultante: parseInt(idConsultante),
+          enviado: false
         },
       });
-      //console.log(historyID)
-
+      
       const datosHistorico = historyID.map((registro) => ({
         nombre: registro.tipo,
         fechaEnvio: registro.fecha,
+        enviado: registro.enviado,
+        id: registro.id
       }));
 
 
@@ -291,89 +350,7 @@ export class Nutricionista {
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR;
     }
   }
-  static async getHistory(ctx) {
-    try {
-      const historyID = await prisma.consultante_receta.findMany({
-        where: {
-          // Replace 'id_nutricionista' with the actual field name from your schema
-          // Recordar hacer esto dinamico!!!
-          id_nutricionista: 27,
-        },
-      });
-      //console.log(historyID)
-      const datosHistorico = await Promise.all(
-        historyID.map(async (historico) => {
-          const receta = await prisma.receta.findFirst({
-            where: {
-              id: historico.id_receta
-            },
-            select: {
-              nombre: true
-            }, // Fetch the Receta.name
-          });
-
-          return {
-            nombre: receta.nombre,
-            fechaEnvio: historico.fecha_envio,
-          };
-        })
-      );
-
-      //  console.log(datosHistorico);
-      ctx.body = datosHistorico;
-      ctx.status = HTTP_STATUS_CREATED;
-    } catch (error) {
-      // If an error occurs, prepare an error message for the client
-      ctx.body = {
-        error: error.message
-      };
-      // Set the HTTP status code to 500 (Internal Server Error)
-      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR;
-    }
-  }
-
-  static async getHistory(ctx) {
-    try {
-      const historyID = await prisma.registro.findMany({
-        where: {
-          // Replace 'id_nutricionista' with the actual field name from your schema
-          // Recordar hacer esto dinamico!!!
-          id_nutricionista: 7,
-        },
-      });
-      //console.log(historyID)
-      const datosHistorico = await Promise.all(
-        historyID.map(async (historico) => {
-          const receta = await prisma.receta.findFirst({
-            where: {
-              id: historico.id_receta
-            },
-            select: {
-              nombre: true
-            }, // Fetch the Receta.name
-          });
-
-          return {
-            nombre: receta.nombre,
-            fechaEnvio: historico.fecha_envio,
-          };
-        })
-      );
-
-      //  console.log(datosHistorico);
-      ctx.body = datosHistorico;
-      ctx.status = HTTP_STATUS_CREATED;
-    } catch (error) {
-      // If an error occurs, prepare an error message for the client
-      ctx.body = {
-        error: error.message
-      };
-      // Set the HTTP status code to 500 (Internal Server Error)
-      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR;
-    }
-  }
-
-
+ 
 
   //creacion de un nutricionista
   // Función para manejar el inicio de sesión de un usuario
@@ -571,6 +548,90 @@ export class Nutricionista {
 
     }
   }
+
+static async login(ctx) {
+    const [type, token] = ctx.headers.authorization.split(" ")
+    const [email, plainTextPassword] = Buffer.from(token, 'base64').toString().split(":")
+    try {
+      // Extraemos el email y la contraseña del cuerpo de la petición
+      // const email = ctx.request.body.email
+      // const plainTextPassword = ctx.request.body.password
+
+      await validatePassword(plainTextPassword)
+      // Intentamos autenticar al usuario
+      const user = await authenticateUser(email, plainTextPassword)
+
+      // Si la autenticación es exitosa, eliminamos la contraseña del objeto del usuario
+      const { password, ...result } = user
+
+      // Creamos un token de acceso para el usuario
+      const accesToken = jwt.sign({
+        sub: user.id,
+        name: user.nombre,
+        expiresIn: Nutricionista.#set_expiration_time,
+      }, process.env.JWT_SECRET)
+
+      // Preparamos la respuesta para el cliente
+      ctx.body = {
+        user: result, accesToken
+      }
+      // Establecemos el código de estado HTTP a 201 (Creado)
+      ctx.status = HTTP_STATUS_CREATED
+
+    } catch (error) {
+      // Si ocurre un error, preparamos un mensaje de error para el cliente
+      ctx.body = { error: error.message }
+      // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
+      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+    }
+  }
+
+  static async saveReport(ctx) {
+    try {
+   //   const [type, token] = ctx.headers.authorization.split(" ")
+    //  const data = jwt.verify(token, process.env.JWT_SECRET)
+     // const id_nutri = data.sub
+   
+     const cuerpo = ctx.request.body.cuerpo
+      const titulo =  ctx.request.body.tipo
+      const id_consult= ctx.request.body.idConsultante
+      console.log(id_consult)
+   //CONSULTANTE TIENE QUE SER DINAMICO, ver si lo saco de la URL o que onda.
+   
+      //const id_consult=2
+      const id_nutri =27
+      // const id_consult = ctx.request.body.id_consult
+     // const id_nutri = ctx.request.body.id_nutri
+      //creo el obj registro_data para darle a prisma y crear el informe
+      const report_data = {
+        id_nutricionista:parseInt(id_nutri),
+        id_consultante: parseInt(id_consult),
+        fecha: new Date(),
+        nota:cuerpo,
+        tipo:titulo,
+        enviado: false
+      }
+
+      
+      //se envian los datos del registro para crear el reporte
+      const reporte = await createReport(report_data)
+ 
+      ctx.body = {
+        report: reporte,
+      }
+      ctx.status = HTTP_STATUS_CREATED
+
+    } catch (error) {
+      ctx.body = {
+        error: error.message
+      }
+      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+    }
+  }
+
+
+
+
 
 
 }

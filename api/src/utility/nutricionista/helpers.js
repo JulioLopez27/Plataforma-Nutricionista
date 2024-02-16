@@ -59,6 +59,24 @@ export async function createUser(user_data) {
   }
 }
 
+export async function createReport(report_data) {
+  console.log(report_data)
+  try {
+    const report = await prisma.registro.create({data: report_data })
+   
+    // Si no se pudo crear el registro, lanzamos un error
+    if (!report) {
+      throw new Error('No se pudo crear el registro')
+    }
+    return report;
+
+  } catch (error) {
+    console.log(error)
+    throw new Error('Error al crear el registro, contacte con la empresa')
+  }
+}
+
+
 //crea un registro en la tabla nutri_pais 
 export async function createUserCountryData(id_nutricionista, id_pais, ciudad) {
   try {

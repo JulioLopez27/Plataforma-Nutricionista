@@ -16,7 +16,9 @@ import {Historico} from './Receta/historico'
 import {HistoricoRegistro} from './Registro/historico'
 
 import { BotoneraConsultante } from "./Consultante/botonera" //TODO PRUEBAAA
-
+import { EnviarRegistro } from "./Registro/enviarRegistro";
+import { RegistroEnviado } from "./Registro/RegistroEnviado";
+  
 
 const router = createBrowserRouter([
   {
@@ -63,6 +65,16 @@ const router = createBrowserRouter([
     path: "/botonera",
     element: <BotoneraConsultante />,
   },
+  {
+    path: "/enviarRegistro",
+    element: <EnviarRegistro />,
+  },
+  ,
+  {
+    path: "/registroEnviado",
+    element: <RegistroEnviado />,
+  },
+
 
 ]);
 
