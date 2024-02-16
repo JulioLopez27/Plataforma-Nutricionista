@@ -103,9 +103,11 @@ export class Consultante {
         try {
 
             //verifico la existencia del consultante en la DB
-            const consultante_existe = await prisma.consultante.findUnique({ where: { email: ctx.request.body.email } })
+            //const consultante_existe = await prisma.consultante.findUnique({ where: { email: ctx.request.body.email } })
             //existe consultante? creo relacion de consultante y nutricionista
-            if (consultante_existe) {
+
+            //if (consultante_existe) { //Se quita para que cada nutricionista tenga su propia copia de consultante
+            
                 //verifico que tenga relacion con el nutricionista que está ingresando sus datos
                 const res = await prisma.nutricionista_consultante.findUnique({
                     where: {
@@ -131,8 +133,8 @@ export class Consultante {
                 })
                 ctx.body = { mensaje: 'Se agregó a su agenda de consultantes.' }
                 ctx.status = HTTP_STATUS_CREATED
-                return
-            }
+                //return
+            //}
 
             //no existe consultante en la db? Lo agrego.
             const fechaNacimiento = new Date(ctx.request.body.fechaNacimiento)

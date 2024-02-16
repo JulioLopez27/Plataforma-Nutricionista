@@ -13,6 +13,7 @@ import { Receta} from './Receta'
 import {ListadoConsultantes} from './Consultante/listadoConsultantes'
 import {Historico} from './Receta/historico'
 import {HistoricoRegistro} from './Registro/historico'
+import {AgregarConsultante} from './Consultante/agregarConsultante'
 
 import { EnviarRegistro } from "./Registro/enviarRegistro";
 import { RegistroEnviado } from "./Registro/RegistroEnviado";
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
   {
     path: "/recetas",
     element: <Receta />,
+  }, 
+  {
+    path: "/agregarConsultante",
+    element: <AgregarConsultante />,
   }, 
 
 //--->ELIMINAR LUEGO DE IMPLEMETAR LA LISTA DE CONSULTANTES CON LOS ENALCES

@@ -685,6 +685,47 @@ static async login(ctx) {
   }
 
 
+  static async getConsultanteForId(ctx) {
+    try {
+      console.log(ctx.query.id)
+      const reportData = await prisma.registro.findUnique({
+        where: {
+          id: parseInt(ctx.query.id)
+      //  id: stringToInt("2")
+        },
+        select: {
+          id: true,
+          id_nutricionista: true,
+          id_consultante: true,
+          nota: true,
+          tipo: true,
+        }
+      })
+      
+      const datosRegistro = {
+        id: reportData.id,
+        id_nutricionista: reportData.id_nutricionista,
+        id_consultante: reportData.id_consultante,
+        nota: reportData.nota,
+        tipo: reportData.tipo,
+      };
+      console.log(datosRegistro)
+      ctx.body = datosRegistro;
+      ctx.status = HTTP_STATUS_CREATED
+
+    } catch(error) {
+      console.log(error)
+      ctx.body = {
+        error: error.message,
+  
+      }
+      // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
+      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+
+    }
+  
+  
+  }
 
 
 
