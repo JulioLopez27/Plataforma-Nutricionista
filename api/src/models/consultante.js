@@ -174,5 +174,80 @@ export class Consultante {
 
     }
 
+    // static async updateProfile(ctx) {
+
+    //     if (!ctx.headers.authorization) {
+    //       ctx.status = HTTP_STATUS_UNAUTHORIZED
+    //       return
+    //     }
+    //     const [type, token] = ctx.headers.authorization.split(" ")
+    //     const data = jwt.verify(token, process.env.JWT_SECRET)
+    //     const userId = data.sub
+    
+    //     const nombre = ctx.request.body.nombre
+    //     const apellido = ctx.request.body.apellido
+    //     const email = ctx.request.body.email
+    //     const telefono = ctx.request.body.telefono
+    
+    //     try {
+    
+    //       const id_pais = await stringToInt(ctx.request.body.pais)
+    //       const id_especialidad = await stringToInt(ctx.request.body.especialidad)
+    //       const anos_experiencia = await positiveValue(ctx.request.body.anos_experiencia)
+    //       await validatePhone(telefono)
+    
+    //       let profileData = { nombre, apellido, email, telefono, anos_experiencia }
+    //       const profile_countrie_data = { id_pais, ciudad: ctx.request.body.ciudad }
+    //       //valido el telefono
+    
+    
+    //       //si recibo contraseña: valido,hasheo y la seteo dentro de profileData
+    //       if (ctx.request.body.password) {
+    //         await validatePassword(ctx.request.body.password)
+    //         //! hasheo la pass que el usuario ingresa / 10->round for hash encryption
+    //         const hashPassword = await bcrypt.hash(ctx.request.body.password, 10)
+    //         //parseo a int los valores que recibo del front
+    //         profileData = { nombre, apellido, email, telefono, anos_experiencia, password: hashPassword }
+    //       }
+    
+    
+    //       const user = await prisma.nutricionista.update({
+    //         where: { id: userId }, data: profileData,
+    //         select: { id: true, nombre: true, apellido: true, email: true }
+    //       })
+    
+    //       //invoco la funct aux updateRecord de params(NombreDeLaTabla,id,data) para que me haga las actualizaciones
+    //       await updateRecord(prisma.nutricionista_pais, userId, profile_countrie_data)
+    //       await updateRecord(prisma.nutricionista_especialidad, userId, { id_especialidad })
+    
+    //       const accesToken = jwt.sign({
+    //         sub: user.id,
+    //         nombre: user.nombre,
+    //         apellido: user.apellido,
+    //         email: user.email,
+    //         expiresIn: Nutricionista.#set_expiration_time,
+    //       }, process.env.JWT_SECRET)
+    
+    
+    //       ctx.body = { user, accesToken }
+    //       ctx.status = HTTP_STATUS_CREATED
+    //     } catch (error) {
+    
+    //       if (error instanceof prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+    //         ctx.body = { error: "No se encontro registro para actualizar" }
+    //         ctx.status = HTTP_STATUS_NOT_FOUND
+    //         return
+    //       }
+    
+    //       console.error('Error al actualizar el perfil:', error);
+    //       ctx.body = { error: 'Error al actualizar el perfil.' };
+    //       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+    //     }
+    //   }
+
+    static async updateConsultant(ctx) {
+
+    }
+
 
 }
