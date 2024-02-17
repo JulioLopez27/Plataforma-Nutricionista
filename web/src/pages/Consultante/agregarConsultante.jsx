@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Header, NavBar } from '~/components'
-import { Input, Custom_select, CustomModal } from '~/components'
+import { Input, CustomModal } from '~/components'
 import { useFormik } from "formik"
 import { useLocalStorage } from 'react-use'
 import * as yup from "yup"
@@ -29,7 +29,7 @@ export function AgregarConsultante() {
 
     const formik = useFormik({
         onSubmit: async (values) => {
-
+            console.log(values);
             try {
 
                 const res = await axios({
@@ -45,7 +45,6 @@ export function AgregarConsultante() {
                 setMessage("Consultante creado correctamente!")
                 setMessageType('approval');
 
-                location.reload();
 
             } catch (error) {
                 //alert("Error al crear consultante: " + error)
@@ -61,6 +60,7 @@ export function AgregarConsultante() {
             nombre: "",
             apellido: "",
             fecha_nac: "",
+            telefono: "",
             correo: "",
             sexo: ""
         },
