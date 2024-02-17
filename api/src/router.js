@@ -11,6 +11,8 @@ export const router = new Router()
 router.get('/login', async (ctx) => { await Nutricionista.login(ctx) })
 router.post('/signup', async (ctx) => { await Nutricionista.signup(ctx) })
 
+//route abierta para exponer los nutricionistas activos
+router.get('/getNutritionist',async(ctx)=>{await Nutricionista.getNutricionistas(ctx)})
 //ruta para dejar expuesto la api para cuando se acepte el registro del nutricionista
 router.put('/acceptRegistration', async (ctx) => { await Nutricionista.acceptRegistration(ctx) })
 // router.post('/test', async (ctx) => { await Nutricionista.envioDeEmail(ctx) })
