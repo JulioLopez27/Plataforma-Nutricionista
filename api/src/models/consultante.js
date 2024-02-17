@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken'
 import {
     Registro
 } from "./registro.js";
@@ -97,9 +98,7 @@ export class Consultante {
 
     //!Envio de datos a chefDigitales
     static async createNewConsultant(ctx) {
-        console.log(ctx.request.body);
-        console.log(ctx.headers.authorization);
-        
+
         if (!ctx.headers.authorization) {
             ctx.status = HTTP_STATUS_UNAUTHORIZED
             return
@@ -116,7 +115,7 @@ export class Consultante {
             ctx.status = HTTP_STATUS_BAD_REQUEST
             return
         }
-
+       
         try {
 
             const existe = await prisma.consultante.findUnique({
@@ -124,8 +123,6 @@ export class Consultante {
                     email: ctx.request.body.email
                 }
             })
-
-            console.log(existe)
 
             if (existe) { //verifico que tenga relacion con el nutricionista que está ingresando sus datos
 
@@ -139,15 +136,28 @@ export class Consultante {
                 })
                 //si existe ya la relacion ingreso al if y retorno error
                 if (asociado) {
-                    ctx.body = {
-                        mensaje: 'Ya está asociado ese email a su agenda.'
-                    }
+
+                    ctx.body = { mensaje: 'Ya está asociado ese email a su agenda.' }
                     ctx.status = HTTP_STATUS_FORBIDEN
+                    return
+                } else {
+                    const crearAsociacion = await prisma.nutricionista_consultante.create({
+                        data: {
+                            id_nutricionista: idNutricionista,
+                            id_consultante: existe.id
+                        }
+                    })
+
+                    if (!crearAsociacion) {
+                        ctx.body = { mensaje: 'Error al agregar el consultante a su agenda.' }
+                        ctx.status = HTTP_STATUS_BAD_REQUEST
+                        return
+                    }
+                    ctx.body = { mensjae: "Se ha agregado correctamente al consultante a tu agenda." }
+                    ctx.status = HTTP_STATUS_CREATED
                     return
                 }
             }
-
-
 
             //no existe consultante en la db? Lo agrego.
             const fechaNacimiento = new Date(ctx.request.body.fechaNacimiento)
@@ -162,31 +172,34 @@ export class Consultante {
             }
 
             //creo el consultante en la DB
-            const user = await prisma.consultante.create({
-                data: data_consultante
-            })
-            //verifico si creó el nuevo consultante
+            const user = await prisma.consultante.create({ data: data_consultante })
+
+            //verifico si no se creó el nuevo consultante
             if (!user) {
-                ctx.body = {
-                    mensaje: 'No se pudo crear el nuevo consultante'
-                }
+                ctx.body = { mensaje: 'No se pudo crear el nuevo consultante' }
                 ctx.status = HTTP_STATUS_NOT_FOUND
                 return
             }
-
+         
             //asocio el consultante al nutricionista que lo creo
-            await prisma.nutricionista_consultante.create({
+            const usuarioAsociado = await prisma.nutricionista_consultante.create({
                 data: {
                     id_nutricionista: idNutricionista,
-                    id_consultante: consultante_existe.id
+                    id_consultante: user.id
                 }
             })
-
+            if (!usuarioAsociado) {
+                ctx.body = { error: 'Se generó error al guardar los datos en su agenda.' }
+                ctx.status = HTTP_STATUS_BAD_REQUEST
+                return
+            }
+            //TODO OK
             ctx.body = {
                 mensaje: 'Se creo correctamente el registro de su nuevo consultante.'
             }
             ctx.status = HTTP_STATUS_CREATED
         } catch (error) {
+           
             ctx.body = {
                 error: 'Se generó error al procesar los datos.'
             }
