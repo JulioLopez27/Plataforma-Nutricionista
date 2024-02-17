@@ -27,3 +27,4 @@ router.post('/saveReport', async (ctx) => { await Nutricionista.saveReport(ctx) 
 router.get('/getReport', async (ctx) => { await Nutricionista.getReport(ctx) })
 
 router.post('/createNewConsultant', async (ctx) => {await Consultante.createNewConsultant(ctx)})
+router.post('/detalleConsultante', async (ctx) => {await Consultante.getConsultantDataForId(ctx)})

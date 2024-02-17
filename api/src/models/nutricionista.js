@@ -2,7 +2,9 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import SibApiV3Sdk from 'sib-api-v3-sdk';
 
-import { prisma } from '../../prisma/index.js'
+import {
+  prisma
+} from '../../prisma/index.js'
 
 import {
   HTTP_STATUS_CREATED,
@@ -39,8 +41,8 @@ import {
 export class Nutricionista {
 
   //se setea el tiempo de expiracion del token
-  static #set_expiration_time = "8h"
-  static #set_default_idChefDigitales = 0
+  static# set_expiration_time = "8h"
+  static# set_default_idChefDigitales = 0
 
   constructor(nombre, apellido, correo, tituloEscaneado, experiencia, telefono, contraseña, país, ciudad) {
     this.nombre = nombre;
@@ -156,9 +158,20 @@ export class Nutricionista {
         throw new Error('No se encontró el nutricionista o no tiene especialidad asociada.')
       }
 
-      const { nombre, apellido, telefono, email, anos_experiencia } = getProfileData
-      const { id_pais, ciudad } = getProfileCountry
-      const { id_especialidad } = getProfileSpecialty
+      const {
+        nombre,
+        apellido,
+        telefono,
+        email,
+        anos_experiencia
+      } = getProfileData
+      const {
+        id_pais,
+        ciudad
+      } = getProfileCountry
+      const {
+        id_especialidad
+      } = getProfileSpecialty
 
       const profileData = {
         nombre,
@@ -182,8 +195,8 @@ export class Nutricionista {
 
   static async getConsultantes(ctx) {
 
-//    const [type, token] = ctx.headers.authorization.split(" ")
-  //  const data = jwt.verify(token, process.env.JWT_SECRET)
+    //    const [type, token] = ctx.headers.authorization.split(" ")
+    //  const data = jwt.verify(token, process.env.JWT_SECRET)
     //const userId = data.sub
 
     try {
@@ -235,7 +248,7 @@ export class Nutricionista {
       const reportData = await prisma.registro.findUnique({
         where: {
           id: parseInt(ctx.query.id)
-      //  id: stringToInt("2")
+          //  id: stringToInt("2")
         },
         select: {
           id: true,
@@ -245,7 +258,7 @@ export class Nutricionista {
           tipo: true,
         }
       })
-      
+
       const datosRegistro = {
         id: reportData.id,
         id_nutricionista: reportData.id_nutricionista,
@@ -257,11 +270,11 @@ export class Nutricionista {
       ctx.body = datosRegistro;
       ctx.status = HTTP_STATUS_CREATED
 
-    } catch(error) {
+    } catch (error) {
       console.log(error)
       ctx.body = {
         error: error.message,
-  
+
       }
       // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
@@ -272,8 +285,8 @@ export class Nutricionista {
 
 
   static async getHistory(ctx) {
-//    const [type, token] = ctx.headers.authorization.split(" ")
-  //  const data = jwt.verify(token, process.env.JWT_SECRET)
+    //    const [type, token] = ctx.headers.authorization.split(" ")
+    //  const data = jwt.verify(token, process.env.JWT_SECRET)
     //const userId = data.sub
 
 
@@ -324,14 +337,14 @@ export class Nutricionista {
       const idConsultante = ctx.query.idConsultante;
       const historyID = await prisma.registro.findMany({
         where: {
-          
+
           // Recordar hacer esto dinamico!!!
           id_nutricionista: parseInt(27),
           id_consultante: parseInt(idConsultante),
           enviado: false
         },
       });
-      
+
       const datosHistorico = historyID.map((registro) => ({
         nombre: registro.tipo,
         fechaEnvio: registro.fecha,
@@ -352,7 +365,7 @@ export class Nutricionista {
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR;
     }
   }
- 
+
 
   //creacion de un nutricionista
   // Función para manejar el inicio de sesión de un usuario
@@ -369,7 +382,10 @@ export class Nutricionista {
       const user = await authenticateUser(email, plainTextPassword)
 
       // Si la autenticación es exitosa, eliminamos la contraseña del objeto del usuario
-      const { password, ...result } = user
+      const {
+        password,
+        ...result
+      } = user
 
       // Creamos un token de acceso para el usuario
       const accesToken = jwt.sign({
@@ -382,14 +398,17 @@ export class Nutricionista {
 
       // Preparamos la respuesta para el cliente
       ctx.body = {
-        user: result, accesToken
+        user: result,
+        accesToken
       }
       // Establecemos el código de estado HTTP a 201 (Creado)
       ctx.status = HTTP_STATUS_CREATED
 
     } catch (error) {
       // Si ocurre un error, preparamos un mensaje de error para el cliente
-      ctx.body = { error: error.message }
+      ctx.body = {
+        error: error.message
+      }
       // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
     }
@@ -453,13 +472,23 @@ export class Nutricionista {
 
       //llamo metodo para enviar datos servicio de chefDigitales
       //para pre-registro
-      const data = { user_data, id_pais, ciudad, id_especialidad }
+      const data = {
+        user_data,
+        id_pais,
+        ciudad,
+        id_especialidad
+      }
       preRegistro(data)
 
       //retiro la pass de los demas attr
-      const { password, ...result } = user
+      const {
+        password,
+        ...result
+      } = user
 
-      ctx.body = { user: result }
+      ctx.body = {
+        user: result
+      }
       ctx.status = HTTP_STATUS_CREATED
 
     } catch (error) {
@@ -477,10 +506,12 @@ export class Nutricionista {
       //se envia la data a algun servicio de chefDigitales para 
       //verificar datos (diploma)
       await fetch('https://cheffdigital.com/cheffadmin/api/api3.php/registroUsuarioNutricionista', {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json', },
-        body: JSON.stringify(data)
-      })
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        })
         .then(response => response.json())
     } catch (error) {
       throw new Error('Error al enviar los datos a ChefDigitales.')
@@ -493,13 +524,19 @@ export class Nutricionista {
 
       if (requestBody.action === "aprobado") {
         await prisma.nutricionista.update({
-          where: { email: requestBody.email },
-          data: { activo: true }
+          where: {
+            email: requestBody.email
+          },
+          data: {
+            activo: true
+          }
         })
       }
       ctx.status = HTTP_STATUS_CREATED
     } catch (error) {
-      ctx.body = { error: 'No se pudo actualizar el estado del registro' }
+      ctx.body = {
+        error: 'No se pudo actualizar el estado del registro'
+      }
       ctx.status = HTTP_STATUS_BAD_REQUEST
     }
   }
@@ -555,8 +592,17 @@ export class Nutricionista {
       const anos_experiencia = await positiveValue(ctx.request.body.anos_experiencia)
       await validatePhone(telefono)
 
-      let profileData = { nombre, apellido, email, telefono, anos_experiencia }
-      const profile_countrie_data = { id_pais, ciudad: ctx.request.body.ciudad }
+      let profileData = {
+        nombre,
+        apellido,
+        email,
+        telefono,
+        anos_experiencia
+      }
+      const profile_countrie_data = {
+        id_pais,
+        ciudad: ctx.request.body.ciudad
+      }
       //valido el telefono
 
 
@@ -566,18 +612,35 @@ export class Nutricionista {
         //! hasheo la pass que el usuario ingresa / 10->round for hash encryption
         const hashPassword = await bcrypt.hash(ctx.request.body.password, 10)
         //parseo a int los valores que recibo del front
-        profileData = { nombre, apellido, email, telefono, anos_experiencia, password: hashPassword }
+        profileData = {
+          nombre,
+          apellido,
+          email,
+          telefono,
+          anos_experiencia,
+          password: hashPassword
+        }
       }
 
 
       const user = await prisma.nutricionista.update({
-        where: { id: userId }, data: profileData,
-        select: { id: true, nombre: true, apellido: true, email: true }
+        where: {
+          id: userId
+        },
+        data: profileData,
+        select: {
+          id: true,
+          nombre: true,
+          apellido: true,
+          email: true
+        }
       })
 
       //invoco la funct aux updateRecord de params(NombreDeLaTabla,id,data) para que me haga las actualizaciones
       await updateRecord(prisma.nutricionista_pais, userId, profile_countrie_data)
-      await updateRecord(prisma.nutricionista_especialidad, userId, { id_especialidad })
+      await updateRecord(prisma.nutricionista_especialidad, userId, {
+        id_especialidad
+      })
 
       const accesToken = jwt.sign({
         sub: user.id,
@@ -588,23 +651,30 @@ export class Nutricionista {
       }, process.env.JWT_SECRET)
 
 
-      ctx.body = { user, accesToken }
+      ctx.body = {
+        user,
+        accesToken
+      }
       ctx.status = HTTP_STATUS_CREATED
     } catch (error) {
 
       if (error instanceof prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        ctx.body = { error: "No se encontro registro para actualizar" }
+        ctx.body = {
+          error: "No se encontro registro para actualizar"
+        }
         ctx.status = HTTP_STATUS_NOT_FOUND
         return
       }
 
       console.error('Error al actualizar el perfil:', error);
-      ctx.body = { error: 'Error al actualizar el perfil.' };
+      ctx.body = {
+        error: 'Error al actualizar el perfil.'
+      };
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
     }
   }
 
-static async login(ctx) {
+  static async login(ctx) {
     const [type, token] = ctx.headers.authorization.split(" ")
     const [email, plainTextPassword] = Buffer.from(token, 'base64').toString().split(":")
     try {
@@ -617,7 +687,10 @@ static async login(ctx) {
       const user = await authenticateUser(email, plainTextPassword)
 
       // Si la autenticación es exitosa, eliminamos la contraseña del objeto del usuario
-      const { password, ...result } = user
+      const {
+        password,
+        ...result
+      } = user
 
       // Creamos un token de acceso para el usuario
       const accesToken = jwt.sign({
@@ -628,14 +701,17 @@ static async login(ctx) {
 
       // Preparamos la respuesta para el cliente
       ctx.body = {
-        user: result, accesToken
+        user: result,
+        accesToken
       }
       // Establecemos el código de estado HTTP a 201 (Creado)
       ctx.status = HTTP_STATUS_CREATED
 
     } catch (error) {
       // Si ocurre un error, preparamos un mensaje de error para el cliente
-      ctx.body = { error: error.message }
+      ctx.body = {
+        error: error.message
+      }
       // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
     }
@@ -643,34 +719,34 @@ static async login(ctx) {
 
   static async saveReport(ctx) {
     try {
-   //   const [type, token] = ctx.headers.authorization.split(" ")
-    //  const data = jwt.verify(token, process.env.JWT_SECRET)
-     // const id_nutri = data.sub
-   
-     const cuerpo = ctx.request.body.cuerpo
-      const titulo =  ctx.request.body.tipo
-      const id_consult= ctx.request.body.idConsultante
+      //   const [type, token] = ctx.headers.authorization.split(" ")
+      //  const data = jwt.verify(token, process.env.JWT_SECRET)
+      // const id_nutri = data.sub
+
+      const cuerpo = ctx.request.body.cuerpo
+      const titulo = ctx.request.body.tipo
+      const id_consult = ctx.request.body.idConsultante
       console.log(id_consult)
-   //CONSULTANTE TIENE QUE SER DINAMICO, ver si lo saco de la URL o que onda.
-   
+      //CONSULTANTE TIENE QUE SER DINAMICO, ver si lo saco de la URL o que onda.
+
       //const id_consult=2
-      const id_nutri =27
+      const id_nutri = 27
       // const id_consult = ctx.request.body.id_consult
-     // const id_nutri = ctx.request.body.id_nutri
+      // const id_nutri = ctx.request.body.id_nutri
       //creo el obj registro_data para darle a prisma y crear el informe
       const report_data = {
-        id_nutricionista:parseInt(id_nutri),
+        id_nutricionista: parseInt(id_nutri),
         id_consultante: parseInt(id_consult),
         fecha: new Date(),
-        nota:cuerpo,
-        tipo:titulo,
+        nota: cuerpo,
+        tipo: titulo,
         enviado: false
       }
 
-      
+
       //se envian los datos del registro para crear el reporte
       const reporte = await createReport(report_data)
- 
+
       ctx.body = {
         report: reporte,
       }
@@ -685,48 +761,229 @@ static async login(ctx) {
   }
 
 
-  static async getConsultanteForId(ctx) {
+
+  static async getConsultantDataForId(ctx) {
+
+    if (!ctx.headers.authorization) {
+      ctx.status = HTTP_STATUS_UNAUTHORIZED
+      return
+    }
+
+    const [type, token] = ctx.headers.authorization.split(" ")
+    const data = jwt.verify(token, process.env.JWT_SECRET)
+    const idNutricionista = data.sub
+    const isValid = await this.validateInput(ctx);
+
+    if (!isValid) {
+      ctx.body = {
+        error: 'Datos de entrada inválidos'
+      }
+      ctx.status = HTTP_STATUS_BAD_REQUEST
+      return
+    }
+
+
     try {
-      console.log(ctx.query.id)
-      const reportData = await prisma.registro.findUnique({
+      const generalData = await prisma.consultante.findUnique({
         where: {
-          id: parseInt(ctx.query.id)
-      //  id: stringToInt("2")
+          id_consultante: ctx.request.body.id
         },
+
         select: {
-          id: true,
-          id_nutricionista: true,
-          id_consultante: true,
-          nota: true,
-          tipo: true,
-        }
+          nombre: true,
+          apellido: true,
+          fechaNacimiento: true,
+          sexo: true,
+          telefono: true
+        },
+
       })
-      
-      const datosRegistro = {
-        id: reportData.id,
-        id_nutricionista: reportData.id_nutricionista,
-        id_consultante: reportData.id_consultante,
-        nota: reportData.nota,
-        tipo: reportData.tipo,
+
+      const responseGeneralData = {
+        nombre: generalData.nombre,
+        apellido: generalData.apellido,
+        fechaNacimiento: generalData.fechaNacimiento,
+        sexo: generalData.sexo,
+        telefono: generalData.telefono
       };
-      console.log(datosRegistro)
-      ctx.body = datosRegistro;
+
+
+      // console.log(datosRegistro)
+      ctx.body = responseGeneralData;
       ctx.status = HTTP_STATUS_CREATED
 
-    } catch(error) {
+    } catch (error) {
       console.log(error)
       ctx.body = {
         error: error.message,
-  
+
       }
       // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
 
     }
-  
-  
+
   }
 
+
+
+
+
+
+  static async getTipoDietaForId(ctx) {
+    try {
+
+      const tipoDieta = await prisma.tipodieta.findUnique({
+        where: {
+          id_consultante: ctx.request.body.id
+        },
+
+        select: {
+          vegetariano: true,
+          vegano: true,
+          pescetariano: true,
+          crudivegano: true,
+          sinGluten: true,
+          sinLactosa: true,
+          keto: true
+
+        }
+
+      })
+
+      const responseTipoDieta = {
+        vegetariano: tipoDieta.vegetariano,
+        vegano: tipoDieta.vegano,
+        pescetariano: tipoDieta.pescetariano,
+        crudivegano: tipoDieta.crudivegano,
+        sinGluten: tipoDieta.sinGluten,
+        sinLactosa: tipoDieta.sinLactosa,
+        keto: tipoDieta.keto
+      };
+
+      ctx.body = responseTipoDieta;
+      ctx.status = HTTP_STATUS_CREATED
+
+
+    } catch (error) {
+      console.log(error)
+      ctx.body = {
+        error: error.message,
+
+      }
+      // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
+      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+
+    }
+    return
+
+  }
+
+
+  static async getAfeccionesForId(ctx) {
+    try {
+
+      const afecciones = await prisma.afeccion.findUnique({
+        where: {
+          id_consultante: ctx.request.body.id
+        },
+
+        select: {
+          diabetes_tipo_1: true,
+          diabetes_tipo_2: true,
+          celiaquismo: true,
+          hipertension: true,
+          alergias: true,
+          enfermedad_renal: true,
+          hipercolesterolemia: true,
+          anemia: true,
+          obesidad: true
+
+        }
+
+      })
+
+      const responseAfecciones = {
+        diabetes_tipo_1: afecciones.diabetes_tipo_1,
+        diabetes_tipo_2: afecciones.diabetes_tipo_2,
+        celiaquismo: afecciones.celiaquismo,
+        hipertension: afecciones.hipertension,
+        alergias: afecciones.alergias,
+        enfermedad_renal: afecciones.enfermedad_renal,
+        hipercolesterolemia: afecciones.hipercolesterolemia,
+        anemia: afecciones.anemia,
+        obesidad: afecciones.obesidad
+      };
+
+      ctx.body = responseAfecciones;
+      ctx.status = HTTP_STATUS_CREATED
+
+
+    } catch (error) {
+      console.log(error)
+      ctx.body = {
+        error: error.message,
+
+      }
+      // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
+      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+
+    }
+    return
+
+  }
+
+
+  static async getAnamnesisForId(ctx) {
+    try {
+
+      const anamnesis = await prisma.afeccion.findUnique({
+        where: {
+          id_consultante: ctx.request.body.id
+        },
+
+        select: {
+          fecha: true,
+          peso: true,
+          altura: true,
+          constitucion_corporal: true,
+          historia_alimenticia: true,
+          horarios_alimenticios: true,
+          deficits_nutricionales: true,
+          objetivos_clinicos: true,
+
+        }
+
+      })
+
+      const responseAnamnesis = {
+        fecha: anamnesis.fecha,
+        peso: anamnesis.peso,
+        altura: anamnesis.altura,
+        constitucion_corporal: anamnesis.constitucion_corporal,
+        historia_alimenticia: anamnesis.historia_alimenticia,
+        horarios_alimenticios: anamnesis.horarios_alimenticios,
+        deficits_nutricionales: anamnesis.deficits_nutricionales,
+        objetivos_clinicos: anamnesis.objetivos_clinicos,
+      };
+
+      ctx.body = responseAnamnesis;
+      ctx.status = HTTP_STATUS_CREATED
+
+
+    } catch (error) {
+      console.log(error)
+      ctx.body = {
+        error: error.message,
+
+      }
+      // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
+      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+
+    }
+    return
+
+  }
 
 
 
