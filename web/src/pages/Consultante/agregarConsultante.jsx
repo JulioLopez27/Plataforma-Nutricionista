@@ -1,10 +1,14 @@
 
 import { useState } from 'react';
-import { Header, NavBar } from '~/components'
-import { Input, CustomModal } from '~/components'
-import { useFormik } from "formik"
+import { Input, CustomModal, Header, NavBar } from '~/components'
+
 import { useLocalStorage } from 'react-use'
+
+import axios from 'axios'
 import * as yup from "yup"
+import { useFormik } from "formik"
+
+
 
 export function AgregarConsultante() {
 
@@ -12,12 +16,12 @@ export function AgregarConsultante() {
     const validationSchema = yup.object().shape({
         nombre: yup.string().required('El nombre es obligatorio'),
         apellido: yup.string().required('El apellido es obligatorio'),
-        fecha_nac: yup.date().required('La fecha de nacimiento es obligatoria').nullable(), //Si falla probar con quitar ".nulleable()"
+        fechaNacimiento: yup.date().required('La fecha de nacimiento es obligatoria'), //Si falla probar con quitar ".nulleable()"
         telefono: yup.string()
-        .min(9, 'El número de teléfono debe tener al menos 9 dígitos')
-        .max(15, 'El número de teléfono tiene un máximo de 15 dígitos')
-        .matches(/^[0-9]*$/, 'El número de teléfono solo puede contener números'),
-        correo: yup.string().email().required('Campo obligatorio'),
+            .min(9, 'El número de teléfono debe tener al menos 9 dígitos')
+            .max(15, 'El número de teléfono tiene un máximo de 15 dígitos')
+            .matches(/^[0-9]*$/, 'El número de teléfono solo puede contener números'),
+        email: yup.string().email().required('Campo obligatorio'),
 
     })
 
@@ -39,7 +43,6 @@ export function AgregarConsultante() {
                     data: values,
                     headers: { Authorization: `Bearer ${auth.accesToken}` }
                 })
-                //alert("Consultante creado correctamente!")
 
                 setIsModalOpen(true);
                 setMessage("Consultante creado correctamente!")
@@ -50,7 +53,7 @@ export function AgregarConsultante() {
                 //alert("Error al crear consultante: " + error)
 
                 setIsModalOpen(true);
-                setMessage("Error al crear consultante: " + error.response.data.error);
+                setMessage("Error al crear consultante: ");
                 setMessageType('error');
             }
 
@@ -59,9 +62,9 @@ export function AgregarConsultante() {
         initialValues: {
             nombre: "",
             apellido: "",
-            fecha_nac: "",
+            fechaNacimiento: "",
             telefono: "",
-            correo: "",
+            email: "",
             sexo: ""
         },
         validationSchema
@@ -82,25 +85,31 @@ export function AgregarConsultante() {
 
                 <form className="w-full max-w-lg space-y-4" onSubmit={formik.handleSubmit}>
 
-                    <Input label="Nombre" name="nombre" value={formik.values.nombre} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2"  error={formik.touched.nombre && formik.errors.nombre} />
-                    <Input label="Apellido" name="apellido" value={formik.values.apellido} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2"  error={formik.touched.apellido && formik.errors.apellido}/>
-                    <Input type="date" label="Fecha nacimiento" name="fecha_nac" value={formik.values.fecha_nac} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2"  error={formik.touched.fecha_nac && formik.errors.fecha_nac}/>
-                    <Input label="Correo" name="correo" value={formik.values.correo} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2"  error={formik.touched.correo && formik.errors.correo}/>
-                    <Input label="Teléfono" name="telefono" value={formik.values.telefono} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2"  error={formik.touched.telefono && formik.errors.telefono}/>
+                    <Input label="Nombre" name="nombre" value={formik.values.nombre} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" error={formik.touched.nombre && formik.errors.nombre} />
+                    <Input label="Apellido" name="apellido" value={formik.values.apellido} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" error={formik.touched.apellido && formik.errors.apellido} />
+                    <Input type="date" label="Fecha nacimiento" name="fechaNacimiento" value={formik.values.fechaNacimiento} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" error={formik.touched.fechaNacimiento && formik.errors.fechaNacimiento} />
+                    <Input label="Email del consultante" name="email" value={formik.values.email} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" error={formik.touched.email && formik.errors.email} />
+                    <Input label="Teléfono" name="telefono" value={formik.values.telefono} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" error={formik.touched.telefono && formik.errors.telefono} />
                     {/* <Input label="Sexo" name="sexo" value="Masculino" onChange={handleInputChange} className="rounded-md bg-gray-100 px-4 py-2" /> */}
                     <select
                         label="Sexo"
                         name="sexo"
                         value={formik.values.sexo}
                         onChange={formik.handleChange}
+                        placeholder='Seleccione un sexo'
                         className="rounded-md bg-gray-100 px-4 py-2"
-                        error={formik.touched.sexo && formik.errors.sexo}
+
                     >
+                        <option value="">Seleccione una opcion</option>
                         <option value="masculino">Masculino</option>
                         <option value="femenino">Femenino</option>
+
                     </select>
                     <div>
-                        <button type="submit" className="bg-verde_oscuro hover:bg-verde_claro text-white font-bold py-2 px-4 rounded mt-2">Guardar cambios</button>
+                        <button type="submit" className="bg-verde_oscuro hover:bg-verde_claro text-white font-bold py-2 px-4 rounded mt-2 disabled:opacity-80"
+                            disabled={!formik.isValid || formik.isSubmitting}>
+                            {formik.isSubmitting ? 'Guardando datos..' : 'Guardar cambios'}
+                        </button>
                     </div>
                 </form>
             </div>
