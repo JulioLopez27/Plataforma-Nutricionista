@@ -9,7 +9,7 @@ export function FormularioRecetas({ userInfo, handleInputChange, formik }) {
            
             
             <button type="submit" className="bg-verde_oscuro hover:bg-verde_claro text-white font-bold py-2 px-4 rounded mt-2">Guardar cambios</button>
-            {/* <H1>FALTA HISTÓRICO DE RECETAS SUGERIDAS Y FILTRO DE RECETAS</H1> */}
+
         </form>
 
 

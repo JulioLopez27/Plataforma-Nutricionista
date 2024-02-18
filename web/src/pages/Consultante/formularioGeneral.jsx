@@ -2,6 +2,11 @@ import React from 'react';
 import { Input } from '~/components'
 
 export function FormularioGeneral({ userInfo, handleInputChange, formik }) {
+
+
+
+
+    
     return (
         <form  className="w-full max-w-lg space-y-4">
             <Input label="Nombre" name="nombre" value="Juan" onChange={handleInputChange} className="rounded-md bg-gray-100 px-4 py-2" />

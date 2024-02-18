@@ -24,17 +24,7 @@ export function FormularioAnamnesis() {
         }
 
     })
-    const userInfo = {
-        fecha : "01/01/2024",
-        edad : "30",
-        peso: "85",
-        altura: "190",
-        constitucion_corporal : "flaco",
-        historia_alimentaria : "pésima",
-        horarios_alimenticios : "entre las 2 y 4 am",
-        objetivos_clinicos : "ganar masa muscular",
-        deficits_nutricionales : "falta de consumo de proteínas"
-    }
+
 
     return (
         <form onSubmit={formik.handleSubmit} className="w-full max-w-lg space-y-4">

@@ -199,8 +199,6 @@ export class Nutricionista {
     const data = jwt.verify(token, process.env.JWT_SECRET)
     const userId = data.sub
 
-
-
     try {
       const consultantesID = await prisma.nutricionista_consultante.findMany({
         where: {
@@ -222,6 +220,7 @@ export class Nutricionista {
       //console.log(result)
       //const nombres = "["
       const datosConsultantes = consultantesNombres.map((consultante) => ({
+        id: consultante.id,
         nombre: consultante.nombre,
         apellido: consultante.apellido,
         email: consultante.email,

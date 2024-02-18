@@ -24,7 +24,7 @@ export function ListadoConsultantes({ }) {
         method: "GET",
         baseURL: import.meta.env.VITE_API_URL,
         url: "/getConsultants",
-        headers: {Authorization:`Bearer ${auth.accesToken}`}
+        headers: { Authorization: `Bearer ${auth.accesToken}` }
       })
       //const response = await axios.get('http://localhost:3000/getConsultants');
       //      console.log(response)
@@ -85,6 +85,9 @@ export function ListadoConsultantes({ }) {
               Agregar Consultante
             </button>
           </div>
+        </div>
+
+        <div className="flex justify-around mt-5 mx-20 pb-4 border-b-2 border-verde_oscuro font-medium text-gris_texto text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl ">
           <table className="w-full min-w-max table-auto text-left border border-black">
             <thead>
               <tr>
@@ -99,16 +102,18 @@ export function ListadoConsultantes({ }) {
                   <td className="p-4">{consultante.nombre} {consultante.apellido}</td>
                   <td className="p-4">{consultante.email}</td>
                   <td className="p-4">
-                    <a href={`http://127.0.0.1/Consultante/ficha${consultante.id}`} className="text-purple-500">
-                      Ir a Ficha
+                    <a href={`${import.meta.env.VITE_WEB_URL}/detalleConsultante?id=${consultante.id}` } className="text-purple-500">
+
+                      Ver detalle
                     </a>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-
         </div>
+
+
 
       </>
     );
