@@ -41,8 +41,8 @@ import {
 export class Nutricionista {
 
   //se setea el tiempo de expiracion del token
-  static# set_expiration_time = "8h"
-  static# set_default_idChefDigitales = 0
+  static set_expiration_time = "8h"
+  static set_default_idChefDigitales = 0
 
   constructor(nombre, apellido, correo, tituloEscaneado, experiencia, telefono, contraseña, país, ciudad) {
     this.nombre = nombre;
@@ -195,24 +195,25 @@ export class Nutricionista {
 
   static async getConsultantes(ctx) {
 
-    //    const [type, token] = ctx.headers.authorization.split(" ")
-    //  const data = jwt.verify(token, process.env.JWT_SECRET)
-    //const userId = data.sub
+    const [type, token] = ctx.headers.authorization.split(" ")
+    const data = jwt.verify(token, process.env.JWT_SECRET)
+    const userId = data.sub
+
+
 
     try {
       const consultantesID = await prisma.nutricionista_consultante.findMany({
         where: {
-          //REcordar cambiar esto para hacerlo dinamico!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
-          id_nutricionista: 27
+          id_nutricionista: parseInt(userId)
         }
       })
-      //   console.log("aaaa")
+
       // const {id_nutricionista,createdAt,updatedAt, ...result } = consultantesID
       const result = consultantesID.map((consultante) => consultante.id_consultante);
 
       const consultantesNombres = await prisma.consultante.findMany({
         where: {
-          //REcordar cambiar esto para hacerlo dinamico!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
+
           id: {
             in: result
           }
@@ -226,15 +227,19 @@ export class Nutricionista {
         email: consultante.email,
       })); //  nombres = nombres + consultantesNombres.map((consultante) => '{nombre:"' + consultante.nombre + '", apellido:"' + consultante.apellido + '", email:"' + consultante.e/mail+"'}");
       // nombres = nombres + "]"
-      //    console.log(datosConsultantes);
+
+      console.log(datosConsultantes);
+
       ctx.body = datosConsultantes;
       ctx.status = HTTP_STATUS_CREATED
 
-    } catch {
+    } catch (error){
       // Si ocurre un error, preparamos un mensaje de error para el cliente
+      console.log(error)
       ctx.body = {
         error: error.message
       }
+      
       // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
 
@@ -393,7 +398,7 @@ export class Nutricionista {
         nombre: user.nombre,
         apellido: user.apellido,
         email: user.email,
-        expiresIn: Nutricionista.#set_expiration_time,
+        expiresIn: Nutricionista.set_expiration_time,
       }, process.env.JWT_SECRET)
 
       // Preparamos la respuesta para el cliente
@@ -445,7 +450,7 @@ export class Nutricionista {
       }
 
       //si no recibo id de chefDigitales, seteo uno propio=0, para evitar inyeccion de datos
-      const idChef = parseInt(ctx.request.body.id_chefDigitales) || Nutricionista.#set_default_idChefDigitales
+      const idChef = parseInt(ctx.request.body.id_chefDigitales) || Nutricionista.set_default_idChefDigitales
       //guardo en una variable la informacion del diploma que el nutricionista subio 
       const {
         foto_diploma
@@ -647,7 +652,7 @@ export class Nutricionista {
         nombre: user.nombre,
         apellido: user.apellido,
         email: user.email,
-        expiresIn: Nutricionista.#set_expiration_time,
+        expiresIn: Nutricionista.set_expiration_time,
       }, process.env.JWT_SECRET)
 
 
@@ -696,7 +701,7 @@ export class Nutricionista {
       const accesToken = jwt.sign({
         sub: user.id,
         name: user.nombre,
-        expiresIn: Nutricionista.#set_expiration_time,
+        expiresIn: Nutricionista.set_expiration_time,
       }, process.env.JWT_SECRET)
 
       // Preparamos la respuesta para el cliente
