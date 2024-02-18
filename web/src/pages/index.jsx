@@ -16,7 +16,7 @@ import {HistoricoRegistro} from './Registro/historico'
 import {AgregarConsultante} from './Consultante/agregarConsultante'
 
 import { EnviarRegistro } from "./Registro/enviarRegistro";
-import { RegistroEnviado } from "./Registro/RegistroEnviado";
+import { RegistroEnviado } from "./Registro/registroEnviado";
   
 
 const router = createBrowserRouter([

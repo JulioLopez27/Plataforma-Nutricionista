@@ -8,10 +8,13 @@ import { FormularioRegistros } from './formularioRegistros';
 import { FormularioRecetas } from './formularioRecetas';
 import { useLocalStorage } from 'react-use'
 import { Navigate } from 'react-router-dom'
+
+
 // Importa los demás formularios...
 
 export function DetalleConsultante() {
     const [isBotoneraConsultanteVisible, setIsBotoneraConsultanteVisible] = useState(false);
+    
     const [formularioVisible, setFormularioVisible] = useState('general');
     const [auth] = useLocalStorage('auth', {})
     if (!auth?.user?.id) {
@@ -23,6 +26,8 @@ export function DetalleConsultante() {
         setFormularioVisible(formulario);
         setIsBotoneraConsultanteVisible(false); // Oculta la BotoneraConsultante en pantallas pequeñas después de seleccionar un formulario
     };
+
+    
 
     return (
         <div>

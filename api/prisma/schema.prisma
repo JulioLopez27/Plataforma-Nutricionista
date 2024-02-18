@@ -54,11 +54,10 @@ model especialidad {
 }
 
 model ingrediente {
-  id                 Int                  @id @default(autoincrement())
-  nombre             String               @unique(map: "nombre") @db.VarChar(255)
-  createdAt          DateTime?            @default(now()) @db.Timestamp(0)
-  updatedAt          DateTime?            @default(now()) @db.Timestamp(0)
-  receta_ingrediente receta_ingrediente[]
+  id        Int       @id @default(autoincrement())
+  nombre    String    @unique(map: "nombre") @db.VarChar(255)
+  createdAt DateTime? @default(now()) @db.Timestamp(0)
+  updatedAt DateTime? @default(now()) @db.Timestamp(0)
 }
 
 model nutricionista {
@@ -96,30 +95,16 @@ model nutricionista_especialidad {
 }
 
 model receta {
-  id                 Int                  @id @default(autoincrement())
-  nombre             String               @unique(map: "nombre") @db.VarChar(255)
-  instrucciones      String               @db.Text
-  id_nutricionista   Int
-  createdAt          DateTime?            @default(now()) @db.Timestamp(0)
-  updatedAt          DateTime?            @default(now()) @db.Timestamp(0)
-  nutricionista      nutricionista        @relation(fields: [id_nutricionista], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "receta_ibfk_1")
-  receta_ingrediente receta_ingrediente[]
-  sugerencia_receta  sugerencia_receta[]
+  id                Int                 @id @default(autoincrement())
+  nombre            String              @unique(map: "nombre") @db.VarChar(255)
+  instrucciones     String              @db.Text
+  id_nutricionista  Int
+  createdAt         DateTime?           @default(now()) @db.Timestamp(0)
+  updatedAt         DateTime?           @default(now()) @db.Timestamp(0)
+  nutricionista     nutricionista       @relation(fields: [id_nutricionista], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "receta_ibfk_1")
+  sugerencia_receta sugerencia_receta[]
 
   @@index([id_nutricionista], map: "id_nutricionista")
-}
-
-model receta_ingrediente {
-  id_receta      Int
-  id_ingrediente Int
-  cantidad       Float       @db.Float
-  createdAt      DateTime?   @default(now()) @db.Timestamp(0)
-  updatedAt      DateTime?   @default(now()) @db.Timestamp(0)
-  receta         receta      @relation(fields: [id_receta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "receta_ingrediente_ibfk_1")
-  ingrediente    ingrediente @relation(fields: [id_ingrediente], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "receta_ingrediente_ibfk_2")
-
-  @@id([id_receta, id_ingrediente])
-  @@index([id_ingrediente], map: "id_ingrediente")
 }
 
 model registro {

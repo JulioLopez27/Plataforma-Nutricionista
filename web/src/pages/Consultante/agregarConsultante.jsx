@@ -7,11 +7,13 @@ import { useLocalStorage } from 'react-use'
 import axios from 'axios'
 import * as yup from "yup"
 import { useFormik } from "formik"
+import { useNavigate } from 'react-router-dom'
 
 
 
 export function AgregarConsultante() {
 
+    const navigate = useNavigate()
 
     const validationSchema = yup.object().shape({
         nombre: yup.string().required('El nombre es obligatorio'),
@@ -47,13 +49,14 @@ export function AgregarConsultante() {
                 setIsModalOpen(true);
                 setMessage("Consultante creado correctamente!")
                 setMessageType('approval');
-
+                navigate("/consultantes");
 
             } catch (error) {
                 //alert("Error al crear consultante: " + error)
 
                 setIsModalOpen(true);
-                setMessage("Error al crear consultante: ");
+
+                setMessage(error.response.data.mensaje);
                 setMessageType('error');
             }
 

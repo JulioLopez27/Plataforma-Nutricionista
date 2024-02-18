@@ -21,17 +21,7 @@ export function FormularioAfecciones() {
         }
 
     })
-    const consultanteInfo = {
-        diabetes_tipo_1: false,
-        diabetes_tipo_2: false,
-        celiaquismo: true,
-        hipertension: false,
-        alergias: 'mani, huevos, leche, soja',
-        enfermedad_renal: false,
-        hipercolesterolemia: false,
-        anemia: false,
-        obesidad: false
-    }
+
 
 
     return (
