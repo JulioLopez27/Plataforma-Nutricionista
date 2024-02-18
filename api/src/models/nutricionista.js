@@ -182,8 +182,8 @@ export class Nutricionista {
 
   static async getConsultantes(ctx) {
 
-//    const [type, token] = ctx.headers.authorization.split(" ")
-  //  const data = jwt.verify(token, process.env.JWT_SECRET)
+    //    const [type, token] = ctx.headers.authorization.split(" ")
+    //  const data = jwt.verify(token, process.env.JWT_SECRET)
     //const userId = data.sub
 
     try {
@@ -235,7 +235,7 @@ export class Nutricionista {
       const reportData = await prisma.registro.findUnique({
         where: {
           id: parseInt(ctx.query.id)
-      //  id: stringToInt("2")
+          //  id: stringToInt("2")
         },
         select: {
           id: true,
@@ -245,7 +245,7 @@ export class Nutricionista {
           tipo: true,
         }
       })
-      
+
       const datosRegistro = {
         id: reportData.id,
         id_nutricionista: reportData.id_nutricionista,
@@ -257,11 +257,11 @@ export class Nutricionista {
       ctx.body = datosRegistro;
       ctx.status = HTTP_STATUS_CREATED
 
-    } catch(error) {
+    } catch (error) {
       console.log(error)
       ctx.body = {
         error: error.message,
-  
+
       }
       // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
@@ -272,8 +272,8 @@ export class Nutricionista {
 
 
   static async getHistory(ctx) {
-//    const [type, token] = ctx.headers.authorization.split(" ")
-  //  const data = jwt.verify(token, process.env.JWT_SECRET)
+    //    const [type, token] = ctx.headers.authorization.split(" ")
+    //  const data = jwt.verify(token, process.env.JWT_SECRET)
     //const userId = data.sub
 
 
@@ -324,14 +324,14 @@ export class Nutricionista {
       const idConsultante = ctx.query.idConsultante;
       const historyID = await prisma.registro.findMany({
         where: {
-          
+
           // Recordar hacer esto dinamico!!!
           id_nutricionista: parseInt(27),
           id_consultante: parseInt(idConsultante),
           enviado: false
         },
       });
-      
+
       const datosHistorico = historyID.map((registro) => ({
         nombre: registro.tipo,
         fechaEnvio: registro.fecha,
@@ -352,7 +352,7 @@ export class Nutricionista {
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR;
     }
   }
- 
+
 
   //creacion de un nutricionista
   // Función para manejar el inicio de sesión de un usuario
@@ -453,8 +453,7 @@ export class Nutricionista {
 
       //llamo metodo para enviar datos servicio de chefDigitales
       //para pre-registro
-      const data = { user_data, id_pais, ciudad, id_especialidad }
-      preRegistro(data)
+      preRegistro(user_data, id_pais, ciudad, id_especialidad)
 
       //retiro la pass de los demas attr
       const { password, ...result } = user
@@ -472,34 +471,50 @@ export class Nutricionista {
 
   //funct usada en el metodo de signup
   //para el pre-registro
-  async preRegistro(data) {
+  static async preRegistro(user_data, id_pais, ciudad, id_especialidad) {
     try {
-      //se envia la data a algun servicio de chefDigitales para 
-      //verificar datos (diploma)
       await fetch('https://cheffdigital.com/cheffadmin/api/api3.php/registroUsuarioNutricionista', {
         method: 'post',
-        headers: { 'Content-Type': 'application/json', },
-        body: JSON.stringify(data)
-      })
-        .then(response => response.json())
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_data, id_pais, ciudad, id_especialidad
+        })
+      });
     } catch (error) {
-      throw new Error('Error al enviar los datos a ChefDigitales.')
+      console.error('Error al enviar los datos a ChefDigitales:', error);
+      throw new Error('Error al enviar los datos a ChefDigitales.');
     }
   }
 
+  //! Testear funcion!!!!
   static async acceptRegistration(ctx) {
+   
     try {
       const requestBody = ctx.request.body
 
-      if (requestBody.action === "aprobado") {
-        await prisma.nutricionista.update({
-          where: { email: requestBody.email },
-          data: { activo: true }
-        })
+      if (requestBody.action !== "aprobado") {
+        ctx.body = { mensaje: "No se pudo aprobar el nutricionista, falló el action." }
+        ctx.status = HTTP_STATUS_UNAUTHORIZED
+        return
       }
+      const res = await prisma.nutricionista.update({
+        where: { email: requestBody.email },
+        data: { activo: true }
+      })
+      if (!res) {
+        ctx.body = { mensaje: "Hubo problemas al actualizar el registro, se adjunta error.", res }
+        ctx.status = HTTP_STATUS_BAD_REQUEST
+        return
+      }
+      if(res.activo){
+        ctx.body = { mensaje: "Ya está activo el nutricionista.", res }
+        ctx.status = HTTP_STATUS_BAD_REQUEST
+        return
+      }
+      ctx.body = res
       ctx.status = HTTP_STATUS_CREATED
     } catch (error) {
-      ctx.body = { error: 'No se pudo actualizar el estado del registro' }
+      ctx.body = { error: 'No se pudo actualizar el estado del registro.',error }
       ctx.status = HTTP_STATUS_BAD_REQUEST
     }
   }
@@ -604,7 +619,7 @@ export class Nutricionista {
     }
   }
 
-static async login(ctx) {
+  static async login(ctx) {
     const [type, token] = ctx.headers.authorization.split(" ")
     const [email, plainTextPassword] = Buffer.from(token, 'base64').toString().split(":")
     try {
@@ -643,34 +658,34 @@ static async login(ctx) {
 
   static async saveReport(ctx) {
     try {
-   //   const [type, token] = ctx.headers.authorization.split(" ")
-    //  const data = jwt.verify(token, process.env.JWT_SECRET)
-     // const id_nutri = data.sub
-   
-     const cuerpo = ctx.request.body.cuerpo
-      const titulo =  ctx.request.body.tipo
-      const id_consult= ctx.request.body.idConsultante
+      //   const [type, token] = ctx.headers.authorization.split(" ")
+      //  const data = jwt.verify(token, process.env.JWT_SECRET)
+      // const id_nutri = data.sub
+
+      const cuerpo = ctx.request.body.cuerpo
+      const titulo = ctx.request.body.tipo
+      const id_consult = ctx.request.body.idConsultante
       console.log(id_consult)
-   //CONSULTANTE TIENE QUE SER DINAMICO, ver si lo saco de la URL o que onda.
-   
+      //CONSULTANTE TIENE QUE SER DINAMICO, ver si lo saco de la URL o que onda.
+
       //const id_consult=2
-      const id_nutri =27
+      const id_nutri = 27
       // const id_consult = ctx.request.body.id_consult
-     // const id_nutri = ctx.request.body.id_nutri
+      // const id_nutri = ctx.request.body.id_nutri
       //creo el obj registro_data para darle a prisma y crear el informe
       const report_data = {
-        id_nutricionista:parseInt(id_nutri),
+        id_nutricionista: parseInt(id_nutri),
         id_consultante: parseInt(id_consult),
         fecha: new Date(),
-        nota:cuerpo,
-        tipo:titulo,
+        nota: cuerpo,
+        tipo: titulo,
         enviado: false
       }
 
-      
+
       //se envian los datos del registro para crear el reporte
       const reporte = await createReport(report_data)
- 
+
       ctx.body = {
         report: reporte,
       }
@@ -691,7 +706,7 @@ static async login(ctx) {
       const reportData = await prisma.registro.findUnique({
         where: {
           id: parseInt(ctx.query.id)
-      //  id: stringToInt("2")
+          //  id: stringToInt("2")
         },
         select: {
           id: true,
@@ -701,7 +716,7 @@ static async login(ctx) {
           tipo: true,
         }
       })
-      
+
       const datosRegistro = {
         id: reportData.id,
         id_nutricionista: reportData.id_nutricionista,
@@ -713,24 +728,90 @@ static async login(ctx) {
       ctx.body = datosRegistro;
       ctx.status = HTTP_STATUS_CREATED
 
-    } catch(error) {
+    } catch (error) {
       console.log(error)
       ctx.body = {
         error: error.message,
-  
+
       }
       // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
 
     }
-  
-  
+
+
   }
 
+  //*ToDo:crear una funcion para listar todos los nutricionistas
+  //genero funcion para obtener los nutricionitas activos
+  static async getNutricionistas(ctx) {
+    const { action } = ctx.request.body
+    //verifico que este presente el action en el body de la request
+    if (!action) {
+      ctx.body = { mensaje: "Error, falta action en la request." }
+      ctx.status = HTTP_STATUS_UNAUTHORIZED
+      return
+    }
 
+    if (action !== "get_nutricionistas") {
+      ctx.body = { mensaje: "Error al obtener los nutricionistas,falló en la cadena del action." }
+      ctx.status = HTTP_STATUS_BAD_REQUEST
+      return
+    }
+
+    try {
+      // obtengo todos los nutricionistas activos
+      const nutricionistas = await prisma.nutricionista.findMany({
+        where: { activo: true },
+        select: {
+          id: true,
+          email: true,
+          nombre: true,
+          apellido: true,
+          telefono: true,
+          anos_experiencia: true,
+          foto_diploma: true,
+          id_chefDigitales: true,
+          createdAt: true,
+          activo: true,
+        }
+      })
+
+      const nutricionista_pais = await prisma.nutricionista_pais.findMany({
+        select: {
+          id: true,
+          id_nutricionista: true,
+          id_pais: true,
+          ciudad: true,
+          pais: {
+            select: { nombre: true }
+          }
+        }
+      })
+
+      const especialidadesNutricionistas = await prisma.nutricionista_especialidad.findMany({
+        select: {
+          id: true,
+          id_nutricionista: true,
+          id_especialidad: true,
+          createdAt: true,
+          especialidad: {
+            select: {
+              nombre: true
+            }
+          }
+        }
+      })
+
+      ctx.body = { nutricionistas, especialidadesNutricionistas, nutricionista_pais }
+      ctx.status = HTTP_STATUS_CREATED
+    } catch (error) {
+      ctx.body = { mensaje: "Se produjo algún error, se adjunta el error del catch: ", error }
+      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+    }
+  }
 
 
 }
 
-//*ToDo:crear una funcion para listar todos los nutricionistas
 //*ToDo:crear una funcion para borrar algun nutricionista
