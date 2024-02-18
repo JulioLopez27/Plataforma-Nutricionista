@@ -18,17 +18,20 @@ export function FormularioGeneral() {
 
     const fetchData = async () => {
         try {
+            console.log("TOKEN: " + auth.accessToken)
             const response = await axios({
                 method: 'get',
                 baseURL: import.meta.env.VITE_API_URL,
                 url: '/detalleConsultante',
-                data: idConsultante,
-                headers: { Authorization: `Bearer ${auth.accesToken}` }
+                //params: { id: idConsultante },
+                headers: { Authorization: `Bearer ${auth.accessToken}` }
             });
+            //(`${import.meta.env.VITE_API_URL}/getReport?id=${idBorrador}`)
+
             setData(response.data);
             setLoading(false);
         } catch (error) {
-            console.log(error);
+            console.log("ERROR: " + error);
             setLoading(false);
         }
     }
@@ -60,7 +63,7 @@ export function FormularioGeneral() {
         return <div>Cargando...</div>;
     }
 
-    console.log(consultante);
+    console.log("datos consultante: " + consultante);
 
     return (
         <>
