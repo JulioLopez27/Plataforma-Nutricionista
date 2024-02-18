@@ -486,36 +486,43 @@ export class Nutricionista {
     }
   }
 
-  //! Testear funcion!!!!
-  static async acceptRegistration(ctx) {
-   
-    try {
-      const requestBody = ctx.request.body
 
+  static async acceptRegistration(ctx) {
+    try {
+      const requestBody = ctx.request.body;
+      //valida que venga el action con el aprobado
       if (requestBody.action !== "aprobado") {
         ctx.body = { mensaje: "No se pudo aprobar el nutricionista, falló el action." }
-        ctx.status = HTTP_STATUS_UNAUTHORIZED
-        return
+        ctx.status = HTTP_STATUS_UNAUTHORIZED;
+        return;
       }
+
+      const nutricionista = await prisma.nutricionista.findUnique({
+        where: { email: requestBody.email },
+      });
+
+      if (nutricionista && nutricionista.activo) {
+        ctx.body = { mensaje: "Ya está activo el nutricionista." };
+        ctx.status = HTTP_STATUS_BAD_REQUEST;
+        return;
+      }
+
       const res = await prisma.nutricionista.update({
         where: { email: requestBody.email },
-        data: { activo: true }
-      })
+        data: { activo: true },
+      });
+
       if (!res) {
-        ctx.body = { mensaje: "Hubo problemas al actualizar el registro, se adjunta error.", res }
-        ctx.status = HTTP_STATUS_BAD_REQUEST
-        return
+        ctx.body = { mensaje: "Hubo problemas al actualizar el registro, se adjunta error.", res };
+        ctx.status = HTTP_STATUS_BAD_REQUEST;
+        return;
       }
-      if(res.activo){
-        ctx.body = { mensaje: "Ya está activo el nutricionista.", res }
-        ctx.status = HTTP_STATUS_BAD_REQUEST
-        return
-      }
-      ctx.body = res
-      ctx.status = HTTP_STATUS_CREATED
+
+      ctx.body = { mensaje: "Usuario actualizado con suceso.", res };
+      ctx.status = HTTP_STATUS_CREATED;
     } catch (error) {
-      ctx.body = { error: 'No se pudo actualizar el estado del registro.',error }
-      ctx.status = HTTP_STATUS_BAD_REQUEST
+      ctx.body = { error: 'No se pudo actualizar el estado del registro.', error };
+      ctx.status = HTTP_STATUS_BAD_REQUEST;
     }
   }
 
@@ -745,65 +752,44 @@ export class Nutricionista {
   //*ToDo:crear una funcion para listar todos los nutricionistas
   //genero funcion para obtener los nutricionitas activos
   static async getNutricionistas(ctx) {
-    const { action } = ctx.request.body
+    const { action } = ctx.request.body;
+
     //verifico que este presente el action en el body de la request
     if (!action) {
-      ctx.body = { mensaje: "Error, falta action en la request." }
-      ctx.status = HTTP_STATUS_UNAUTHORIZED
-      return
+      ctx.body = { mensaje: "Error, falta action en la request." };
+      ctx.status = HTTP_STATUS_UNAUTHORIZED;
+      return;
     }
 
     if (action !== "get_nutricionistas") {
-      ctx.body = { mensaje: "Error al obtener los nutricionistas,falló en la cadena del action." }
-      ctx.status = HTTP_STATUS_BAD_REQUEST
-      return
+      ctx.body = { mensaje: "Error al obtener los nutricionistas, falló en la cadena del action." };
+      ctx.status = HTTP_STATUS_BAD_REQUEST;
+      return;
     }
 
     try {
       // obtengo todos los nutricionistas activos
       const nutricionistas = await prisma.nutricionista.findMany({
-        where: { activo: true },
         select: {
-          id: true,
-          email: true,
-          nombre: true,
-          apellido: true,
-          telefono: true,
-          anos_experiencia: true,
-          foto_diploma: true,
-          id_chefDigitales: true,
-          createdAt: true,
-          activo: true,
-        }
-      })
-
-      const nutricionista_pais = await prisma.nutricionista_pais.findMany({
-        select: {
-          id: true,
-          id_nutricionista: true,
-          id_pais: true,
-          ciudad: true,
-          pais: {
-            select: { nombre: true }
-          }
-        }
-      })
-
-      const especialidadesNutricionistas = await prisma.nutricionista_especialidad.findMany({
-        select: {
-          id: true,
-          id_nutricionista: true,
-          id_especialidad: true,
-          createdAt: true,
-          especialidad: {
+          id: true, email: true, nombre: true, apellido: true, telefono: true,
+          anos_experiencia: true, foto_diploma: true, id_chefDigitales: true,
+          createdAt: true, activo: true, nutricionista_pais: {
             select: {
-              nombre: true
+              id: true, id_pais: true, ciudad: true,
+              pais: {
+                select: { nombre: true }
+              }
+            }
+          },
+          nutricionista_especialidad: {
+            select: {
+              id: true, id_especialidad: true, createdAt: true,
+              especialidad: { select: { nombre: true } }
             }
           }
         }
       })
-
-      ctx.body = { nutricionistas, especialidadesNutricionistas, nutricionista_pais }
+      ctx.body = { nutricionistas }
       ctx.status = HTTP_STATUS_CREATED
     } catch (error) {
       ctx.body = { mensaje: "Se produjo algún error, se adjunta el error del catch: ", error }
