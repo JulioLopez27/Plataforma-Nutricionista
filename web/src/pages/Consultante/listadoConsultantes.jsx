@@ -102,7 +102,7 @@ export function ListadoConsultantes({ }) {
                   <td className="p-4">{consultante.nombre} {consultante.apellido}</td>
                   <td className="p-4">{consultante.email}</td>
                   <td className="p-4">
-                    <a href={`${import.meta.env.VITE_WEB_URL}/detalleConsultante?id=${consultante.id}` } className="text-purple-500">
+                    <a href={`${import.meta.env.VITE_WEB_URL}/detalleConsultante?id=${consultante.id}`} className="text-purple-500">
 
                       Ver detalle
                     </a>

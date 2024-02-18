@@ -55,7 +55,8 @@ export function AgregarConsultante() {
                 //alert("Error al crear consultante: " + error)
 
                 setIsModalOpen(true);
-                setMessage("Error al crear consultante: ");
+
+                setMessage(error.response.data.mensaje);
                 setMessageType('error');
             }
 

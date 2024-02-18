@@ -200,26 +200,26 @@ export class Nutricionista {
     const userId = data.sub
 
     try {
-      const consultantesID = await prisma.nutricionista_consultante.findMany({
+      const consultantesID = await prisma.consultante.findMany({
         where: {
           id_nutricionista: parseInt(userId)
         }
       })
 
       // const {id_nutricionista,createdAt,updatedAt, ...result } = consultantesID
-      const result = consultantesID.map((consultante) => consultante.id_consultante);
+      //const result = consultantesID.map((consultante) => consultante.id_consultante);
 
-      const consultantesNombres = await prisma.consultante.findMany({
-        where: {
+      // const consultantesNombres = await prisma.consultante.findMany({
+      //   where: {
 
-          id: {
-            in: result
-          }
-        }
-      })
+      //     id: {
+      //       in: co
+      //     }
+      //   }
+      // })
       //console.log(result)
       //const nombres = "["
-      const datosConsultantes = consultantesNombres.map((consultante) => ({
+      const datosConsultantes = consultantesID.map((consultante) => ({
         id: consultante.id,
         nombre: consultante.nombre,
         apellido: consultante.apellido,
@@ -227,18 +227,17 @@ export class Nutricionista {
       })); //  nombres = nombres + consultantesNombres.map((consultante) => '{nombre:"' + consultante.nombre + '", apellido:"' + consultante.apellido + '", email:"' + consultante.e/mail+"'}");
       // nombres = nombres + "]"
 
-      console.log(datosConsultantes);
 
       ctx.body = datosConsultantes;
       ctx.status = HTTP_STATUS_CREATED
 
-    } catch (error){
+    } catch (error) {
       // Si ocurre un error, preparamos un mensaje de error para el cliente
       console.log(error)
       ctx.body = {
         error: error.message
       }
-      
+
       // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
 
@@ -768,6 +767,9 @@ export class Nutricionista {
 
   static async getConsultantDataForId(ctx) {
 
+
+    console.log(ctx.request.body.id);
+
     if (!ctx.headers.authorization) {
       ctx.status = HTTP_STATUS_UNAUTHORIZED
       return
@@ -776,45 +778,48 @@ export class Nutricionista {
     const [type, token] = ctx.headers.authorization.split(" ")
     const data = jwt.verify(token, process.env.JWT_SECRET)
     const idNutricionista = data.sub
-    const isValid = await this.validateInput(ctx);
-
-    if (!isValid) {
-      ctx.body = {
-        error: 'Datos de entrada inválidos'
-      }
-      ctx.status = HTTP_STATUS_BAD_REQUEST
-      return
-    }
 
 
+    //TODO verificar que esto FUNCIONE (cambio en la BD)
     try {
-      const generalData = await prisma.consultante.findUnique({
+      const autorizado = await prisma.consultante.findUnique({
         where: {
-          id_consultante: ctx.request.body.id
-        },
-
-        select: {
-          nombre: true,
-          apellido: true,
-          fechaNacimiento: true,
-          sexo: true,
-          telefono: true
+          id: ctx.request.body.id,
+          id_nutricionista: idNutricionista
+          
         },
 
       })
 
-      const responseGeneralData = {
-        nombre: generalData.nombre,
-        apellido: generalData.apellido,
-        fechaNacimiento: generalData.fechaNacimiento,
-        sexo: generalData.sexo,
-        telefono: generalData.telefono
-      };
+      if (autorizado) {
+        const generalData = await prisma.consultante.findUnique({
+          where: {
+            id_consultante: ctx.request.body.id,
+          },
+
+          select: {
+            nombre: true,
+            apellido: true,
+            fechaNacimiento: true,
+            sexo: true,
+            telefono: true
+          },
+
+        })
+
+        const responseGeneralData = {
+          nombre: generalData.nombre,
+          apellido: generalData.apellido,
+          fechaNacimiento: generalData.fechaNacimiento,
+          sexo: generalData.sexo,
+          telefono: generalData.telefono
+        };
+
+        ctx.body = responseGeneralData;
+        ctx.status = HTTP_STATUS_CREATED
 
 
-      // console.log(datosRegistro)
-      ctx.body = responseGeneralData;
-      ctx.status = HTTP_STATUS_CREATED
+      }
 
     } catch (error) {
       console.log(error)

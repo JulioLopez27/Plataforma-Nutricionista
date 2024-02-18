@@ -98,7 +98,6 @@ export class Consultante {
 
     //!Envio de datos a chefDigitales
     static async createNewConsultant(ctx) {
-
         if (!ctx.headers.authorization) {
             ctx.status = HTTP_STATUS_UNAUTHORIZED
             return
@@ -115,98 +114,70 @@ export class Consultante {
             ctx.status = HTTP_STATUS_BAD_REQUEST
             return
         }
-       
+
         try {
 
-            const existe = await prisma.consultante.findUnique({
+            console.log(ctx.request.body.email)
+            console.log(idNutricionista)
+            const existe = await prisma.consultante.findMany({
                 where: {
-                    email: ctx.request.body.email
+                    email: ctx.request.body.email,
+                    id_nutricionista: idNutricionista
                 }
             })
 
-            if (existe) { //verifico que tenga relacion con el nutricionista que está ingresando sus datos
 
-                const asociado = await prisma.nutricionista_consultante.findUnique({
-                    where: {
-                        id_nutricionista_id_consultante: {
-                            id_nutricionista: idNutricionista,
-                            id_consultante: existe.id
-                        }
-                    }
+            if (existe.length === 0) { //verifico que tenga relacion con el nutricionista que está ingresando sus datos
+                //no existe consultante en la db? Lo agrego.
+
+
+                const fechaNacimiento = new Date(ctx.request.body.fechaNacimiento)
+                // En caso de que no exista el consultante en la DB
+                const data_consultante = {
+                    nombre: ctx.request.body.nombre,
+                    apellido: ctx.request.body.apellido,
+                    email: ctx.request.body.email,
+                    fechaNacimiento,
+                    sexo: ctx.request.body.sexo,
+                    telefono: ctx.request.body.telefono,
+                    id_nutricionista: idNutricionista // Asigna el nutricionista al nuevo consultante
+                }
+
+                //creo el consultante en la DB
+                const user = await prisma.consultante.create({
+                    data: data_consultante
                 })
-                //si existe ya la relacion ingreso al if y retorno error
-                if (asociado) {
 
-                    ctx.body = { mensaje: 'Ya está asociado ese email a su agenda.' }
-                    ctx.status = HTTP_STATUS_FORBIDEN
-                    return
-                } else {
-                    const crearAsociacion = await prisma.nutricionista_consultante.create({
-                        data: {
-                            id_nutricionista: idNutricionista,
-                            id_consultante: existe.id
-                        }
-                    })
-
-                    if (!crearAsociacion) {
-                        ctx.body = { mensaje: 'Error al agregar el consultante a su agenda.' }
-                        ctx.status = HTTP_STATUS_BAD_REQUEST
-                        return
+                //verifico si no se creó el nuevo consultante
+                if (!user) {
+                    ctx.body = {
+                        mensaje: 'No se pudo crear el nuevo consultante'
                     }
-                    ctx.body = { mensjae: "Se ha agregado correctamente al consultante a tu agenda." }
-                    ctx.status = HTTP_STATUS_CREATED
+                    ctx.status = HTTP_STATUS_NOT_FOUND
                     return
                 }
-            }
 
-            //no existe consultante en la db? Lo agrego.
-            const fechaNacimiento = new Date(ctx.request.body.fechaNacimiento)
-            // En caso de que no exista el consultante en la DB
-            const data_consultante = {
-                nombre: ctx.request.body.nombre,
-                apellido: ctx.request.body.apellido,
-                email: ctx.request.body.email,
-                fechaNacimiento,
-                sexo: ctx.request.body.sexo,
-                telefono: ctx.request.body.telefono
-            }
-
-            //creo el consultante en la DB
-            const user = await prisma.consultante.create({ data: data_consultante })
-
-            //verifico si no se creó el nuevo consultante
-            if (!user) {
-                ctx.body = { mensaje: 'No se pudo crear el nuevo consultante' }
-                ctx.status = HTTP_STATUS_NOT_FOUND
-                return
-            }
-         
-            //asocio el consultante al nutricionista que lo creo
-            const usuarioAsociado = await prisma.nutricionista_consultante.create({
-                data: {
-                    id_nutricionista: idNutricionista,
-                    id_consultante: user.id
+                ctx.body = {
+                    mensaje: 'Se creo correctamente el registro de su nuevo consultante.'
                 }
-            })
-            if (!usuarioAsociado) {
-                ctx.body = { error: 'Se generó error al guardar los datos en su agenda.' }
-                ctx.status = HTTP_STATUS_BAD_REQUEST
+                ctx.status = HTTP_STATUS_CREATED
                 return
             }
-            //TODO OK
+            console.log("FRONTERA 05")
             ctx.body = {
-                mensaje: 'Se creo correctamente el registro de su nuevo consultante.'
+                mensaje: 'Este consultante ya existe en su agenda.'
             }
-            ctx.status = HTTP_STATUS_CREATED
+            ctx.status = HTTP_STATUS_BAD_REQUEST
+
         } catch (error) {
-           
             ctx.body = {
                 error: 'Se generó error al procesar los datos.'
             }
             ctx.status = HTTP_STATUS_BAD_REQUEST
         }
-
     }
+
+
 
     // static async updateProfile(ctx) {
 
