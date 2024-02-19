@@ -779,53 +779,60 @@ export class Nutricionista {
 
 
   static async getConsultantDataForId(ctx) {
-    console.log(ctx.request.body.id);
-    if (!ctx.headers.authorization) {
-      ctx.status = HTTP_STATUS_UNAUTHORIZED
-      return
-    }
-
-    const [type, token] = ctx.headers.authorization.split(" ")
-    const data = jwt.verify(token, process.env.JWT_SECRET)
-    const idNutricionista = data.sub
-
-
-    //TODO verificar que esto FUNCIONE (cambio en la BD)
     try {
+      // Verifica la existencia del token de autorización en los encabezados de la solicitud
+      if (!ctx.headers.authorization) {
+        ctx.status = HTTP_STATUS_UNAUTHORIZED;
+        return
+      }
+
+      const [type, token] = ctx.headers.authorization.split(" ");
+      const data = jwt.verify(token, process.env.JWT_SECRET);
+      const idNutricionista = data.sub;
+      const idConsultanteString = ctx.request.body.id_consultante // Obtener el valor asociado con la clave 'id_consultante'
+      const id_consultante = await stringToInt(idConsultanteString)
+
+
+      // Verificar la autorización del consultante en la base de datos
       const autorizado = await prisma.consultante.findUnique({
         where: {
-          id: ctx.request.body.id,
+          id: id_consultante,
           id_nutricionista: idNutricionista
-        },
+        }
       })
 
-      if (autorizado) {
-        const generalData = await prisma.consultante.findUnique({
-          where: {
-            id_consultante: ctx.request.body.id,
-          },
-          select: {
-            nombre: true,
-            apellido: true,
-            fechaNacimiento: true,
-            sexo: true,
-            telefono: true
-          },
-        })
-
-        const responseGeneralData = {
-          nombre: generalData.nombre,
-          apellido: generalData.apellido,
-          fechaNacimiento: generalData.fechaNacimiento,
-          sexo: generalData.sexo,
-          telefono: generalData.telefono
-        }
-        ctx.body = responseGeneralData;
-        ctx.status = HTTP_STATUS_CREATED
+      if (!autorizado) {
+        ctx.status = HTTP_STATUS_UNAUTHORIZED;
+        return
       }
+
+      // Obtener los datos generales del consultante
+      const generalData = await prisma.consultante.findUnique({
+        where: {
+          id: id_consultante
+        },
+        select: {
+          nombre: true,
+          apellido: true,
+          fechaNacimiento: true,
+          sexo: true,
+          telefono: true
+        }
+      })
+      // Construir la respuesta con los datos generales del consultante
+      const responseGeneralData = {
+        nombre: generalData.nombre,
+        apellido: generalData.apellido,
+        fechaNacimiento: generalData.fechaNacimiento,
+        sexo: generalData.sexo,
+        telefono: generalData.telefono
+      }
+      // Establecer la respuesta y el código de estado HTTP
+      ctx.body = responseGeneralData
+      ctx.status = HTTP_STATUS_CREATED // Cambiado a HTTP_STATUS_OK ya que se obtuvieron los datos correctamente
     } catch (error) {
+      console.log(error);
       ctx.body = { error: error.message }
-      // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
     }
   }
