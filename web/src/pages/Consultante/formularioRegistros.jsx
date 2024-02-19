@@ -51,7 +51,7 @@ export function FormularioRegistros() {
 
         <>
             <div className="flex justify-center">
-                <h1 className="text-3xl font-bold text-gray-900">Registro clínicos</h1>
+                <h1 className="text-3xl font-bold text-gray-900">Registros clínicos</h1>
             </div>
 
             {/* <form className="w-full max-w-lg space-y-4">
@@ -78,8 +78,7 @@ export function FormularioRegistros() {
             </form> */}
 
             <HistoricoRegistro>
-
-                </HistoricoRegistro>
+             </HistoricoRegistro>
         </>
     );
 }

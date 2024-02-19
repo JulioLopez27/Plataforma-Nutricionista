@@ -145,4 +145,3 @@ export function FormularioAnamnesis() {
     );
 }
 
-//export default FormularioAnamnesis;

@@ -33,8 +33,9 @@ export function EnviarRegistro() {
       Object.keys(values).forEach((key) => {
         formData.append(key, values[key]);
       });
+console.log("formData -> " + formData)
+      //alert("ID consultante 2 -> " + idConsultante)
 
-      alert("ID consultante 2 -> " + idConsultante)
       try {
 
         const res = await axios({
@@ -120,7 +121,7 @@ export function EnviarRegistro() {
 
 
                   />
-                  <p> <button type="submit" class=" bg-purple-400 p-2">Guardar cambios</button></p>
+                  <button type="submit" className="bg-verde_oscuro hover:bg-verde_claro text-white font-bold py-2 px-4 rounded mt-2">Guardar cambios</button>
 
                 </div>
 

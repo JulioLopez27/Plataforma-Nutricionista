@@ -112,10 +112,10 @@ export function FormularioGeneral() {
             setError(error);
         });
     }
-    
+
     return (
         <>
-        <div className="flex justify-center">
+            <div className="flex justify-center">
                 <h1 className="text-3xl font-bold text-gray-900">Datos personales</h1>
             </div>
             <main>
@@ -128,7 +128,17 @@ export function FormularioGeneral() {
                     <form className="w-full max-w-lg space-y-4" onSubmit={formik.handleSubmit}>
                         <Input htmlFor="nombre" id="nombre" label="Nombre" name="nombre" value={formik.values.nombre} onChange={formik.handleChange} error={formik.touched.nombre && formik.errors.nombre} onBlur={formik.handleBlur} />
                         <Input htmlFor="apellido" id="apellido" label="Apellido" name="apellido" value={formik.values.apellido} onChange={formik.handleChange} error={formik.touched.apellido && formik.errors.apellido} onBlur={formik.handleBlur} />
-                        <Input htmlFor="fechaNacimiento " id="fechaNacimiento" type="string" label="fecha nacimiento" name="fechaNacimiento" value={formik.values.fechaNacimiento} onChange={formik.handleChange} onBlur={formik.handleBlur} />
+                        <Input
+                            htmlFor="fechaNacimiento"
+                            id="fechaNacimiento"
+                            type="string"
+                            label="Fecha de nacimiento"
+                            name="fechaNacimiento"
+                            value={new Date(formik.values.fechaNacimiento).toLocaleDateString()}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            readOnly
+                        />
                         <Input htmlFor="telefono" id="telefono" label="Teléfono" name="telefono" value={formik.values.telefono} onChange={formik.handleChange} error={formik.touched.telefono && formik.errors.telefono} onBlur={formik.handleBlur} />
                         <Input htmlFor="sexo" id="sexo" label="Sexo" name="sexo" value={formik.values.sexo} onChange={formik.handleChange} error={formik.touched.sexo && formik.errors.sexo} onBlur={formik.handleBlur} />
 

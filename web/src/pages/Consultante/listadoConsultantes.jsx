@@ -3,7 +3,7 @@ import { Header, NavBar } from '~/components'
 import { useLocalStorage } from 'react-use'
 import { Navigate } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
-import {useState,useEffect} from 'react'
+import { useState, useEffect } from 'react'
 
 export function ListadoConsultantes() {
   const [consultantsData, setConsultantsData] = useState([])
@@ -42,54 +42,31 @@ export function ListadoConsultantes() {
   }, [])
 
 
-  if (consultantsData.length === 0) {
-    return (
-      <>
-        <Header nombreDelUsuario={auth.user.nombre} />
-        <NavBar />
-
-
-        {/* <div className="h-full w-full overflow-scroll"> */}
-        
-        <div className="mt-4 flex flex-wrap items-center justify-center h-full">
-
-          <div className="flex flex-col items-center justify-center mb-4">
-            <h1 className="text-4xl font-bold text-center mb-4">CONSULTANTES</h1>
-
+  //if (consultantsData.length === 0) {
+  return (
+    <>
+    <Header nombreDelUsuario={auth.user.nombre} />
+    <NavBar />
+    <div className="mt-4 flex flex-col items-center h-full">
+      <h1 className="text-4xl font-bold text-center mb-4">CONSULTANTES</h1>
+      <div className="w-full flex justify-center mb-4">
+  
+        {auth.user.id && (
+          <div>
             <button onClick={irAgregarConsultante} className="bg-verde_oscuro text-white font-bold py-2 px-4 rounded">
               Agregar Consultante
             </button>
           </div>
-
-          <table className="w-full min-w-max table-auto text-left">
-            <tr>
-              <td className="p-4">Usted no tiene consultantes.</td>
-            </tr>
-          </table>
-
-        </div>
-
-
-      </>
-    );
-  } else {
-    return (
-      <>
-        <Header nombreDelUsuario={auth.user.nombre} />
-        <NavBar />
-
-        <div className="mt-4 flex flex-wrap items-center justify-center h-full">
-
-          <div className="flex flex-col items-center justify-center mb-4">
-            <h1 className="text-4xl font-bold text-center mb-4">CONSULTANTES</h1>
-
-            <button onClick={irAgregarConsultante} className="bg-verde_oscuro text-white font-bold py-2 px-4 rounded">
-              Agregar Consultante
-            </button>
-          </div>
-        </div>
-
-        <div className="flex justify-around mt-5 mx-20 pb-4 border-b-2 border-verde_oscuro font-medium text-gris_texto text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl ">
+        )}
+      </div>
+      {consultantsData.length === 0 ? (
+        <table className="w-full min-w-max table-auto text-left">
+          <tr>
+            <td className="p-4">Usted no tiene consultantes.</td>
+          </tr>
+        </table>
+      ) : (
+        <div className="max-w-3xl mt-5 mx-20 pb-4 border-b-2 border-verde_oscuro font-medium text-gris_texto text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl ">
           <table className="w-full min-w-max table-auto text-left border border-black">
             <thead>
               <tr>
@@ -105,7 +82,6 @@ export function ListadoConsultantes() {
                   <td className="p-4">{consultante.email}</td>
                   <td className="p-4">
                     <a href={`${import.meta.env.VITE_WEB_URL}/detalleConsultante?id=${consultante.id}`} className="text-purple-500">
-
                       Ver detalle
                     </a>
                   </td>
@@ -114,10 +90,15 @@ export function ListadoConsultantes() {
             </tbody>
           </table>
         </div>
+      )}
+    </div>
+  </>
+  
+  
 
 
 
-      </>
-    );
-  }
+
+  );
 }
+//}

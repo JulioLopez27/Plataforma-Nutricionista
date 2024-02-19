@@ -28,6 +28,7 @@ export function DetalleConsultante() {
     };
 
     return (
+  
         <div>
             <Header nombreDelUsuario={auth.user.nombre} />
             <NavBar />
@@ -82,4 +83,3 @@ export function DetalleConsultante() {
     );
 }
 
-//export default BotoneraConsultante;
