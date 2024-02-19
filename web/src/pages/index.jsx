@@ -52,7 +52,7 @@ const router = createBrowserRouter([
   {
     path: "/detalleConsultante/anamnesis",
     element: <FormularioAnamnesis/>,
-  },  
+  },
   {
     path: "/detalleConsultante/afecciones",
     element: <FormularioAfecciones/>,

@@ -22,9 +22,9 @@ export function HistoricoRegistro() {
 
 
   const fetchHistory = async () => {
-
+    
     try {
-
+      
       const res = await axios({
         method: "post",
         baseURL: import.meta.env.VITE_API_URL,
@@ -35,11 +35,11 @@ export function HistoricoRegistro() {
           Authorization: `Bearer ${auth.accesToken}`
         }
       })
-
+     
 
       return res.data;
     } catch (error) {
-      alert('Error fetching history:' + error);
+     alert('Error fetching history:' + error);
       return [];
     }
   };

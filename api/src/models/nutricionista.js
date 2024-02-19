@@ -989,8 +989,6 @@ export class Nutricionista {
 
     } catch (error) {
       console.log("ERROR: " + error)
-      ctx.body = { error: error.message }
-      console.log("ERROR: " + error)
       ctx.body = {
         error: error.message
       }
