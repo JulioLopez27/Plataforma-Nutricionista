@@ -631,49 +631,6 @@ export class Nutricionista {
     }
   }
 
-  static async login(ctx) {
-    const [type, token] = ctx.headers.authorization.split(" ")
-    const [email, plainTextPassword] = Buffer.from(token, 'base64').toString().split(":")
-    try {
-      // Extraemos el email y la contraseña del cuerpo de la petición
-      // const email = ctx.request.body.email
-      // const plainTextPassword = ctx.request.body.password
-
-      await validatePassword(plainTextPassword)
-      // Intentamos autenticar al usuario
-      const user = await authenticateUser(email, plainTextPassword)
-
-      // Si la autenticación es exitosa, eliminamos la contraseña del objeto del usuario
-      const {
-        password,
-        ...result
-      } = user
-
-      // Creamos un token de acceso para el usuario
-      const accesToken = jwt.sign({
-        sub: user.id,
-        name: user.nombre,
-        expiresIn: Nutricionista.set_expiration_time,
-      }, process.env.JWT_SECRET)
-
-      // Preparamos la respuesta para el cliente
-      ctx.body = {
-        user: result,
-        accesToken
-      }
-      // Establecemos el código de estado HTTP a 201 (Creado)
-      ctx.status = HTTP_STATUS_CREATED
-
-    } catch (error) {
-      // Si ocurre un error, preparamos un mensaje de error para el cliente
-      ctx.body = {
-        error: error.message
-      }
-      // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
-      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
-    }
-  }
-
   static async saveReport(ctx) {
 
     console.log("Frontera 01")
