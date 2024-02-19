@@ -3,6 +3,7 @@ a ser usadas*/
 import Router from '@koa/router'
 import { Nutricionista } from './models/nutricionista.js'
 import { Consultante } from './models/consultante.js'
+import * as para_agente_externo from './utility/nutricionista/api/index.js'
 export const router = new Router()
 
 
@@ -11,11 +12,6 @@ export const router = new Router()
 router.get('/login', async (ctx) => { await Nutricionista.login(ctx) })
 router.post('/signup', async (ctx) => { await Nutricionista.signup(ctx) })
 
-//route abierta para exponer los nutricionistas activos
-router.post('/getNutritionist',async(ctx)=>{await Nutricionista.getNutricionistas(ctx)})
-//ruta para dejar expuesto la api para cuando se acepte el registro del nutricionista
-router.put('/acceptRegistration', async (ctx) => { await Nutricionista.acceptRegistration(ctx) })
-// router.post('/test', async (ctx) => { await Nutricionista.envioDeEmail(ctx) })
 router.get('/getSpecialty', async (ctx) => { await Nutricionista.getSpecialty(ctx) })
 router.get('/getCountries', async (ctx) => { await Nutricionista.getCountries(ctx) })
 
@@ -28,5 +24,19 @@ router.get('/getHistoryInformes', async (ctx) => { await Nutricionista.getHistor
 router.post('/saveReport', async (ctx) => { await Nutricionista.saveReport(ctx) })
 router.get('/getReport', async (ctx) => { await Nutricionista.getReport(ctx) })
 
-router.post('/createNewConsultant', async (ctx) => {await Consultante.createNewConsultant(ctx)})
-router.post('/detalleConsultante', async (ctx) => {await Nutricionista.getConsultantDataForId(ctx)})
+router.post('/createNewConsultant', async (ctx) => { await Consultante.createNewConsultant(ctx) })
+router.post('/detalleConsultante', async (ctx) => { await Nutricionista.getConsultantDataForId(ctx) })
+
+//------------------------------------------------------------------------------------------------------------
+// Segmento para las rutas que van a estar expuestas a un servicio externo.
+
+//para_agente_externo => hace referencia las apis que se proporciona a ChefDigitales para
+// que pueda obtener algunos recursos de la plataforma sin necesidad de acceder al codigo fuente.
+
+//route abierta para exponer los nutricionistas con todos sus datos
+router.post('/getNutritionist', para_agente_externo.getNutricionistas)
+
+
+//ruta: Deja expuesto las apis para aceptar el registro del nutricionista / desactivar su cuenta
+router.put('/acceptRegistration', para_agente_externo.acceptRegistration)
+router.put('/disabledNutritionist', para_agente_externo.disabledNutricionista)
