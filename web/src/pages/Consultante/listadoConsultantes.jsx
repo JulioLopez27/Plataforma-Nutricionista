@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Header, NavBar } from '~/components'
 import { useLocalStorage } from 'react-use'
 import { Navigate } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 
-export function ListadoConsultantes({ }) {
+export function ListadoConsultantes() {
   const [consultantsData, setConsultantsData] = useState([]);
-  const [auth, setAuth] = useLocalStorage('auth', {})
+  const [auth] = useLocalStorage('auth', {})
   const navigate = useNavigate()
 
   if (!auth?.user?.id) {
@@ -39,7 +38,7 @@ export function ListadoConsultantes({ }) {
     fetchConsultants().then((data) => {
       setConsultantsData(data);
     });
-  }, []);
+  }, [])
 
 
   if (consultantsData.length === 0) {
