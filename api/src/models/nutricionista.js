@@ -868,7 +868,7 @@ export class Nutricionista {
       ctx.status = HTTP_STATUS_CREATED
 
     } catch (error) {
-      console.log(error)
+      console.log("ERROR: " + error )
       ctx.body = { error: error.message }
       // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
