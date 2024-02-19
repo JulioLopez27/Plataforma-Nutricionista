@@ -35,6 +35,12 @@ export function FormularioRegistros( ) {
 
 
     return (
+
+        <>
+        <div className="flex justify-center">
+                <h1 className="text-3xl font-bold text-gray-900">Registro clínicos</h1>
+            </div>
+       
         <form  className="w-full max-w-lg space-y-4">
             <Input label="Título" name="titulo" value="" onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" />
             <Input label="Contenido" name="contenido" value="" onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2 " />
@@ -57,5 +63,6 @@ export function FormularioRegistros( ) {
 
 
         </form>
+        </>
     );
 }

@@ -10,6 +10,9 @@ import { Dashboard } from './Dashboard'
 import { Profile } from "./Profile"
 import { DetalleConsultante } from "./Consultante/detalleConsultante"
 import { FormularioAnamnesis } from "./Consultante/formularioAnamnesis"
+import { FormularioAfecciones } from "./Consultante/formularioAfecciones"
+import { FormularioTipoDieta } from "./Consultante/formularioTipoDieta"
+
 import { Receta} from './Receta'
 import {ListadoConsultantes} from './Consultante/listadoConsultantes'
 import {Historico} from './Receta/historico'
@@ -48,6 +51,14 @@ const router = createBrowserRouter([
   {
     path: "/detalleConsultante/anamnesis",
     element: <FormularioAnamnesis/>,
+  },
+  {
+    path: "/detalleConsultante/afecciones",
+    element: <FormularioAfecciones/>,
+  },
+  {
+    path: "/detalleConsultante/tippdieta",
+    element: <FormularioTipoDieta/>,
   },
 
 //--->ELIMINAR LUEGO DE IMPLEMETAR LA LISTA DE CONSULTANTES CON LOS ENALCES

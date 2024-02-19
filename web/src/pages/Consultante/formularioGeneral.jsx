@@ -115,6 +115,9 @@ export function FormularioGeneral() {
     
     return (
         <>
+        <div className="flex justify-center">
+                <h1 className="text-3xl font-bold text-gray-900">Datos personales</h1>
+            </div>
             <main>
                 {error ? (
                     <div>

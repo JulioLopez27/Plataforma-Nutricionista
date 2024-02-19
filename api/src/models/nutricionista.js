@@ -504,9 +504,14 @@ export class Nutricionista {
     try {
       await fetch('https://cheffdigital.com/cheffadmin/api/api3.php/registroUsuarioNutricionista', {
         method: 'post',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
-          user_data, id_pais, ciudad, id_especialidad
+          user_data,
+          id_pais,
+          ciudad,
+          id_especialidad
         })
       });
     } catch (error) {
@@ -521,36 +526,55 @@ export class Nutricionista {
       const requestBody = ctx.request.body;
       //valida que venga el action con el aprobado
       if (requestBody.action !== "aprobado") {
-        ctx.body = { mensaje: "No se pudo aprobar el nutricionista, falló el action." }
+        ctx.body = {
+          mensaje: "No se pudo aprobar el nutricionista, falló el action."
+        }
         ctx.status = HTTP_STATUS_UNAUTHORIZED;
         return;
       }
 
       const nutricionista = await prisma.nutricionista.findUnique({
-        where: { email: requestBody.email },
+        where: {
+          email: requestBody.email
+        },
       });
 
       if (nutricionista && nutricionista.activo) {
-        ctx.body = { mensaje: "Ya está activo el nutricionista." };
+        ctx.body = {
+          mensaje: "Ya está activo el nutricionista."
+        };
         ctx.status = HTTP_STATUS_BAD_REQUEST;
         return;
       }
 
       const res = await prisma.nutricionista.update({
-        where: { email: requestBody.email },
-        data: { activo: true },
+        where: {
+          email: requestBody.email
+        },
+        data: {
+          activo: true
+        },
       });
 
       if (!res) {
-        ctx.body = { mensaje: "Hubo problemas al actualizar el registro, se adjunta error.", res };
+        ctx.body = {
+          mensaje: "Hubo problemas al actualizar el registro, se adjunta error.",
+          res
+        };
         ctx.status = HTTP_STATUS_BAD_REQUEST;
         return;
       }
 
-      ctx.body = { mensaje: "Usuario actualizado con suceso.", res };
+      ctx.body = {
+        mensaje: "Usuario actualizado con suceso.",
+        res
+      };
       ctx.status = HTTP_STATUS_CREATED;
     } catch (error) {
-      ctx.body = { error: 'No se pudo actualizar el estado del registro.', error };
+      ctx.body = {
+        error: 'No se pudo actualizar el estado del registro.',
+        error
+      };
       ctx.status = HTTP_STATUS_BAD_REQUEST;
     }
   }
@@ -777,6 +801,82 @@ export class Nutricionista {
     }
   }
 
+  //*ToDo:crear una funcion para listar todos los nutricionistas
+  //genero funcion para obtener los nutricionitas 
+  static async getNutricionistas(ctx) {
+    const {
+      action
+    } = ctx.request.body;
+
+    //verifico que este presente el action en el body de la request
+    if (!action) {
+      ctx.body = {
+        mensaje: "Error, falta action en la request."
+      };
+      ctx.status = HTTP_STATUS_UNAUTHORIZED;
+      return;
+    }
+
+    if (action !== "get_nutricionistas") {
+      ctx.body = {
+        mensaje: "Error al obtener los nutricionistas, falló en la cadena del action."
+      };
+      ctx.status = HTTP_STATUS_BAD_REQUEST;
+      return;
+    }
+
+    try {
+      // obtengo todos los nutricionistas activos
+      const nutricionistas = await prisma.nutricionista.findMany({
+        select: {
+          id: true,
+          email: true,
+          nombre: true,
+          apellido: true,
+          telefono: true,
+          anos_experiencia: true,
+          foto_diploma: true,
+          id_chefDigitales: true,
+          createdAt: true,
+          activo: true,
+          nutricionista_pais: {
+            select: {
+              id: true,
+              id_pais: true,
+              ciudad: true,
+              pais: {
+                select: {
+                  nombre: true
+                }
+              }
+            }
+          },
+          nutricionista_especialidad: {
+            select: {
+              id: true,
+              id_especialidad: true,
+              createdAt: true,
+              especialidad: {
+                select: {
+                  nombre: true
+                }
+              }
+            }
+          }
+        }
+      })
+      ctx.body = {
+        nutricionistas
+      }
+      ctx.status = HTTP_STATUS_CREATED
+    } catch (error) {
+      ctx.body = {
+        mensaje: "Se produjo algún error, se adjunta el error del catch: ",
+        error
+      }
+      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+    }
+  }
 
   static async getConsultantDataForId(ctx) {
     try {
@@ -832,17 +932,27 @@ export class Nutricionista {
       ctx.status = HTTP_STATUS_CREATED // Cambiado a HTTP_STATUS_OK ya que se obtuvieron los datos correctamente
     } catch (error) {
       console.log(error);
-      ctx.body = { error: error.message }
+      ctx.body = {
+        error: error.message
+      }
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
     }
   }
 
   static async getTipoDietaForId(ctx) {
+
+    const [type, token] = ctx.headers.authorization.split(" ");
+    const data = jwt.verify(token, process.env.JWT_SECRET);
+
+    const idConsultanteString = ctx.request.body.id_consultante // Obtener el valor asociado con la clave 'id_consultante'
+    const id_consultante = await stringToInt(idConsultanteString)
+
+
     try {
 
-      const tipoDieta = await prisma.tipodieta.findUnique({
+      const tipoDieta = await prisma.tipodieta.findFirst({
         where: {
-          id_consultante: ctx.request.body.id
+          id_consultante: id_consultante
         },
         select: {
           vegetariano: true,
@@ -868,65 +978,33 @@ export class Nutricionista {
       ctx.status = HTTP_STATUS_CREATED
 
     } catch (error) {
-      console.log("ERROR: " + error )
-      ctx.body = { error: error.message }
+      console.log("ERROR: " + error)
+      ctx.body = {
+        error: error.message
+      }
       // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
     }
   }
 
-  //*ToDo:crear una funcion para listar todos los nutricionistas
-  //genero funcion para obtener los nutricionitas 
-  static async getNutricionistas(ctx) {
-    const { action } = ctx.request.body;
 
-    //verifico que este presente el action en el body de la request
-    if (!action) {
-      ctx.body = { mensaje: "Error, falta action en la request." };
-      ctx.status = HTTP_STATUS_UNAUTHORIZED;
-      return;
-    }
-
-    if (action !== "get_nutricionistas") {
-      ctx.body = { mensaje: "Error al obtener los nutricionistas, falló en la cadena del action." };
-      ctx.status = HTTP_STATUS_BAD_REQUEST;
-      return;
-    }
-
-    try {
-      // obtengo todos los nutricionistas activos
-      const nutricionistas = await prisma.nutricionista.findMany({
-        select: {
-          id: true, email: true, nombre: true, apellido: true, telefono: true,
-          anos_experiencia: true, foto_diploma: true, id_chefDigitales: true,
-          createdAt: true, activo: true, nutricionista_pais: {
-            select: {
-              id: true, id_pais: true, ciudad: true,
-              pais: { select: { nombre: true } }
-            }
-          },
-          nutricionista_especialidad: {
-            select: {
-              id: true, id_especialidad: true, createdAt: true,
-              especialidad: { select: { nombre: true } }
-            }
-          }
-        }
-      })
-      ctx.body = { nutricionistas }
-      ctx.status = HTTP_STATUS_CREATED
-    } catch (error) {
-      ctx.body = { mensaje: "Se produjo algún error, se adjunta el error del catch: ", error }
-      ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
-    }
-  }
 
 
   static async getAfeccionesForId(ctx) {
+
+    const [type, token] = ctx.headers.authorization.split(" ");
+    const data = jwt.verify(token, process.env.JWT_SECRET);
+
+    const idConsultanteString = ctx.request.body.id_consultante // Obtener el valor asociado con la clave 'id_consultante'
+    const id_consultante = await stringToInt(idConsultanteString)
+
+    //console.log("getAfeccionesForId")
+
+
     try {
-      const afecciones = await prisma.afeccion.findUnique({
+      const afecciones = await prisma.afeccion.findFirst({
         where: {
-          id_consultante: ctx.request.body.id
+          id_consultante: id_consultante
         },
         select: {
           diabetes_tipo_1: true,
@@ -956,9 +1034,10 @@ export class Nutricionista {
       ctx.body = responseAfecciones;
       ctx.status = HTTP_STATUS_CREATED
 
+      //console.log("responseAfecciones -> " + ctx.body);
 
     } catch (error) {
-      console.log(error)
+      //console.log(error)
       ctx.body = {
         error: error.message,
       }
@@ -1017,7 +1096,9 @@ export class Nutricionista {
 
     } catch (error) {
       console.log(error)
-      ctx.body = { error: error.message, }
+      ctx.body = {
+        error: error.message,
+      }
       // Establecemos el código de estado HTTP a 500 (Error interno del servidor)
       ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
     }
