@@ -51,6 +51,7 @@ export function Profile() {
   const [specialties, setSpecialties] = useState([])
 
   const [auth, setAuth] = useLocalStorage('auth', {})
+  //didMount-> se usa para el useEffect no haga solicitudes http duplicadas
   const [didMount, setDidMount] = useState(false)
 
 
@@ -144,7 +145,7 @@ export function Profile() {
       if (didMount) {
         fetchData().catch((error) => {
           console.error('Error al obtener la información del usuario:', error)
-          setError(error);
+          setError(error)
         })
       }
     } else {
