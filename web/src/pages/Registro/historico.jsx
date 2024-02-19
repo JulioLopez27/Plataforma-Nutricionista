@@ -1,29 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import { useLocalStorage } from 'react-use'
+
 
 export function HistoricoRegistro({ }) {
   const [historyData, setHistoryData] = useState([]);
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
-  const idConsultante = urlParams.get('idConsultante');
+  const idConsultante = urlParams.get('id');
+
+  const [auth] = useLocalStorage('auth', {})
+
 
   let navigate = useNavigate();
   const routeChange = () => {
 
 
-    navigate('/enviarRegistro?idConsultante=' + parseInt(idConsultante));
+    navigate('/enviarRegistro?id=' + parseInt(idConsultante));
   }
 
 
   const fetchHistory = async () => {
+    
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/getHistoryInformes?id=${idConsultante}`);
+      
+      const res = await axios({
+        method: "post",
+        baseURL: import.meta.env.VITE_API_URL,
+        url: "/getHistoryInformes",
+        data: { id: idConsultante },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${auth.accesToken}`
+        }
+      })
+     
 
-
-      return response.data;
+      return res.data;
     } catch (error) {
-      console.error('Error fetching history:', error);
+     alert('Error fetching history:' + error);
       return [];
     }
   };

@@ -336,19 +336,23 @@ export class Nutricionista {
   }
 
   static async getHistoryInformes(ctx) {
+    const [type, token] = ctx.headers.authorization.split(" ")
+    const data = jwt.verify(token, process.env.JWT_SECRET)
+    const userId = data.sub
     try {
-
-      const idConsultante = ctx.query.idConsultante;
+      
+      const idConsultante = ctx.request.body.id;
+      console.log(idConsultante)
       const historyID = await prisma.registro.findMany({
         where: {
 
           // Recordar hacer esto dinamico!!!
-          id_nutricionista: parseInt(27),
-          id_consultante: parseInt(idConsultante),
-          enviado: false
+          id_nutricionista: parseInt(userId),
+          id_consultante: parseInt(idConsultante)
+         // enviado: false
         },
       });
-
+      console.log("pre - map")
 
       const datosHistorico = historyID.map((registro) => ({
         nombre: registro.tipo,
@@ -357,7 +361,7 @@ export class Nutricionista {
         id: registro.id
       }));
 
-
+      console.log("Erespuesta")
       //  console.log(datosHistorico);
       ctx.body = datosHistorico;
       ctx.status = HTTP_STATUS_CREATED;
@@ -756,21 +760,26 @@ export class Nutricionista {
   }
 
   static async saveReport(ctx) {
+
+    console.log("Frontera 01")
+
     try {
-      //   const [type, token] = ctx.headers.authorization.split(" ")
-      //  const data = jwt.verify(token, process.env.JWT_SECRET)
-      // const id_nutri = data.sub
+      const [type, token] = ctx.headers.authorization.split(" ")
+      const data = jwt.verify(token, process.env.JWT_SECRET)
+      const id_nutri = data.sub
 
       const cuerpo = ctx.request.body.cuerpo
       const titulo = ctx.request.body.tipo
       const id_consult = ctx.request.body.idConsultante
-      console.log(id_consult)
+
+      console.log("Frontera 02" + id_consult)
+
       //CONSULTANTE TIENE QUE SER DINAMICO, ver si lo saco de la URL o que onda.
 
       //CONSULTANTE TIENE QUE SER DINAMICO, ver si lo saco de la URL o que onda.
 
       //const id_consult=2
-      const id_nutri = 27
+      //const id_nutri = 27
       // const id_consult = ctx.request.body.id_consult
       // const id_nutri = ctx.request.body.id_nutri
       // const id_nutri = ctx.request.body.id_nutri
