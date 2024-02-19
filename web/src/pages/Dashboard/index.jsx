@@ -13,12 +13,8 @@ export function Dashboard() {
     return (
 
         <div>
-
             <Header nombreDelUsuario={auth.user.nombre} />
-
             <NavBar />
-
-
             <main>
 
                 <section id="header" className="max-w-full flex items-center justify-center">
