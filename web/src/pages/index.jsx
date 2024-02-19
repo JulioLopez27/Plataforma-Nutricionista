@@ -9,6 +9,7 @@ import { Signup } from './Signup'
 import { Dashboard } from './Dashboard'
 import { Profile } from "./Profile"
 import { DetalleConsultante } from "./Consultante/detalleConsultante"
+import { FormularioAnamnesis } from "./Consultante/formularioAnamnesis"
 import { Receta} from './Receta'
 import {ListadoConsultantes} from './Consultante/listadoConsultantes'
 import {Historico} from './Receta/historico'
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
     path: "/agregarConsultante",
     element: <AgregarConsultante />,
   }, 
+  {
+    path: "/detalleConsultante/anamnesis",
+    element: <FormularioAnamnesis/>,
+  },
 
 //--->ELIMINAR LUEGO DE IMPLEMETAR LA LISTA DE CONSULTANTES CON LOS ENALCES
   {

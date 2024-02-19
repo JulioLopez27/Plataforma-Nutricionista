@@ -974,9 +974,17 @@ export class Nutricionista {
   static async getAnamnesisForId(ctx) {
     try {
 
-      const anamnesis = await prisma.afeccion.findUnique({
+
+      const [type, token] = ctx.headers.authorization.split(" ");
+      const data = jwt.verify(token, process.env.JWT_SECRET);
+
+      const idConsultanteString = ctx.request.body.id_consultante // Obtener el valor asociado con la clave 'id_consultante'
+      const id_consultante = await stringToInt(idConsultanteString)
+
+
+      const anamnesis = await prisma.anamnesis.findFirst({
         where: {
-          id_consultante: ctx.request.body.id
+          id_consultante: id_consultante
         },
         select: {
           fecha: true,
@@ -990,6 +998,7 @@ export class Nutricionista {
 
         }
       })
+
 
       const responseAnamnesis = {
         fecha: anamnesis.fecha,
