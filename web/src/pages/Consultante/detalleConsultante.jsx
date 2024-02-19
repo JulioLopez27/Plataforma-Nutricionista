@@ -27,8 +27,6 @@ export function DetalleConsultante() {
         setIsBotoneraConsultanteVisible(false); // Oculta la BotoneraConsultante en pantallas pequeñas después de seleccionar un formulario
     };
 
-    
-
     return (
         <div>
             <Header nombreDelUsuario={auth.user.nombre} />

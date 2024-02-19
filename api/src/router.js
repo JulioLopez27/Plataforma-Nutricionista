@@ -20,12 +20,10 @@ router.put('/updateProfileData', async (ctx) => { await Nutricionista.updateProf
 
 router.get('/getConsultants', async (ctx) => { await Nutricionista.getConsultantes(ctx) })
 router.get('/getHistory', async (ctx) => { await Nutricionista.getHistory(ctx) })
-router.get('/getHistoryInformes', async (ctx) => { await Nutricionista.getHistoryInformes(ctx) })
+router.post('/getHistoryInformes', async (ctx) => { await Nutricionista.getHistoryInformes(ctx) })
 router.post('/saveReport', async (ctx) => { await Nutricionista.saveReport(ctx) })
 router.get('/getReport', async (ctx) => { await Nutricionista.getReport(ctx) })
 
-router.post('/createNewConsultant', async (ctx) => { await Consultante.createNewConsultant(ctx) })
-router.post('/detalleConsultante', async (ctx) => { await Nutricionista.getConsultantDataForId(ctx) })
 
 //------------------------------------------------------------------------------------------------------------
 // Segmento para las rutas que van a estar expuestas a un servicio externo.
@@ -40,3 +38,11 @@ router.post('/getNutritionist', para_agente_externo.getNutricionistas)
 //ruta: Deja expuesto las apis para aceptar el registro del nutricionista / desactivar su cuenta
 router.put('/acceptRegistration', para_agente_externo.acceptRegistration)
 router.put('/disabledNutritionist', para_agente_externo.disabledNutricionista)
+//----------------------------------------------------------------------------------------------------------------
+
+router.post('/createNewConsultant', async (ctx) => {await Consultante.createNewConsultant(ctx)})
+router.post('/detalleConsultante', async (ctx) => {await Nutricionista.getConsultantDataForId(ctx)})
+router.post('/detalleConsultante/anamnesis', async (ctx) => {await Nutricionista.getAnamnesisForId(ctx)})
+router.post('/detalleConsultante/afecciones', async (ctx) => {await Nutricionista.getAfeccionesForId(ctx)})
+router.post('/detalleConsultante/tipodieta', async (ctx) => {await Nutricionista.getTipoDietaForId(ctx)})
+

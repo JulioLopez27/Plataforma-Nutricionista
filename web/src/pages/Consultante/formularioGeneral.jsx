@@ -48,20 +48,20 @@ export function FormularioGeneral() {
     const formik = useFormik({
         //se carga los datos al crear el formulario
         initialValues: initialValues,
-        onSubmit: async (values) => {
-            try {
-                const res = await axios({
-                    method: 'PUT',
-                    baseURL: import.meta.env.VITE_API_URL,
-                    url: '/TODO',
-                    data: values,
-                    headers: { Authorization: `Bearer ${auth.accesToken}` }
-                })
-                console.log("🚀 ~ onSubmit: ~ res:", res)
-            } catch (error) {
-                console.log("🚀 ~ onSubmit: ~ error:", error)
-            }
-        }, validationSchema
+        // onSubmit: async (values) => {
+        //     try {
+        //         const res = await axios({
+        //             method: 'PUT',
+        //             baseURL: import.meta.env.VITE_API_URL,
+        //             url: '/TODO',
+        //             data: values,
+        //             headers: { Authorization: `Bearer ${auth.accesToken}` }
+        //         })
+        //         console.log("🚀 ~ onSubmit: ~ res:", res)
+        //     } catch (error) {
+        //         console.log("🚀 ~ onSubmit: ~ error:", error)
+        //     }
+        // }, validationSchema
     })
 
     // Custom hook para la consulta al cargar la página
@@ -74,7 +74,7 @@ export function FormularioGeneral() {
                 data: { id_consultante: idConsultante },
                 headers: { Authorization: `Bearer ${auth.accesToken}` }
             })
-            
+
             setData(user_data)
             setIsLoaded(true)
             formik.setValues({
@@ -108,12 +108,16 @@ export function FormularioGeneral() {
     const retryFetchUserInfo = () => {
         setError(null); // Reinicia el estado de error
         fetchData(data, setIsLoaded).catch((error) => {
-          console.error('Error al obtener la información del usuario:', error);
-          setError(error);
+            console.error('Error al obtener la información del usuario:', error);
+            setError(error);
         });
-      }
+    }
+    
     return (
         <>
+        <div className="flex justify-center">
+                <h1 className="text-3xl font-bold text-gray-900">Datos personales</h1>
+            </div>
             <main>
                 {error ? (
                     <div>
