@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import SibApiV3Sdk from 'sib-api-v3-sdk';
+
 
 import {
   prisma
