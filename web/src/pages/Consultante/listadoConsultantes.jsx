@@ -3,9 +3,10 @@ import { Header, NavBar } from '~/components'
 import { useLocalStorage } from 'react-use'
 import { Navigate } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
+import {useState,useEffect} from 'react'
 
 export function ListadoConsultantes() {
-  const [consultantsData, setConsultantsData] = useState([]);
+  const [consultantsData, setConsultantsData] = useState([])
   const [auth] = useLocalStorage('auth', {})
   const navigate = useNavigate()
 
