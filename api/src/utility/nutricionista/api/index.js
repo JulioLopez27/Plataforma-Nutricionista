@@ -84,7 +84,7 @@ export async function acceptRegistration(ctx) {
 
         const res = await prisma.nutricionista.update({
             where: { email: requestBody.email },
-            data: { activo: true },
+            data: { activo: true,id_chefDigitales:requestBody.idChefDigitales },
         });
 
         if (!res) {
