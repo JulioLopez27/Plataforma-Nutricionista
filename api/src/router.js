@@ -27,7 +27,7 @@ router.get('/getReport', async (ctx) => { await Nutricionista.getReport(ctx) })
 
 //------------------------------------------------------------------------------------------------------------------
 //Recetas -> obtenerlas y crearlas
-router.get('/getAllRecipes', async (ctx) => { await Receta.getRecipes(ctx) })
+router.get('/getRecipes', async (ctx) => { await Receta.getRecipes(ctx) })
 router.get('/createRecipe', async (ctx) => { await Receta.createRecipe(ctx) })
 
 //------------------------------------------------------------------------------------------------------------
