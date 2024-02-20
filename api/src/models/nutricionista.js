@@ -7,12 +7,12 @@ import {
 } from '../../prisma/index.js'
 
 import {
-  HTTP_STATUS_OK,
+ 
   HTTP_STATUS_CREATED,
   HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
   HTTP_STATUS_UNAUTHORIZED,
-  HTTP_STATUS_BAD_REQUEST
+
 } from '../HTTP_STATUS/index.js'
 
 import {
