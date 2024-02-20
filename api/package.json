@@ -24,10 +24,6 @@
     "sib-api-v3-sdk": "^8.5.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.9",
-    "@babel/preset-env": "^7.23.9",
-    "babel-jest": "^29.7.0",
-    "jest": "^29.7.0",
     "prisma": "^5.7.1"
   }
 }
