@@ -4,8 +4,7 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "server": "node -r dotenv-safe/config src/server.js",
-    "test": "jest"
+    "server": "node -r dotenv-safe/config src/server.js"
   },
   "author": "",
   "license": "MIT",
