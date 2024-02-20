@@ -61,9 +61,6 @@ export function Historico({}) {
       <div className="h-full w-full overflow-scroll">
         <div className="flex items-center justify-between mb-4">
         <h3 className="text-2xl font-bold text-center flex-grow">Historico</h3>
-          <button className="bg-purple-500 text-white font-bold py-2 px-4 rounded">
-            Sugerir Receta
-          </button>
         </div>
         <table className="w-full min-w-max table-auto text-left border border-black">
   <thead>
