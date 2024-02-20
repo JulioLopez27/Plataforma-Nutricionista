@@ -43,7 +43,7 @@ export class Nutricionista {
 
   //se setea el tiempo de expiracion del token
   static set_expiration_time = "8h"
-  static set_default_idChefDigitales = 0
+  static set_default_idChefDigitales = "sin identificador"
 
   constructor(nombre, apellido, correo, tituloEscaneado, experiencia, telefono, contraseña, país, ciudad) {
     this.nombre = nombre;
@@ -454,7 +454,7 @@ export class Nutricionista {
         return
       }
 
-      //si no recibo id de chefDigitales, seteo uno propio=0, para evitar inyeccion de datos
+      //si no recibo id de chefDigitales, seteo uno propio "sin identificador", para evitar inyeccion de datos
       const idChef = parseInt(ctx.request.body.id_chefDigitales) || Nutricionista.set_default_idChefDigitales
       //guardo en una variable la informacion del diploma que el nutricionista subio 
       const {
