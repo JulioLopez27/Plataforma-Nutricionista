@@ -1,4 +1,4 @@
-// import { promise as fs } from 'fs'
+import { promises as fs } from 'fs'
 
 
 import {
@@ -14,6 +14,7 @@ import {
 
 } from '../HTTP_STATUS/index.js'
 
+import jwt from 'jsonwebtoken'
 const DificultadReceta = {
     FACIL: "Fácil",
     MEDIO: "Medio",
@@ -67,8 +68,6 @@ export class Receta {
         const userId = data.sub
 
         try {
-
-
             const recetas = await prisma.recipes.findMany({
                 include: {
                     recipeimages: true  // Include de la relación con la tabla RecipeImages
@@ -77,19 +76,20 @@ export class Receta {
             if (recetas.length === 0) {
                 ctx.body = { mensaje: "No existe recetas." }
                 ctx.status = HTTP_STATUS_BAD_REQUEST
+                return
             }
-
+          
             ctx.body = recetas
             ctx.status = HTTP_STATUS_OK
         } catch (error) {
             ctx.body = { mensaje: "Error al obtener las recetas.", error }
+            ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
         }
-        ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
     }
 
 
-    static async saveRecipe(ctx) {
-      
+    static async createRecipe(ctx) {
+
         if (!ctx.headers.authorization) {
             ctx.status = HTTP_STATUS_UNAUTHORIZED
             return
@@ -97,16 +97,35 @@ export class Receta {
         const [type, token] = ctx.headers.authorization.split(" ")
         const data = jwt.verify(token, process.env.JWT_SECRET)
         const userId = data.sub
-     
+
         try {
+            // Obtener los datos de la receta del cuerpo de la solicitud
+            const { recipe_name, description, categories, difficulty, tiempo, ingredientes, alergias, vegano, vegetariano, celiaco, has_video, user_id, healthy, byName, status, page, perPage, recipeImg /* Agrega cualquier otra propiedad aquí... */ } = ctx.request.body;
+
             // Leer el archivo de imagen y convertirlo en un BLOB
             const imageBuffer = await fs.readFile(ctx.request.body.recipeImg)
+
 
             // Crear la receta en la base de datos
             const receta = await prisma.recipes.create({
                 data: {
-                    recipe_name: recipeData.recipe_name,
-                    // Otros campos de la receta...
+                    recipe_name,
+                    description,
+                    categories,
+                    difficulty,
+                    tiempo,
+                    ingredientes,
+                    alergias,
+                    vegano,
+                    vegetariano,
+                    celiaco,
+                    has_video,
+                    user_id,
+                    healthy,
+                    byName,
+                    status,
+                    page,
+                    perPage,
                     RecipeImages: {
                         create: {
                             image_data: imageBuffer
@@ -116,12 +135,12 @@ export class Receta {
                 include: {
                     RecipeImages: true
                 }
-            });
-
-            return receta;
+            })
+            ctx.body = receta
+            ctx.status = HTTP_STATUS_CREATED
         } catch (error) {
-            console.error("Error al guardar la receta con imagen:", error);
-            throw new Error("Error al guardar la receta con imagen");
+            ctx.body = { mensaje: "Hubo error, no se pudo crear la receta" }
+            ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
         }
     }
 
