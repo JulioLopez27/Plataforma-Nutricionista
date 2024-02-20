@@ -42,6 +42,8 @@ router.put('/disabledNutritionist', para_agente_externo.disabledNutricionista)
 
 router.post('/createNewConsultant', async (ctx) => {await Consultante.createNewConsultant(ctx)})
 router.post('/detalleConsultante', async (ctx) => {await Nutricionista.getConsultantDataForId(ctx)})
+router.put('/updateConsultantData', async (ctx) => { await Consultante.updateConsultantData(ctx) })
+
 router.post('/detalleConsultante/anamnesis', async (ctx) => {await Nutricionista.getAnamnesisForId(ctx)})
 router.post('/detalleConsultante/afecciones', async (ctx) => {await Nutricionista.getAfeccionesForId(ctx)})
 router.post('/detalleConsultante/tipodieta', async (ctx) => {await Nutricionista.getTipoDietaForId(ctx)})

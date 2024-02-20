@@ -8,15 +8,21 @@ import {
 import {
     Sugerencia
 } from "./sugerencia.js";
+import { prisma } from '../../prisma/index.js'
+
 import {
-    prisma
-} from '../../prisma/index.js'
-import {
+    HTTP_STATUS_INTERNAL_SERVER_ERROR,
     HTTP_STATUS_BAD_REQUEST,
     HTTP_STATUS_CREATED,
     HTTP_STATUS_FORBIDEN,
     HTTP_STATUS_NOT_FOUND
 } from "../HTTP_STATUS/index.js";
+import {
+    stringToInt,
+    positiveValue,
+    validatePhone,
+} from '../utility/shared.js'
+
 
 export class Consultante {
     constructor(nombre, apellido, fecha_nac, correo, telefono, sexo, nutricionista) {
@@ -250,7 +256,82 @@ export class Consultante {
     //     }
     //   }
 
-    static async updateConsultant(ctx) {
+    static async updateConsultantData(ctx) {
+
+        if (!ctx.headers.authorization) {
+            ctx.status = HTTP_STATUS_UNAUTHORIZED
+            return
+        }
+        const [type, token] = ctx.headers.authorization.split(" ")
+        const data = jwt.verify(token, process.env.JWT_SECRET)
+        const idNutricionista = data.sub
+
+        const idConsultante = ctx.request.body.idConsultante
+        const nombre = ctx.request.body.nombre
+        const apellido = ctx.request.body.apellido
+        const fechaNacimiento = ctx.request.body.fechaNacimiento
+        const telefono = ctx.request.body.telefono
+        const sexo = ctx.request.body.sexo
+
+
+        let consultantData = {
+            id:parseInt(idConsultante),
+            nombre,
+            apellido,
+            fechaNacimiento,
+            telefono,
+            sexo
+        }
+        
+        console.error('ID Consultante:' + consultantData.id);
+        try {
+            const consultant = await prisma.consultante.update({
+                where: {
+                    id: parseInt(idConsultante),
+                    id_nutricionista: idNutricionista
+                },
+                data: consultantData,
+                select: {
+                    id: true,
+                    nombre: true,
+                    apellido: true,
+                    fechaNacimiento: true,
+                    sexo: true,
+                    telefono: true
+                }
+            })
+
+            ctx.status = HTTP_STATUS_CREATED
+
+        } catch (error) {
+
+            console.error('FRONTERA 01:');
+
+            
+            // if (error instanceof prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+
+            //     console.error('FRONTERA 02:');
+
+            //     ctx.body = {
+            //         error: "No se encontro registro para actualizar"
+            //     }
+            //     ctx.status = HTTP_STATUS_NOT_FOUND
+            //     return
+            // }
+
+            console.error('FRONTERA 03:');
+            console.error('Error al actualizar los datos del consultante:', error);
+            ctx.body = {
+                error: 'Error al actualizar los datos del consultante.'
+            };
+            ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
+
+        }
+
+
+
+
+
 
     }
 

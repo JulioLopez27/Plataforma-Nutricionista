@@ -37,6 +37,7 @@ export function FormularioGeneral() {
 
     //setear los datos al hacer la llamada http
     const initialValues = useMemo(() => ({
+        idConsultante: parseInt(idConsultante),
         nombre: isLoaded ? data.nombre : '',
         apellido: isLoaded ? data.apellido : '',
         fechaNacimiento: isLoaded ? data.fechaNacimiento : '',
@@ -48,20 +49,22 @@ export function FormularioGeneral() {
     const formik = useFormik({
         //se carga los datos al crear el formulario
         initialValues: initialValues,
-        // onSubmit: async (values) => {
-        //     try {
-        //         const res = await axios({
-        //             method: 'PUT',
-        //             baseURL: import.meta.env.VITE_API_URL,
-        //             url: '/TODO',
-        //             data: values,
-        //             headers: { Authorization: `Bearer ${auth.accesToken}` }
-        //         })
-        //         console.log("🚀 ~ onSubmit: ~ res:", res)
-        //     } catch (error) {
-        //         console.log("🚀 ~ onSubmit: ~ error:", error)
-        //     }
-        // }, validationSchema
+
+        onSubmit: async (values) => {
+            console.log("VALUES " + values.idConsultante);
+            try {
+                const res = await axios({
+                    method: 'PUT',
+                    baseURL: import.meta.env.VITE_API_URL,
+                    url: '/updateConsultantData',
+                    data: values,
+                    headers: { Authorization: `Bearer ${auth.accesToken}` }
+                })
+                console.log("🚀 ~ onSubmit: ~ res:", res)
+            } catch (error) {
+                console.log("🚀 ~ onSubmit: ~ error:", error)
+            }
+        }, validationSchema
     })
 
     // Custom hook para la consulta al cargar la página
@@ -82,7 +85,8 @@ export function FormularioGeneral() {
                 apellido: user_data.data.apellido,
                 fechaNacimiento: user_data.data.fechaNacimiento,
                 sexo: user_data.data.sexo,
-                telefono: user_data.data.telefono
+                telefono: user_data.data.telefono,
+                idConsultante: idConsultante
             })
         } catch (error) {
             setIsLoaded(false)
@@ -126,6 +130,7 @@ export function FormularioGeneral() {
                     </div>
                 ) : isLoaded ? (
                     <form className="w-full max-w-lg space-y-4" onSubmit={formik.handleSubmit}>
+                        <Input type="hidden" id="idConsultante" name="idConsultante" value={formik.values.idConsultante} />
                         <Input htmlFor="nombre" id="nombre" label="Nombre" name="nombre" value={formik.values.nombre} onChange={formik.handleChange} error={formik.touched.nombre && formik.errors.nombre} onBlur={formik.handleBlur} />
                         <Input htmlFor="apellido" id="apellido" label="Apellido" name="apellido" value={formik.values.apellido} onChange={formik.handleChange} error={formik.touched.apellido && formik.errors.apellido} onBlur={formik.handleBlur} />
                         <Input
@@ -140,8 +145,19 @@ export function FormularioGeneral() {
                             readOnly
                         />
                         <Input htmlFor="telefono" id="telefono" label="Teléfono" name="telefono" value={formik.values.telefono} onChange={formik.handleChange} error={formik.touched.telefono && formik.errors.telefono} onBlur={formik.handleBlur} />
-                        <Input htmlFor="sexo" id="sexo" label="Sexo" name="sexo" value={formik.values.sexo} onChange={formik.handleChange} error={formik.touched.sexo && formik.errors.sexo} onBlur={formik.handleBlur} />
-
+                        <label className="p-1 font-semibold mb-2">Sexo</label>
+                        <select
+                            htmlFor="sexo"
+                            id="sexo"
+                            name="sexo"
+                            value={formik.values.sexo}
+                            onChange={formik.handleChange}
+                            className="form-select mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        >
+                            <option value="">Seleccione sexo</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                        </select>
                         <button type="submit" className="bg-verde_oscuro hover:bg-verde_claro text-white font-bold py-2 px-4 rounded mt-2 disabled:opacity-80 " disabled={!formik.isValid || formik.isSubmitting}>
                             {formik.isSubmitting ? 'Guardando sus modificaciones' : 'Guardar cambios'}
                         </button>

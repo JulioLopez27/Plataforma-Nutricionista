@@ -33,7 +33,7 @@ export function EnviarRegistro() {
       Object.keys(values).forEach((key) => {
         formData.append(key, values[key]);
       });
-console.log("formData -> " + formData)
+      //console.log("formData -> " + formData)
       //alert("ID consultante 2 -> " + idConsultante)
 
       try {
