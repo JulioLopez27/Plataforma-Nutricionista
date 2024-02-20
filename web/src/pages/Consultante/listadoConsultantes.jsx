@@ -61,9 +61,11 @@ export function ListadoConsultantes() {
       </div>
       {consultantsData.length === 0 ? (
         <table className="w-full min-w-max table-auto text-left">
+         <tbody>
           <tr>
             <td className="p-4">Usted no tiene consultantes.</td>
           </tr>
+          </tbody>
         </table>
       ) : (
         <div className="max-w-3xl mt-5 mx-20 pb-4 border-b-2 border-verde_oscuro font-medium text-gris_texto text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl ">

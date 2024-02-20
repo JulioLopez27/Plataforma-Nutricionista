@@ -63,9 +63,11 @@ export function HistoricoRegistro() {
 
         </div>
         <table className="w-full min-w-max table-auto text-left">
+          <tbody>
           <tr>
             <td className="p-4">Aun no le ha enviado informes a este consultante..</td>
           </tr>
+          </tbody>
         </table>
       </div>
     );
