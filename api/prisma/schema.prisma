@@ -27,19 +27,18 @@ model afeccion {
 }
 
 model consultante {
-  id               Int           @id @default(autoincrement())
-  nombre           String        @db.VarChar(255)
-  apellido         String        @db.VarChar(255)
-  email            String        @db.VarChar(255)
-  fechaNacimiento  DateTime      @db.Date
-  sexo             String        @db.VarChar(10)
-  telefono         String        @db.VarChar(255)
-  createdAt        DateTime?     @default(now()) @db.Timestamp(0)
-  updatedAt        DateTime?     @default(now()) @db.Timestamp(0)
+  id               Int          @id @default(autoincrement())
+  nombre           String       @db.VarChar(255)
+  apellido         String       @db.VarChar(255)
+  email            String       @db.VarChar(255)
+  fechaNacimiento  DateTime     @db.Date
+  sexo             String       @db.VarChar(10)
+  telefono         String       @db.VarChar(255)
+  createdAt        DateTime?    @default(now()) @db.Timestamp(0)
+  updatedAt        DateTime?    @default(now()) @db.Timestamp(0)
   id_nutricionista Int
   afeccion         afeccion[]
   anamnesis        anamnesis[]
-  nutricionista    nutricionista @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_id_nutri")
   registro         registro[]
   sugerencia       sugerencia[]
   tipodieta        tipodieta[]
@@ -73,7 +72,6 @@ model nutricionista {
   createdAt                  DateTime?                    @default(now()) @db.Timestamp(0)
   updatedAt                  DateTime?                    @default(now()) @db.Timestamp(0)
   activo                     Boolean                      @default(false)
-  consultante                consultante?
   nutricionista_especialidad nutricionista_especialidad[]
   nutricionista_pais         nutricionista_pais[]
   receta                     receta[]
@@ -209,4 +207,39 @@ model sugerencia_receta {
 
   @@index([id_receta], map: "id_receta")
   @@index([id_sugerencia], map: "id_sugerencia")
+}
+
+model recipeimages {
+  id         Int       @id @default(autoincrement())
+  image_path Bytes?    @db.Blob
+  createdAt  DateTime? @default(now()) @db.Timestamp(0)
+  updatedAt  DateTime? @default(now()) @db.Timestamp(0)
+  recipes    recipes[]
+}
+
+model recipes {
+  id              Int           @id @default(autoincrement())
+  recipe_name     String        @db.VarChar(255)
+  description     String        @db.VarChar(255)
+  categories      String?       @db.VarChar(255)
+  difficulty      String?       @db.VarChar(100)
+  tiempo          Int?
+  ingredientes    String?       @db.VarChar(500)
+  alergias        String?       @db.VarChar(500)
+  vegano          Boolean?
+  vegetariano     Boolean?
+  celiaco         Boolean?
+  has_video       Boolean?
+  user_id         String?       @db.VarChar(50)
+  healthy         Boolean?
+  byName          String?       @db.VarChar(255)
+  status          String?       @db.VarChar(15)
+  page            Int?          @default(1)
+  perPage         Int?          @default(10)
+  recipe_image_id Int?
+  createdAt       DateTime?     @default(now()) @db.Timestamp(0)
+  updatedAt       DateTime?     @default(now()) @db.Timestamp(0)
+  recipeimages    recipeimages? @relation(fields: [recipe_image_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recipes_ibfk_1")
+
+  @@index([recipe_image_id], map: "recipe_image_id")
 }
