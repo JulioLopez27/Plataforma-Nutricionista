@@ -68,7 +68,7 @@ model nutricionista {
   telefono                   String?                      @db.VarChar(255)
   anos_experiencia           Int
   foto_diploma               String?                      @db.VarChar(255)
-  id_chefDigitales           Int?
+  id_chefDigitales           String?                      @db.VarChar(255)
   createdAt                  DateTime?                    @default(now()) @db.Timestamp(0)
   updatedAt                  DateTime?                    @default(now()) @db.Timestamp(0)
   activo                     Boolean                      @default(false)
