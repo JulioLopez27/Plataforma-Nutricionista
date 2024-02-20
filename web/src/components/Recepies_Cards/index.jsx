@@ -12,16 +12,16 @@ export const Recepies_Cards = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Spaghetti Bolognese</CardTitle>
+            <CardTitle>Spaghetti a la Boloñesa</CardTitle>
           </CardHeader>
           <CardContent>
             <img
               alt="Spaghetti Bolognese"
               className="w-full h-48 object-cover aspect-w-16 aspect-h-9 rounded-md"
               src="/assets/img/espagueti.jpg"
-           
+
             />
-            <p className="mt-2 sm:mt-4 text-sm sm:text-base">A classic Italian dish with a rich and meaty sauce served over spaghetti.</p>
+            <p className="mt-2 sm:mt-4 text-sm sm:text-base">Un plato clásico italiano con una salsa rica con carne servida sobre espaguetis..</p>
           </CardContent>
         </Card>
 
@@ -29,7 +29,7 @@ export const Recepies_Cards = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Chicken Tikka Masala</CardTitle>
+            <CardTitle>Pollo tikka masala</CardTitle>
           </CardHeader>
           <CardContent>
             <img
@@ -37,13 +37,14 @@ export const Recepies_Cards = () => {
               className="w-full h-48 object-cover aspect-w-16 aspect-h-9 rounded-md"
               src="/assets/img/chicken.jpg"
             />
-            <p className="mt-4">A popular Indian dish made with chicken in a creamy, spicy tomato sauce.</p>
+            <p className="mt-4">
+              Un plato popular de la India hecho con pollo en una salsa cremosa, picante y de tomate..</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Beef Tacos</CardTitle>
+            <CardTitle>Tacos de res</CardTitle>
           </CardHeader>
           <CardContent>
             <img
@@ -51,13 +52,14 @@ export const Recepies_Cards = () => {
               className="w-full h-48 object-cover aspect-w-16 aspect-h-9 rounded-md"
               src="/assets/img/beefTacos.jpg"
             />
-            <p className="mt-4">A Mexican dish with beef, lettuce, and cheese served in a crunchy taco shell.</p>
+            <p className="mt-4">Un plato mexicano con carne de res, lechuga y queso servido en una cáscara de taco crujiente.</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Vegetable Stir Fry</CardTitle>
+            <CardTitle>
+              Revuelto de verduras.</CardTitle>
           </CardHeader>
           <CardContent>
             <img
@@ -65,38 +67,38 @@ export const Recepies_Cards = () => {
               className="w-full h-48 object-cover aspect-w-16 aspect-h-9 rounded-md"
               src="/assets/img/vegetales.jpg"
             />
-            <p className="mt-4">A healthy and colorful dish with a variety of stir-fried vegetables in a savory sauce.</p>
+            <p className="mt-4">Un plato saludable y colorido con una variedad de verduras salteadas en una salsa sabrosa.</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Seafood Paella</CardTitle>
+            <CardTitle>Paella de mariscos</CardTitle>
           </CardHeader>
           <CardContent>
             <img
               alt="Seafood Paella"
               className="w-full h-48 object-cover aspect-w-16 aspect-h-9 rounded-md"
               src="/assets/img/paella.jpg"
-              
+
             />
-            <p className="mt-4">A traditional Spanish dish with rice, various types of seafood, and a blend of spices.</p>
+            <p className="mt-4">Un plato tradicional español con arroz, varios tipos de mariscos y una mezcla de especias.</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Chocolate Cake</CardTitle>
+            <CardTitle>Torta de chocolate</CardTitle>
           </CardHeader>
           <CardContent>
             <img
               alt="Chocolate Cake"
               className="w-full h-48 object-cover aspect-w-16 aspect-h-9 rounded-md"
               src="/assets/img/chocolate.jpg"
-              
+
             />
             <p className="mt-4">
-              A rich and moist dessert made with dark chocolate.
+              Un postre rico y húmedo hecho con chocolate negro
             </p>
           </CardContent>
         </Card>

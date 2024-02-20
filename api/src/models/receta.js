@@ -1,5 +1,8 @@
-import { promises as fs } from 'fs'
-
+import { createReadStream, createWriteStream } from 'fs'
+import { dirname, join } from 'path'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { format } from 'date-fns'
 
 import {
     prisma
@@ -7,7 +10,6 @@ import {
 import {
     HTTP_STATUS_OK,
     HTTP_STATUS_CREATED,
-    HTTP_STATUS_NOT_FOUND,
     HTTP_STATUS_INTERNAL_SERVER_ERROR,
     HTTP_STATUS_UNAUTHORIZED,
     HTTP_STATUS_BAD_REQUEST,
@@ -15,8 +17,10 @@ import {
 } from '../HTTP_STATUS/index.js'
 
 import jwt from 'jsonwebtoken'
+
+
 const DificultadReceta = {
-    FACIL: "Fácil",
+    FACIL: "Facil",
     MEDIO: "Medio",
     DIFICIL: "Difícil"
 };
@@ -78,7 +82,7 @@ export class Receta {
                 ctx.status = HTTP_STATUS_BAD_REQUEST
                 return
             }
-          
+
             ctx.body = recetas
             ctx.status = HTTP_STATUS_OK
         } catch (error) {
@@ -88,6 +92,43 @@ export class Receta {
     }
 
 
+    // Método para obtener la ruta de la carpeta de subidas
+    static async getUploadFolderPath() {
+        const __filename = fileURLToPath(import.meta.url)
+        const __dirname = dirname(__filename)
+        const partenDir = dirname(__dirname)
+        return join(partenDir, 'uploads')
+    }
+
+    static async guardarImagen(rutaImagen, nombreArchivo) {
+        try {
+            //obtengo la extension de la imagen
+            const extension = path.extname(nombreArchivo)
+            const nombreBase = path.basename(nombreArchivo, extension)
+            // Generar un sello de tiempo
+            const timestamp = format(new Date(), 'yyyyMMddHHmmss')
+            // Crear un nuevo nombre de archivo con el sello de tiempo
+            const nuevoNombreArchivo = `${nombreBase}-${timestamp}${extension}`
+            //genero la ruta de destino con el nombre del archivo
+            const rutaDestino = join(await this.getUploadFolderPath(), nuevoNombreArchivo)
+
+            // Crear un flujo de lectura desde el archivo temporal
+            const streamLectura = createReadStream(rutaImagen)
+
+            // Crear un flujo de escritura hacia el archivo de destino
+            const streamEscritura = createWriteStream(rutaDestino);
+
+            // Pipe para transferir el contenido del archivo temporal al archivo de destino
+            streamLectura.pipe(streamEscritura);
+            //  Manejar eventos de finalización y error
+            streamEscritura.on('finish', () => { })
+            streamEscritura.on('error', () => { })
+            return rutaDestino
+        } catch (error) {
+            console.log('Error-> ', error);
+        }
+    }
+
     static async createRecipe(ctx) {
 
         if (!ctx.headers.authorization) {
@@ -96,57 +137,65 @@ export class Receta {
         }
         const [type, token] = ctx.headers.authorization.split(" ")
         const data = jwt.verify(token, process.env.JWT_SECRET)
-        const userId = data.sub
 
+        //obtengo el archivo
+        const { recipeImage } = ctx.request.files
+        //obtengo la ruta del archivo->lo que me sirve
+        const rutaImagen = recipeImage.filepath
+
+
+        const nombreImagen = recipeImage.originalFilename
         try {
-            // Obtener los datos de la receta del cuerpo de la solicitud
-            const { recipe_name, description, categories, difficulty, tiempo, ingredientes, alergias, vegano, vegetariano, celiaco, has_video, user_id, healthy, byName, status, page, perPage, recipeImg /* Agrega cualquier otra propiedad aquí... */ } = ctx.request.body;
+            const { recipe_name, description, categories, difficulty, tiempo, ingredientes, alergias, vegano, vegetariano, celiaco, has_video, user_id, healthy, byName, status, page, perPage } = ctx.request.body;
 
-            // Leer el archivo de imagen y convertirlo en un BLOB
-            const imageBuffer = await fs.readFile(ctx.request.body.recipeImg)
+            // Verificar que el tipo de dificultad esté en DificultadReceta
+            if (!Object.values(DificultadReceta).includes(difficulty)) {
+                ctx.body = { mensaje: "No ingresó un valor de dificultad válido." }
+                ctx.status = HTTP_STATUS_BAD_REQUEST
+                return
+            }
+            console.log(ctx.request.body);
+            const image_path = await this.guardarImagen(rutaImagen, nombreImagen)
 
-
-            // Crear la receta en la base de datos
-            const receta = await prisma.recipes.create({
-                data: {
-                    recipe_name,
-                    description,
-                    categories,
-                    difficulty,
-                    tiempo,
-                    ingredientes,
-                    alergias,
-                    vegano,
-                    vegetariano,
-                    celiaco,
-                    has_video,
-                    user_id,
-                    healthy,
-                    byName,
-                    status,
-                    page,
-                    perPage,
-                    RecipeImages: {
-                        create: {
-                            image_data: imageBuffer
-                        }
-                    }
-                },
-                include: {
-                    RecipeImages: true
-                }
+            const recipeImage = await prisma.recipeimages.create({
+                data: { image_path }
             })
-            ctx.body = receta
-            ctx.status = HTTP_STATUS_CREATED
+
+            const recipe = await prisma.recipes.create({
+                data: {
+                    recipe_name: recipe_name || '',
+                    description: description || '',
+                    categories: categories || '',
+                    difficulty: difficulty || '',
+                    tiempo: tiempo || '',
+                    ingredientes: ingredientes || '',
+                    alergias: alergias || '',
+                    vegano: vegano,
+                    vegetariano: vegetariano || false,
+                    celiaco: celiaco || false,
+                    has_video: has_video || false,
+                    user_id: user_id || '',
+                    healthy: healthy || false,
+                    byName: '',
+                    status: '',
+                    page: '',
+                    perPage: '',
+                    recipe_image_id: recipeImage.id,
+                },
+            })
+
+            if (!recipe) {
+                ctx.body = { mensaje: 'No se pudo crear la receta' }
+                ctx.status = HTTP_STATUS_BAD_REQUEST
+                return
+            }
+            ctx.body = { mensaje: 'se agrego la imagen ' };
+            ctx.status = HTTP_STATUS_CREATED;
         } catch (error) {
-            ctx.body = { mensaje: "Hubo error, no se pudo crear la receta" }
+            ctx.body = { mensaje: 'Errores.' }
             ctx.status = HTTP_STATUS_INTERNAL_SERVER_ERROR
         }
     }
-
-
-
-
 
 
 
