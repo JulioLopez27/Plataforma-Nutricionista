@@ -28,7 +28,7 @@ router.get('/getReport', async (ctx) => { await Nutricionista.getReport(ctx) })
 //------------------------------------------------------------------------------------------------------------------
 //Recetas -> obtenerlas y crearlas
 router.get('/getRecipes', async (ctx) => { await Receta.getRecipes(ctx) })
-router.get('/createRecipe', async (ctx) => { await Receta.createRecipe(ctx) })
+router.post('/createRecipe', async (ctx) => { await Receta.createRecipe(ctx) })
 
 //------------------------------------------------------------------------------------------------------------
 // Segmento para las rutas que van a estar expuestas a un servicio externo.
