@@ -3,7 +3,8 @@ import axios from 'axios'
 import * as yup from 'yup'
 import { useFormik } from 'formik'
 import { useState, useCallback, useEffect } from 'react'
-
+import { useLocalStorage } from 'react-use'
+import { Navigate } from 'react-router-dom'
 import { Input, Custom_select, CustomModal } from '~/components'
 
 
@@ -57,7 +58,7 @@ const fetchData = async (url) => {
 }
 
 export const Signup = () => {
-
+    const [auth] = useLocalStorage('auth', {})
     const [isModalOpen, setIsModalOpen] = useState(false); // Agrega este estado
     const [message, setMessage] = useState(''); // Agrega este estado para manejar el mensaje de error
     const [messageType, setMessageType] = useState('');
@@ -81,7 +82,7 @@ export const Signup = () => {
             // Realizar las solicitudes HTTP de manera concurrente
             Promise.all([fetchSpecialty(), fetchCountries()]);
         }
-    }, [fetchSpecialty, fetchCountries,didMount]);
+    }, [fetchSpecialty, fetchCountries, didMount]);
 
     const formik = useFormik({
         onSubmit: async (values) => {
@@ -125,7 +126,9 @@ export const Signup = () => {
         },
         validationSchema
     })
-
+    if (auth?.user?.id) {
+        return <Navigate to="/dashboard" replace={true} />
+    }
     const handleCloseModal = () => {
         setIsModalOpen(false); // Función para cerrar el modal
     }
@@ -270,9 +273,7 @@ export const Signup = () => {
                         accept='image/*'
                         error={formik.touched.foto_diploma && formik.errors.foto_diploma}
                         onBlur={formik.handleBlur}
-                        onChange={(event) => {
-                            formik.setFieldValue("foto_diploma", event.currentTarget.files[0]);
-                        }}
+                        onChange={(event) => { formik.setFieldValue("foto_diploma", event.currentTarget.files[0]) }}
                     />
 
                     <div className="flex flex-col gap-4 text-center text-white">
