@@ -211,7 +211,7 @@ model sugerencia_receta {
 
 model recipeimages {
   id         Int       @id @default(autoincrement())
-  image_path Bytes?    @db.Blob
+  image_path String?   @db.VarChar(255)
   createdAt  DateTime? @default(now()) @db.Timestamp(0)
   updatedAt  DateTime? @default(now()) @db.Timestamp(0)
   recipes    recipes[]
