@@ -3,6 +3,7 @@ a ser usadas*/
 import Router from '@koa/router'
 import { Nutricionista } from './models/nutricionista.js'
 import { Consultante } from './models/consultante.js'
+import { Receta } from './models/receta.js'
 import * as para_agente_externo from './utility/nutricionista/api/index.js'
 export const router = new Router()
 
@@ -24,6 +25,10 @@ router.post('/getHistoryInformes', async (ctx) => { await Nutricionista.getHisto
 router.post('/saveReport', async (ctx) => { await Nutricionista.saveReport(ctx) })
 router.get('/getReport', async (ctx) => { await Nutricionista.getReport(ctx) })
 
+//------------------------------------------------------------------------------------------------------------------
+//Recetas -> obtenerlas y crearlas
+router.get('/getAllRecipes', async (ctx) => { await Receta.getRecipes(ctx) })
+router.get('/createRecipe', async (ctx) => { await Receta.createRecipe(ctx) })
 
 //------------------------------------------------------------------------------------------------------------
 // Segmento para las rutas que van a estar expuestas a un servicio externo.
@@ -40,11 +45,11 @@ router.put('/acceptRegistration', para_agente_externo.acceptRegistration)
 router.put('/disabledNutritionist', para_agente_externo.disabledNutricionista)
 //----------------------------------------------------------------------------------------------------------------
 
-router.post('/createNewConsultant', async (ctx) => {await Consultante.createNewConsultant(ctx)})
-router.post('/detalleConsultante', async (ctx) => {await Nutricionista.getConsultantDataForId(ctx)})
+router.post('/createNewConsultant', async (ctx) => { await Consultante.createNewConsultant(ctx) })
+router.post('/detalleConsultante', async (ctx) => { await Nutricionista.getConsultantDataForId(ctx) })
 router.put('/updateConsultantData', async (ctx) => { await Consultante.updateConsultantData(ctx) })
 
-router.post('/detalleConsultante/anamnesis', async (ctx) => {await Nutricionista.getAnamnesisForId(ctx)})
-router.post('/detalleConsultante/afecciones', async (ctx) => {await Nutricionista.getAfeccionesForId(ctx)})
-router.post('/detalleConsultante/tipodieta', async (ctx) => {await Nutricionista.getTipoDietaForId(ctx)})
+router.post('/detalleConsultante/anamnesis', async (ctx) => { await Nutricionista.getAnamnesisForId(ctx) })
+router.post('/detalleConsultante/afecciones', async (ctx) => { await Nutricionista.getAfeccionesForId(ctx) })
+router.post('/detalleConsultante/tipodieta', async (ctx) => { await Nutricionista.getTipoDietaForId(ctx) })
 
