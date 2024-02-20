@@ -15,62 +15,43 @@ export function FormularioTipoDieta() {
     const [error, setError] = useState(null)
     //didMount-> se usa para el useEffect no haga solicitudes http duplicadas
     const [didMount, setDidMount] = useState(false)
-
+    const [tipoDietaID, setTipoDietaId] = useState(null); 
     const queryString = window.location.search
     const urlParams = new URLSearchParams(queryString)
     const idConsultante = urlParams.get('id')
 
-    // const [formData, setFormData] = useState({
-    //     vegetariano: false,
-    //     vegano: false,
-    //     pescetariano: false,
-    //     crudivegano: false,
-    //     sin_gluten: true,
-    //     sin_lactosa: false,
-    //     keto: false
-    // });
-
     const initialValues = useMemo(() => ({
+        idConsultante: parseInt(idConsultante),
         vegetariano: isLoaded ? data.vegetariano : false,
         vegano: isLoaded ? data.vegano : false,
         pescetariano: isLoaded ? data.pescetariano : false,
         crudivegano: isLoaded ? data.crudivegano : false,
-        sin_gluten: isLoaded ? data.sin_gluten : false,
-        sin_lactosa: isLoaded ? data.sin_lactosa : false,
+        sinGluten: isLoaded ? data.sinGluten : false,
+        sinLactosa: isLoaded ? data.sinLactosa : false,
         keto: isLoaded ? data.keto : false,
         alergias: isLoaded ? data.alergias : ''
     }), [isLoaded, data]);
 
 
-    const formik = useFormik({
-        initialValues: initialValues,
-
+    const formik = useFormik({   initialValues: initialValues,
         onSubmit: async (values) => {
-
-            // try {
-            //     const res = await axios({
-            //         //   method: 'post',
-            //         //   baseURL: 'http://localhost:3000',
-            //         //   url: '/login',
-            //         //   data: values
-            //     })
-
-            // } catch (error) {
-
-            // }
-        }
-
-    })
-
-    // const handleChange = (e) => {
-    //     const { name, checked } = e.target;
-    //     setFormData({ ...formData, [name]: checked });
-    // };
-
-    // const handleSubmit = (e) => {
-    //     e.preventDefault();
-    //     onSubmit(formData);
-    // };
+            try {
+                const res = await axios({
+                    method: 'PUT',
+                    baseURL: import.meta.env.VITE_API_URL,
+                    url: '/detalleConsultante/updateTipoDieta',
+                    data: {tipoDietaID,values},
+                    headers: { Authorization: `Bearer ${auth.accesToken}`,}
+                })
+                console.log("🚀 ~ onSubmit: ~ res:", res)
+                alert("Cambios realizados con exito!")
+            } catch (error) {
+                console.log("🚀 ~ onSubmit: ~ error:", error)
+                alert("No se pudieron realizar los cambios")
+            }
+        }, //validationSchema
+    }
+    )
 
     const fetchData = async () => {
         try {
@@ -84,16 +65,17 @@ export function FormularioTipoDieta() {
 
             setData(user_data.data)
             setIsLoaded(true)
-
+            setTipoDietaId(user_data.data.id_tipoDieta)
             formik.setValues({
                 vegetariano: user_data.data.vegetariano,
                 vegano: user_data.data.vegano,
                 pescetariano: user_data.data.pescetariano,
                 crudivegano: user_data.data.crudivegano,
-                sin_gluten: user_data.data.sinGluten,
-                sin_lactosa: user_data.data.sinLactosa,
+                sinGluten: user_data.data.sinGluten,
+                sinLactosa: user_data.data.sinLactosa,
                 keto: user_data.data.keto,
-                alergias: user_data.data.alergias
+                idConsultante: idConsultante
+               
             });
         } catch (error) {
             setIsLoaded(false)
@@ -179,25 +161,25 @@ export function FormularioTipoDieta() {
                 <div className="flex items-center">
                     <input
                         type="checkbox"
-                        id="sin_gluten"
-                        name="sin_gluten"
-                        checked={formik.values.sin_gluten}
+                        id="sinGluten"
+                        name="sinGluten"
+                        checked={formik.values.sinGluten}
                         onChange={formik.handleChange}
                         className="mr-2 h-5 w-5 text-verde_oscuro focus:ring-verde_oscuro border-gray-300 rounded"
                     />
-                    <label htmlFor="sin_gluten" className="text-gray-700">Sin gluten</label>
+                    <label htmlFor="sinGluten" className="text-gray-700">Sin gluten</label>
                 </div>
 
                 <div className="flex items-center">
                     <input
                         type="checkbox"
-                        id="sin_lactosa"
-                        name="sin_lactosa"
-                        checked={formik.values.sin_lactosa}
+                        id="sinLactosa"
+                        name="sinLactosa"
+                        checked={formik.values.sinLactosa}
                         onChange={formik.handleChange}
                         className="mr-2 h-5 w-5 text-verde_oscuro focus:ring-verde_oscuro border-gray-300 rounded"
                     />
-                    <label htmlFor="sin_lactosa" className="text-gray-700">Sin lactosa</label>
+                    <label htmlFor="sinLactosa" className="text-gray-700">Sin lactosa</label>
                 </div>
 
                 <div className="flex items-center">
@@ -211,13 +193,11 @@ export function FormularioTipoDieta() {
                     />
                     <label htmlFor="keto" className="text-gray-700">Keto</label>
                 </div>
-
-                <button
-                    type="submit"
-                    className="bg-verde_oscuro hover:bg-verde_claro text-white font-bold py-2 px-4 rounded mt-2"
-                >
-                    Guardar cambios
-                </button>
+                <Input type="hidden" label="" id="idConsultante" name="idConsultante" value={formik.values.idConsultante} />                     
+           
+                <button type="submit" className="bg-verde_oscuro hover:bg-verde_claro text-white font-bold py-2 px-4 rounded mt-2 disabled:opacity-80 ">
+                            {formik.isSubmitting ? 'Guardando sus modificaciones' : 'Guardar cambios'}
+            </button>  
 
             </form>
 

@@ -72,4 +72,5 @@ export async function formateoDeFecha(fecha) {
   const dia = fecha.getDate() + 1
   // Formatear la fecha en el formato deseado (YYYY-MM-DD)
   const fNacimiento = `${año}-${mes < 10 ? '0' : ''}${mes}-${dia < 10 ? '0' : ''}${dia}`
+  return fNacimiento;
 }

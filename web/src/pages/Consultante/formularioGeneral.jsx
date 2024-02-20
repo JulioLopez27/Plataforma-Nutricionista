@@ -1,4 +1,3 @@
-
 import { Input } from '~/components'
 import { useEffect, useState, useMemo } from 'react';
 import { useLocalStorage } from 'react-use'
@@ -130,7 +129,7 @@ export function FormularioGeneral() {
                     </div>
                 ) : isLoaded ? (
                     <form className="w-full max-w-lg space-y-4" onSubmit={formik.handleSubmit}>
-                        <Input type="hidden" id="idConsultante" name="idConsultante" value={formik.values.idConsultante} />
+                        <Input type="hidden" label="" id="idConsultante" name="idConsultante" value={formik.values.idConsultante} />
                         <Input htmlFor="nombre" id="nombre" label="Nombre" name="nombre" value={formik.values.nombre} onChange={formik.handleChange} error={formik.touched.nombre && formik.errors.nombre} onBlur={formik.handleBlur} />
                         <Input htmlFor="apellido" id="apellido" label="Apellido" name="apellido" value={formik.values.apellido} onChange={formik.handleChange} error={formik.touched.apellido && formik.errors.apellido} onBlur={formik.handleBlur} />
                         <Input

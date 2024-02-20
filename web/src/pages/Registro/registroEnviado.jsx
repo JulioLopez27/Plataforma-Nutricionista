@@ -5,7 +5,11 @@ import { useNavigate } from 'react-router-dom';
 
 export function RegistroEnviado() {
   const [titulo, setTitulo] = useState("");
-  const [cuerpo, setCuerpo] = useState("");
+  const [cuerpo, setCuerpo] = useState(()=>{
+    
+
+
+  });
   const navigate = useNavigate();
 
 console.log(cuerpo)
@@ -22,7 +26,8 @@ console.log(cuerpo)
 
           if (response.data.tipo !== "") {
             setTitulo(response.data.tipo);
-            setCuerpo(response.data.nota);
+document.getElementById("cuerpo").innerHTML=response.data.nota;
+           // setCuerpo(response.data.nota);
           } else {
             setTitulo("ID de informe incorrecto");
             setCuerpo("ID de informe incorrecto");

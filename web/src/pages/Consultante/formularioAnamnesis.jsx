@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios';
 import { useFormik } from 'formik'
 import * as yup from 'yup'
-
+import {formateoDeFecha} from "../../../../api/src/utility/shared.js"
 
 const validationSchema = yup.object().shape({
     fecha: yup.date().required('Campo obligatorio'),
@@ -29,19 +29,19 @@ export function FormularioAnamnesis() {
     const [error, setError] = useState(null)
     //didMount-> se usa para el useEffect no haga solicitudes http duplicadas
     const [didMount, setDidMount] = useState(false)
-
+    const [anamnesisID, setAnamnesisId] = useState(null); 
     const queryString = window.location.search
     const urlParams = new URLSearchParams(queryString)
     const idConsultante = urlParams.get('id')
 
 
     const initialValues = useMemo(() => ({
+        idConsultante: parseInt(idConsultante),
         fecha: isLoaded ? data.fecha : '',
-        edad: isLoaded ? data.edad : '',
         peso: isLoaded ? data.peso : '',
         altura: isLoaded ? data.altura : '',
         constitucion_corporal: isLoaded ? data.constitucion_corporal : '',
-        historia_alimentaria: isLoaded ? data.historia_alimentaria : '',
+        historia_alimenticia: isLoaded ? data.historia_alimenticia: '',
         horarios_alimenticios: isLoaded ? data.horarios_alimenticios : '',
         objetivos_clinicos: isLoaded ? data.objetivos_clinicos : '',
         deficits_nutricionales: isLoaded ? data.deficits_nutricionales : '',
@@ -50,22 +50,29 @@ export function FormularioAnamnesis() {
 
     const formik = useFormik({
         //se carga los datos al crear el formulario
+        
         initialValues: initialValues,
-        // onSubmit: async (values) => {
-        //     try {
-        //         const res = await axios({
-        //             method: 'PUT',
-        //             baseURL: import.meta.env.VITE_API_URL,
-        //             url: '/TODO',
-        //             data: values,
-        //             headers: { Authorization: `Bearer ${auth.accesToken}` }
-        //         })
-        //         console.log("🚀 ~ onSubmit: ~ res:", res)
-        //     } catch (error) {
-        //         console.log("🚀 ~ onSubmit: ~ error:", error)
-        //     }
-        // }, validationSchema
-    })
+        onSubmit: async (values) => {
+            console.log("VALUES " + anamnesisID);
+            try {
+                const res = await axios({
+                    method: 'PUT',
+                    baseURL: import.meta.env.VITE_API_URL,
+                    url: '/detalleConsultante/updateAnamnesis',
+                    data: {anamnesisID,values},
+                    headers: { Authorization: `Bearer ${auth.accesToken}`,}
+                })
+                console.log("🚀 ~ onSubmit: ~ res:", res)
+                alert("Cambios realizados con exito!")
+            } catch (error) {
+                console.log("🚀 ~ onSubmit: ~ error:", error)
+                alert("No se pudieron realizar los cambios")
+            }
+        }, //validationSchema
+    }
+    
+  
+    )
 
     const fetchData = async () => {
         try {
@@ -79,18 +86,18 @@ export function FormularioAnamnesis() {
 
             setData(user_data.data); // Se debe acceder a la propiedad .data para obtener los datos
             setIsLoaded(true);
-
+            setAnamnesisId(user_data.data.id_anamnesis)
             // Establecer los valores en el formulario de anamnesis
             formik.setValues({
-                fecha: user_data.data.fecha,
-                edad: user_data.data.edad,
+                fecha: await formateoDeFecha(new Date(user_data.data.fecha)),
                 peso: user_data.data.peso,
                 altura: user_data.data.altura,
                 constitucion_corporal: user_data.data.constitucion_corporal,
                 historia_alimenticia: user_data.data.historia_alimenticia,
                 horarios_alimenticios: user_data.data.horarios_alimenticios,
                 objetivos_clinicos: user_data.data.objetivos_clinicos,
-                deficits_nutricionales: user_data.data.deficits_nutricionales
+                deficits_nutricionales: user_data.data.deficits_nutricionales,
+                idConsultante: idConsultante
             });
         } catch (error) {
             setIsLoaded(false);
@@ -131,7 +138,8 @@ export function FormularioAnamnesis() {
             </div>
         
         <form onSubmit={formik.handleSubmit} className="w-full max-w-lg space-y-4">
-            <Input label="Fecha" type="date" name="fecha" value={formik.values.fecha} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" />
+            <Input type="hidden" label="" id="idConsultante" name="idConsultante" value={formik.values.idConsultante} />                     
+             <Input label="Fecha" type="date" name="fecha" value={formik.values.fecha} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" />
             <Input label="Peso" type="number" step="0.01" name="peso" value={formik.values.peso} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" />
             <Input label="Altura" type="number" step="0.01" name="altura" value={formik.values.altura} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" />
             <Input label="Constitución Corporal" name="constitucion_corporal" value={formik.values.constitucion_corporal} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" />
@@ -139,8 +147,10 @@ export function FormularioAnamnesis() {
             <Input label="Horarios Alimenticios" name="horarios_alimenticios" value={formik.values.horarios_alimenticios} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" />
             <Input label="Objetivos Clínicos" name="objetivos_clinicos" value={formik.values.objetivos_clinicos} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" />
             <Input label="Déficits Nutricionales" name="deficits_nutricionales" value={formik.values.deficits_nutricionales} onChange={formik.handleChange} className="rounded-md bg-gray-100 px-4 py-2" />
-            <button type="submit" className="bg-verde_oscuro hover:bg-verde_claro text-white font-bold py-2 px-4 rounded mt-2">Guardar cambios</button>
-        </form>
+            <button type="submit" className="bg-verde_oscuro hover:bg-verde_claro text-white font-bold py-2 px-4 rounded mt-2 disabled:opacity-80 ">
+                            {formik.isSubmitting ? 'Guardando sus modificaciones' : 'Guardar cambios'}
+            </button>   
+            </form>
         </>
     );
 }

@@ -15,14 +15,14 @@ export function FormularioAfecciones() {
     const [error, setError] = useState(null)
     //didMount-> se usa para el useEffect no haga solicitudes http duplicadas
     const [didMount, setDidMount] = useState(false)
-
+    const [afeccionesID, setAfeccionesId] = useState(null); 
     const queryString = window.location.search
     const urlParams = new URLSearchParams(queryString)
     const idConsultante = urlParams.get('id')
 
 
     const initialValues = useMemo(() => ({
-
+        idConsultante: parseInt(idConsultante),
         diabetes_tipo_1: isLoaded ? data.diabetes_tipo_1 : false,
         diabetes_tipo_2: isLoaded ? data.diabetes_tipo_2 : false,
         celiaquismo: isLoaded ? data.celiaquismo : false,
@@ -39,24 +39,24 @@ export function FormularioAfecciones() {
 
     const formik = useFormik({
         initialValues: initialValues,
-
         onSubmit: async (values) => {
-
-            // try {
-            //     const res = await axios({
-            //         //   method: 'post',
-            //         //   baseURL: 'http://localhost:3000',
-            //         //   url: '/login',
-            //         //   data: values
-            //     })
-
-            // } catch (error) {
-
-            // }
-        }
-
-    })
-
+            try {
+                const res = await axios({
+                    method: 'PUT',
+                    baseURL: import.meta.env.VITE_API_URL,
+                    url: '/detalleConsultante/updateAfecciones',
+                    data: {afeccionesID,values},
+                    headers: { Authorization: `Bearer ${auth.accesToken}`,}
+                })
+                console.log("🚀 ~ onSubmit: ~ res:", res)
+                alert("Cambios realizados con exito!")
+            } catch (error) {
+                console.log("🚀 ~ onSubmit: ~ error:", error)
+                alert("No se pudieron realizar los cambios")
+            }
+        }, //validationSchema
+    }
+    )
     const fetchData = async () => {
         try {
             const user_data = await axios({
@@ -69,8 +69,7 @@ export function FormularioAfecciones() {
 
             setData(user_data.data);
             setIsLoaded(true);
-
-            console.log("user_data -> " + user_data.data.obesidad);
+            setAfeccionesId(user_data.data.id_afecciones)
 
             formik.setValues({
                 diabetes_tipo_1: user_data.data.diabetes_tipo_1,
@@ -81,7 +80,8 @@ export function FormularioAfecciones() {
                 enfermedad_renal: user_data.data.enfermedad_renal,
                 hipercolesterolemia: user_data.data.hipercolesterolemia,
                 anemia: user_data.data.anemia,
-                obesidad: user_data.data.obesidad
+                obesidad: user_data.data.obesidad,
+                idConsultante: idConsultante
             });
 
             //console.log("FORMIK " + formik.values.anemia);
@@ -128,6 +128,7 @@ export function FormularioAfecciones() {
                     />
                     <label htmlFor="diabetes_tipo_1" className="text-gray-700">Diabetes Tipo 1</label>
                 </div>
+            
                 <div className="flex items-center">
                     <input
                         type="checkbox"
@@ -150,6 +151,18 @@ export function FormularioAfecciones() {
                     />
                     <label htmlFor="celiaquismo" className="text-gray-700">Celiaquismo</label>
                 </div>
+                <div className="flex items-center">
+                    <input
+                        type="checkbox"
+                        id="anemia"
+                        name="anemia"
+                        checked={formik.values.anemia}
+                        onChange={() =>formik.setFieldValue("anemia",!formik.values.anemia) }
+                          className="mr-2 h-5 w-5 text-verde_oscuro focus:ring-verde_oscuro border-gray-300 rounded"
+                    />
+                    <label htmlFor="anemia" className="text-gray-700">Anemia</label>
+                </div>
+               
                 <div className="flex items-center">
                     <input
                         type="checkbox"
@@ -189,11 +202,12 @@ export function FormularioAfecciones() {
                         id="obesidad"
                         name="obesidad"
                         checked={formik.values.obesidad}
-                        onChange={formik.handleChange}
+                        onChange={() =>formik.setFieldValue("obesidad",!formik.values.obesidad) }
                         className="mr-2 h-5 w-5 text-verde_oscuro focus:ring-verde_oscuro border-gray-300 rounded"
                     />
                     <label htmlFor="obesidad" className="text-gray-700">Obesidad</label>
                 </div>
+
                 <div>
                     <label htmlFor="alergias" className="text-gray-700">Alergias</label>
                     <input
@@ -205,7 +219,11 @@ export function FormularioAfecciones() {
                         className="rounded-md bg-gray-100 px-4 py-2 w-full border border-gray-300 focus:ring-verde_oscuro focus:border-verde_oscuro"
                     />
                 </div>
-                <button type="submit" className="bg-verde_oscuro hover:bg-verde_claro text-white font-bold py-2 px-4 rounded mt-2">Guardar cambios</button>
+                <Input type="hidden" label="" id="idConsultante" name="idConsultante" value={formik.values.idConsultante} />                     
+           
+                <button type="submit" className="bg-verde_oscuro hover:bg-verde_claro text-white font-bold py-2 px-4 rounded mt-2 disabled:opacity-80 ">
+                            {formik.isSubmitting ? 'Guardando sus modificaciones' : 'Guardar cambios'}
+            </button>   
             </form>
 
         </>
