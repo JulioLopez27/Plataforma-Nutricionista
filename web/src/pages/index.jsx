@@ -58,7 +58,7 @@ const router = createBrowserRouter([
     element: <FormularioAfecciones/>,
   },
   {
-    path: "/detalleConsultante/tippdieta",
+    path: "/detalleConsultante/tipodieta",
     element: <FormularioTipoDieta/>,
   },
 

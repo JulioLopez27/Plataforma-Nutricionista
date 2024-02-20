@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { Input } from '~/components';
+import { Historico } from '../Receta/historico';
+
 
 export function FormularioRecetas() {
     const [formData, setFormData] = useState({
@@ -251,6 +253,8 @@ export function FormularioRecetas() {
                     Buscar Recetas
                 </button>
             </form>
+
+            <Historico></Historico>
         </>
     );
 }

@@ -271,35 +271,33 @@ export class Nutricionista {
   }
 
   static async getHistory(ctx) {
-    //    const [type, token] = ctx.headers.authorization.split(" ")
-    //  const data = jwt.verify(token, process.env.JWT_SECRET)
-    //const userId = data.sub
+    const [type, token] = ctx.headers.authorization.split(" ");
+    const data = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = data.sub;
 
     try {
-      const historyID = await prisma.consultante_receta.findMany({
+      const idConsultante = ctx.request.body.id;
+      console.log(idConsultante);
+      const historyID = await prisma.sugerencia.findMany({
         where: {
-          // Recordar hacer esto dinamico!!!
-          id_nutricionista: 27,
+          id_nutricionista: parseInt(userId),
+          id_consultante: parseInt(idConsultante),
+        },
+        select: {
+          fecha: true,
+          comentario: true,
+          enviado: true,
+          id: true,
         },
       });
-      //console.log(historyID)
-      const datosHistorico = await Promise.all(
-        historyID.map(async (historico) => {
-          const receta = await prisma.receta.findFirst({
-            where: {
-              id: historico.id_receta,
-            },
-            select: {
-              nombre: true,
-            }, // Fetch the Receta.name
-          });
+      console.log("pre - map");
 
-          return {
-            nombre: receta.nombre,
-            fechaEnvio: historico.fecha_envio,
-          };
-        })
-      );
+      const datosHistorico = historyID.map((registro) => ({
+        fecha: registro.fecha,
+        comentario: registro.comentario,
+        enviado: registro.enviado,
+        id: registro.id,
+      }));
 
       //  console.log(datosHistorico);
       ctx.body = datosHistorico;
