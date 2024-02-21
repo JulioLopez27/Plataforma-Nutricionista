@@ -10,21 +10,42 @@ export const router = new Router()
 
 
 
-router.get('/login', async (ctx) => { await Nutricionista.login(ctx) })
-router.post('/signup', async (ctx) => { await Nutricionista.signup(ctx) })
+router.get("/login", async (ctx) => {
+  await Nutricionista.login(ctx);
+});
+router.post("/signup", async (ctx) => {
+  await Nutricionista.signup(ctx);
+});
 
-router.get('/getSpecialty', async (ctx) => { await Nutricionista.getSpecialty(ctx) })
-router.get('/getCountries', async (ctx) => { await Nutricionista.getCountries(ctx) })
+router.get("/getSpecialty", async (ctx) => {
+  await Nutricionista.getSpecialty(ctx);
+});
+router.get("/getCountries", async (ctx) => {
+  await Nutricionista.getCountries(ctx);
+});
 
-router.get('/getProfileData', async (ctx) => { await Nutricionista.getProfileData(ctx) })
-router.put('/updateProfileData', async (ctx) => { await Nutricionista.updateProfile(ctx) })
+router.get("/getProfileData", async (ctx) => {
+  await Nutricionista.getProfileData(ctx);
+});
+router.put("/updateProfileData", async (ctx) => {
+  await Nutricionista.updateProfile(ctx);
+});
 
-router.get('/getConsultants', async (ctx) => { await Nutricionista.getConsultantes(ctx) })
-router.get('/getHistory', async (ctx) => { await Nutricionista.getHistory(ctx) })
-router.post('/getHistoryInformes', async (ctx) => { await Nutricionista.getHistoryInformes(ctx) })
-router.post('/saveReport', async (ctx) => { await Nutricionista.saveReport(ctx) })
-router.get('/getReport', async (ctx) => { await Nutricionista.getReport(ctx) })
-
+router.get("/getConsultants", async (ctx) => {
+  await Nutricionista.getConsultantes(ctx);
+});
+router.post("/getHistory", async (ctx) => {
+  await Nutricionista.getHistory(ctx);
+});
+router.post("/getHistoryInformes", async (ctx) => {
+  await Nutricionista.getHistoryInformes(ctx);
+});
+router.post("/saveReport", async (ctx) => {
+  await Nutricionista.saveReport(ctx);
+});
+router.get("/getReport", async (ctx) => {
+  await Nutricionista.getReport(ctx);
+});
 //------------------------------------------------------------------------------------------------------------------
 //Recetas -> obtenerlas y crearlas
 router.get('/getRecipes', async (ctx) => { await Receta.getRecipes(ctx) })
@@ -37,22 +58,38 @@ router.post('/createRecipe', async (ctx) => { await Receta.createRecipe(ctx) })
 // que pueda obtener algunos recursos de la plataforma sin necesidad de acceder al codigo fuente.
 
 //route abierta para exponer los nutricionistas con todos sus datos
-router.post('/getNutritionist', para_agente_externo.getNutricionistas)
-
+router.post("/getNutritionist", para_agente_externo.getNutricionistas);
 
 //ruta: Deja expuesto las apis para aceptar el registro del nutricionista / desactivar su cuenta
-router.put('/acceptRegistration', para_agente_externo.acceptRegistration)
-router.put('/disabledNutritionist', para_agente_externo.disabledNutricionista)
+router.put("/acceptRegistration", para_agente_externo.acceptRegistration);
+router.put("/disabledNutritionist", para_agente_externo.disabledNutricionista);
 //----------------------------------------------------------------------------------------------------------------
 
-router.post('/createNewConsultant', async (ctx) => { await Consultante.createNewConsultant(ctx) })
-router.post('/detalleConsultante', async (ctx) => { await Nutricionista.getConsultantDataForId(ctx) })
-router.put('/updateConsultantData', async (ctx) => { await Consultante.updateConsultantData(ctx) })
-router.put('/detalleConsultante/updateAnamnesis', async (ctx) => { await Consultante.updateAnamnesis(ctx) })
-router.put('/detalleConsultante/updateAfecciones', async (ctx) => { await Consultante.updateAfecciones(ctx) })
-router.put('/detalleConsultante/updateTipoDieta', async (ctx) => { await Consultante.updateTipoDieta(ctx) })
+router.post("/createNewConsultant", async (ctx) => {
+  await Consultante.createNewConsultant(ctx);
+});
+router.post("/detalleConsultante", async (ctx) => {
+  await Nutricionista.getConsultantDataForId(ctx);
+});
+router.put("/updateConsultantData", async (ctx) => {
+  await Consultante.updateConsultantData(ctx);
+});
+router.put("/detalleConsultante/updateAnamnesis", async (ctx) => {
+  await Consultante.updateAnamnesis(ctx);
+});
+router.put("/detalleConsultante/updateAfecciones", async (ctx) => {
+  await Consultante.updateAfecciones(ctx);
+});
+router.put("/detalleConsultante/updateTipoDieta", async (ctx) => {
+  await Consultante.updateTipoDieta(ctx);
+});
 
-router.post('/detalleConsultante/anamnesis', async (ctx) => { await Nutricionista.getAnamnesisForId(ctx) })
-router.post('/detalleConsultante/afecciones', async (ctx) => { await Nutricionista.getAfeccionesForId(ctx) })
-router.post('/detalleConsultante/tipodieta', async (ctx) => { await Nutricionista.getTipoDietaForId(ctx) })
-
+router.post("/detalleConsultante/anamnesis", async (ctx) => {
+  await Nutricionista.getAnamnesisForId(ctx);
+});
+router.post("/detalleConsultante/afecciones", async (ctx) => {
+  await Nutricionista.getAfeccionesForId(ctx);
+});
+router.post("/detalleConsultante/tipodieta", async (ctx) => {
+  await Nutricionista.getTipoDietaForId(ctx);
+});
