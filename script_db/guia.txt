@@ -1,0 +1,4 @@
+El archivo Estructura y datos de la db, contiene como su nombre lo dice, la estructura y la base que usamos de forma local,
+es un self-contained-file proporcionado por mysql workbech para exportar la data base.
+En caso de querer generar y crear los datos, se precisará ir a mysql workbech-> pestaña server-> data import -> seleccionar este archivo y la opcion de 
+Import from self-contained file.
