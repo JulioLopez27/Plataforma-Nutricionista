@@ -456,7 +456,7 @@ export class Nutricionista {
 
       //llamo metodo para enviar datos servicio de chefDigitales
       //para pre-registro
-      preRegistro(user_data, id_pais, ciudad, id_especialidad);
+     await this.preRegistro(user_data, id_pais, ciudad, id_especialidad);
 
       //retiro la pass de los demas attr
       const { password, ...result } = user;
