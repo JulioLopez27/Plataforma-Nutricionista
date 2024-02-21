@@ -10,12 +10,8 @@ export const router = new Router()
 
 
 
-router.get("/login", async (ctx) => {
-  await Nutricionista.login(ctx);
-});
-router.post("/signup", async (ctx) => {
-  await Nutricionista.signup(ctx);
-});
+router.get('/login', async (ctx) => { await Nutricionista.login(ctx) })
+router.post('/signup', async (ctx) => { await Nutricionista.signup(ctx) })
 
 router.get("/getSpecialty", async (ctx) => {
   await Nutricionista.getSpecialty(ctx);
